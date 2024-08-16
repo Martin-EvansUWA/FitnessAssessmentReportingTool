@@ -1,10 +1,10 @@
 import "./App.css";
-import FormTemplate from "./components/formTemplate";
+import FormTemplateGenerator from "./components/formTemplateGenerator";
 
 function App() {
     return (
         <>
-            <FormTemplate />
+            <FormTemplateGenerator />
         </>
     );
 }
