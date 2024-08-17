@@ -1,10 +1,14 @@
 import "./App.css";
-import FormTemplate from "./components/formTemplate";
+import FormTemplateGenerator from "./components/formTemplateGenerator";
+import Layout from "./components/layout";
 
 function App() {
     return (
         <>
-            <FormTemplate />
+            <Layout
+                sidebarContent={<div></div>}
+                mainContent={<FormTemplateGenerator />}
+            ></Layout>
         </>
     );
 }
