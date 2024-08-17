@@ -1,8 +1,14 @@
 import { ReactNode } from "react";
 
-const MainSection = ({ content }: { content: ReactNode }) => {
+const MainSection = ({
+    content,
+    className,
+}: {
+    content: ReactNode;
+    className?: string;
+}) => {
     return (
-        <main className="border-2 border-black rounded-lg p-5 bg-white">
+        <main className={"rounded-2xl p-5 bg-white" + " " + className}>
             {content}
         </main>
     );

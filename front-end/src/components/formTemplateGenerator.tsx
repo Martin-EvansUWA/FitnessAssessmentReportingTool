@@ -9,7 +9,6 @@ const initialTemplate: FormTemplate = {
         Age: MeasurementType.int,
         Height: MeasurementType.float,
         Weight: MeasurementType.float,
-        "Is Student": MeasurementType.bool,
     },
 };
 
@@ -98,11 +97,17 @@ const FormTemplateGenerator = () => {
         []
     );
 
+    // TODO: Implement saveFormTemplate function
+    const saveFormTemplate = () => {
+        // Save form template to database
+    };
+
     const categories = useMemo(() => Object.keys(template), [template]);
 
     return (
         <div>
             <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
+            <hr className="w-28 border-t-2 border-[#FFC220] mt-2" />
             <div>
                 {categories.map((category, index) => (
                     <div key={index} className="my-6">
@@ -110,7 +115,14 @@ const FormTemplateGenerator = () => {
                             <span className="text-lg font-bold mr-5">
                                 {category}
                             </span>
-                            <button onClick={() => removeCategory(category)}>
+                            <button
+                                onClick={() => removeCategory(category)}
+                                className="hover:text-[#FFC220] text-[#003087] p-0 m-0"
+                                style={{
+                                    background: "none",
+                                    border: "none",
+                                }}
+                            >
                                 <FontAwesomeIcon icon={faTrash} />
                             </button>
                         </div>
@@ -139,7 +151,11 @@ const FormTemplateGenerator = () => {
                                                         measurement
                                                     )
                                                 }
-                                                className="basis-1/4"
+                                                className="hover:text-[#FFC220] text-[#003087] p-0 m-0"
+                                                style={{
+                                                    background: "none",
+                                                    border: "none",
+                                                }}
                                             >
                                                 <FontAwesomeIcon
                                                     icon={faTrash}
@@ -163,7 +179,7 @@ const FormTemplateGenerator = () => {
                                             e.target.value
                                         )
                                     }
-                                    className="border-solid border border-black mr-2 my-1"
+                                    className="border-solid border border-[#003087] mr-2 my-1"
                                 />
                                 <select
                                     aria-label="Measurement Type"
@@ -177,7 +193,7 @@ const FormTemplateGenerator = () => {
                                             e.target.value
                                         )
                                     }
-                                    className="border-solid border border-black mr-2 my-1"
+                                    className="border-solid border border-[#003087] mr-2 my-1"
                                 >
                                     <option disabled value="">
                                         - select type -
@@ -197,7 +213,7 @@ const FormTemplateGenerator = () => {
                                 </select>
                                 <button
                                     onClick={() => addNewMeasurement(category)}
-                                    className="my-1"
+                                    className="text-xl my-1 text-[#FFC220] hover:text-[#003087]"
                                 >
                                     <FontAwesomeIcon icon={faPlus} />
                                 </button>
@@ -205,16 +221,33 @@ const FormTemplateGenerator = () => {
                         </ul>
                     </div>
                 ))}
-                <input
-                    type="text"
-                    placeholder="New Category"
-                    value={newCategoryName}
-                    onChange={(e) => setNewCategoryName(e.target.value)}
-                    className="border-solid border border-black mr-2"
-                />
-                <button onClick={() => addNewCategory(newCategoryName)}>
-                    <FontAwesomeIcon icon={faPlus} />
-                </button>
+                <div className="w-full">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="New Category"
+                                value={newCategoryName}
+                                onChange={(e) =>
+                                    setNewCategoryName(e.target.value)
+                                }
+                                className="border-solid border border-[#003087] mr-2"
+                            />
+                            <button
+                                onClick={() => addNewCategory(newCategoryName)}
+                                className="text-xl text-[#FFC220] hover:text-[#003087]"
+                            >
+                                <FontAwesomeIcon icon={faPlus} />
+                            </button>
+                        </div>
+                        <button
+                            onClick={() => saveFormTemplate()}
+                            className="bg-[#FFC220] p-1 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                        >
+                            Save Form
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
     );
