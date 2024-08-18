@@ -28,6 +28,13 @@ const dummySidebarData: SidebarData = {
                     console.log("SSEH3301 - Sem 2 2023 clicked");
                 },
             },
+            "SSEH3301 - Sem 1 2023": {
+                sectionName: "SSEH3301 - Sem 1 2023",
+                sectionLink: "/get-form-content/SSEH3301-Sem1-2023",
+                sectionOnClick: () => {
+                    console.log("SSEH3301 - Sem 1 2023 clicked");
+                },
+            },
         },
     ],
 };
