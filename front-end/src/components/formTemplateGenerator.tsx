@@ -107,7 +107,7 @@ const FormTemplateGenerator = () => {
     return (
         <div>
             <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
-            <hr className="w-28 border-t-2 border-[#FFC220] mt-2" />
+            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
             <div>
                 {categories.map((category, index) => (
                     <div key={index} className="my-6">
@@ -117,7 +117,7 @@ const FormTemplateGenerator = () => {
                             </span>
                             <button
                                 onClick={() => removeCategory(category)}
-                                className="hover:text-[#FFC220] text-[#003087] p-0 m-0"
+                                className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
                                 style={{
                                     background: "none",
                                     border: "none",
@@ -151,7 +151,7 @@ const FormTemplateGenerator = () => {
                                                         measurement
                                                     )
                                                 }
-                                                className="hover:text-[#FFC220] text-[#003087] p-0 m-0"
+                                                className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
                                                 style={{
                                                     background: "none",
                                                     border: "none",
@@ -179,7 +179,7 @@ const FormTemplateGenerator = () => {
                                             e.target.value
                                         )
                                     }
-                                    className="border-solid border border-[#003087] mr-2 my-1"
+                                    className="border-solid border border-uwa-blue mr-2 my-1"
                                 />
                                 <select
                                     aria-label="Measurement Type"
@@ -193,7 +193,7 @@ const FormTemplateGenerator = () => {
                                             e.target.value
                                         )
                                     }
-                                    className="border-solid border border-[#003087] mr-2 my-1"
+                                    className="border-solid border border-uwa-blue mr-2 my-1"
                                 >
                                     <option disabled value="">
                                         - select type -
@@ -213,7 +213,7 @@ const FormTemplateGenerator = () => {
                                 </select>
                                 <button
                                     onClick={() => addNewMeasurement(category)}
-                                    className="text-xl my-1 text-[#FFC220] hover:text-[#003087]"
+                                    className="text-xl my-1 text-uwa-yellow hover:text-uwa-blue"
                                 >
                                     <FontAwesomeIcon icon={faPlus} />
                                 </button>
@@ -231,18 +231,18 @@ const FormTemplateGenerator = () => {
                                 onChange={(e) =>
                                     setNewCategoryName(e.target.value)
                                 }
-                                className="border-solid border border-[#003087] mr-2"
+                                className="border-solid border border-uwa-blue mr-2"
                             />
                             <button
                                 onClick={() => addNewCategory(newCategoryName)}
-                                className="text-xl text-[#FFC220] hover:text-[#003087]"
+                                className="text-xl text-uwa-yellow hover:text-uwa-blue"
                             >
                                 <FontAwesomeIcon icon={faPlus} />
                             </button>
                         </div>
                         <button
                             onClick={() => saveFormTemplate()}
-                            className="bg-[#FFC220] p-1 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                            className="bg-uwa-yellow p-1 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
                         >
                             Save Form
                         </button>
