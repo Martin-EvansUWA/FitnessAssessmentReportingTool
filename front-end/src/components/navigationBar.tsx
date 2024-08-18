@@ -12,7 +12,7 @@ const NavigationBar = ({ className }: { className?: string }) => {
 
     return (
         <div className={"relative w-full h-16" + " " + className}>
-            <nav className="absolute top-0 left-0 flex justify-between items-center pl-4 bg-white rounded-full font-bold w-full h-16 z-10">
+            <nav className="absolute top-0 left-0 flex justify-between items-center pl-4 bg-white font-bold w-full h-16 z-10">
                 <div className="flex items-center">
                     <a
                         href="#landing-page"
@@ -37,8 +37,7 @@ const NavigationBar = ({ className }: { className?: string }) => {
                     >
                         Logout
                     </a>
-                    <a className="flex flex-row items-center space-x-2 bg-uwa-blue h-full rounded-r-full">
-                        <div className="bg-white rounded-r-full w-10 h-full"></div>
+                    <a className="flex flex-row items-center space-x-2 bg-uwa-blue h-full rounded-l-full pl-5">
                         <span className="text-white text-sm md:text-base">
                             Hello, Placeholder!
                         </span>
@@ -52,7 +51,7 @@ const NavigationBar = ({ className }: { className?: string }) => {
                     <button
                         title="navigation-button"
                         onClick={toggleMenu}
-                        className="focus:outline-none text-uwa-blue  m-5"
+                        className="focus:outline-none text-uwa-blue m-5"
                     >
                         {/* Asset from W3C for menu icon. Change in future if needed */}
                         <svg
