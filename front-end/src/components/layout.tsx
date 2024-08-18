@@ -23,11 +23,11 @@ const Layout = ({
             <div className="flex flex-1">
                 <Sidebar
                     content={sidebarContent}
-                    className="hidden md:flex w-72 ml-5 my-5"
+                    className="hidden md:flex w-96 ml-5 my-5"
                 />
                 <MainSection
                     content={mainContent}
-                    className="w-full mx-5 my-5"
+                    className="w-full md:mx-5 md:my-5"
                 />
             </div>
         </div>
