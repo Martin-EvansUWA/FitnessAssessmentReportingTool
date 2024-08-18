@@ -105,149 +105,159 @@ const FormTemplateGenerator = () => {
     const categories = useMemo(() => Object.keys(template), [template]);
 
     return (
-        <div>
-            <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
-            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-            <div>
-                {categories.map((category, index) => (
-                    <div key={index} className="my-6">
-                        <div>
-                            <span className="text-lg font-bold mr-5">
-                                {category}
-                            </span>
-                            <button
-                                onClick={() => removeCategory(category)}
-                                className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
-                                style={{
-                                    background: "none",
-                                    border: "none",
-                                }}
-                            >
-                                <FontAwesomeIcon icon={faTrash} />
-                            </button>
-                        </div>
-                        <ul className="w-full md:w-80">
-                            {Object.keys(template[category]).map(
-                                (measurement, index) => (
-                                    <li
-                                        key={index}
-                                        className="ml-2 md:ml-14 my-2"
+        <div className="flex flex-col min-h-full">
+            <div className="flex-grow">
+                <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
+                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                <div className="overflow-y-auto max-h-[40rem]">
+                    {categories.map((category, index) => (
+                        <div key={index} className="my-5">
+                            <div>
+                                <span className="text-lg font-bold mr-5">
+                                    {category}
+                                </span>
+                                <button
+                                    onClick={() => removeCategory(category)}
+                                    className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
+                                    style={{
+                                        background: "none",
+                                        border: "none",
+                                    }}
+                                >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                </button>
+                            </div>
+                            <ul className="w-full md:w-80">
+                                {Object.keys(template[category]).map(
+                                    (measurement, index) => (
+                                        <li
+                                            key={index}
+                                            className="ml-2 md:ml-14 my-2"
+                                        >
+                                            <div className="flex flex-row items-center justify-between">
+                                                <span className="text-sm basis-1/4">
+                                                    <b>{measurement}:</b>
+                                                </span>
+                                                <span className="basis-1/4">
+                                                    {
+                                                        template[category][
+                                                            measurement
+                                                        ]
+                                                    }
+                                                </span>
+                                                <button
+                                                    onClick={() =>
+                                                        removeMeasurement(
+                                                            category,
+                                                            measurement
+                                                        )
+                                                    }
+                                                    className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
+                                                    style={{
+                                                        background: "none",
+                                                        border: "none",
+                                                    }}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faTrash}
+                                                    />
+                                                </button>
+                                            </div>
+                                        </li>
+                                    )
+                                )}
+                                <li className="ml-2 md:ml-14">
+                                    <input
+                                        type="text"
+                                        placeholder="New Measurement"
+                                        value={
+                                            newMeasurements[category]?.name ||
+                                            ""
+                                        }
+                                        onChange={(e) =>
+                                            handleMeasurementChange(
+                                                category,
+                                                "name",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-solid border border-uwa-blue mr-2 my-1"
+                                    />
+                                    <select
+                                        aria-label="Measurement Type"
+                                        value={
+                                            newMeasurements[category]?.type ||
+                                            ""
+                                        }
+                                        onChange={(e) =>
+                                            handleMeasurementChange(
+                                                category,
+                                                "type",
+                                                e.target.value
+                                            )
+                                        }
+                                        className="border-solid border border-uwa-blue mr-2 my-1"
                                     >
-                                        <div className="flex flex-row items-center justify-between">
-                                            <span className="text-sm basis-1/4">
-                                                <b>{measurement}:</b>
-                                            </span>
-                                            <span className="basis-1/4">
-                                                {
-                                                    template[category][
-                                                        measurement
-                                                    ]
-                                                }
-                                            </span>
-                                            <button
-                                                onClick={() =>
-                                                    removeMeasurement(
-                                                        category,
-                                                        measurement
-                                                    )
-                                                }
-                                                className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
-                                                style={{
-                                                    background: "none",
-                                                    border: "none",
-                                                }}
-                                            >
-                                                <FontAwesomeIcon
-                                                    icon={faTrash}
-                                                />
-                                            </button>
-                                        </div>
-                                    </li>
-                                )
-                            )}
-                            <li className="ml-2 md:ml-14">
+                                        <option disabled value="">
+                                            - select type -
+                                        </option>
+                                        <option value={MeasurementType.int}>
+                                            Integer
+                                        </option>
+                                        <option value={MeasurementType.str}>
+                                            String
+                                        </option>
+                                        <option value={MeasurementType.float}>
+                                            Float
+                                        </option>
+                                        <option value={MeasurementType.bool}>
+                                            Boolean
+                                        </option>
+                                    </select>
+                                    <button
+                                        onClick={() =>
+                                            addNewMeasurement(category)
+                                        }
+                                        className="text-xl my-1 text-uwa-yellow hover:text-uwa-blue"
+                                    >
+                                        <FontAwesomeIcon icon={faPlus} />
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                    ))}
+                    <div className="w-full">
+                        <div className="flex justify-between items-center">
+                            <div>
                                 <input
                                     type="text"
-                                    placeholder="New Measurement"
-                                    value={
-                                        newMeasurements[category]?.name || ""
-                                    }
+                                    placeholder="New Category"
+                                    value={newCategoryName}
                                     onChange={(e) =>
-                                        handleMeasurementChange(
-                                            category,
-                                            "name",
-                                            e.target.value
-                                        )
+                                        setNewCategoryName(e.target.value)
                                     }
-                                    className="border-solid border border-uwa-blue mr-2 my-1"
+                                    className="border-solid border border-uwa-blue mr-2"
                                 />
-                                <select
-                                    aria-label="Measurement Type"
-                                    value={
-                                        newMeasurements[category]?.type || ""
-                                    }
-                                    onChange={(e) =>
-                                        handleMeasurementChange(
-                                            category,
-                                            "type",
-                                            e.target.value
-                                        )
-                                    }
-                                    className="border-solid border border-uwa-blue mr-2 my-1"
-                                >
-                                    <option disabled value="">
-                                        - select type -
-                                    </option>
-                                    <option value={MeasurementType.int}>
-                                        Integer
-                                    </option>
-                                    <option value={MeasurementType.str}>
-                                        String
-                                    </option>
-                                    <option value={MeasurementType.float}>
-                                        Float
-                                    </option>
-                                    <option value={MeasurementType.bool}>
-                                        Boolean
-                                    </option>
-                                </select>
                                 <button
-                                    onClick={() => addNewMeasurement(category)}
-                                    className="text-xl my-1 text-uwa-yellow hover:text-uwa-blue"
+                                    onClick={() =>
+                                        addNewCategory(newCategoryName)
+                                    }
+                                    className="text-xl text-uwa-yellow hover:text-uwa-blue"
                                 >
                                     <FontAwesomeIcon icon={faPlus} />
                                 </button>
-                            </li>
-                        </ul>
-                    </div>
-                ))}
-                <div className="w-full">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <input
-                                type="text"
-                                placeholder="New Category"
-                                value={newCategoryName}
-                                onChange={(e) =>
-                                    setNewCategoryName(e.target.value)
-                                }
-                                className="border-solid border border-uwa-blue mr-2"
-                            />
-                            <button
-                                onClick={() => addNewCategory(newCategoryName)}
-                                className="text-xl text-uwa-yellow hover:text-uwa-blue"
-                            >
-                                <FontAwesomeIcon icon={faPlus} />
-                            </button>
+                            </div>
                         </div>
-                        <button
-                            onClick={() => saveFormTemplate()}
-                            className="bg-uwa-yellow p-1 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
-                        >
-                            Save Form
-                        </button>
                     </div>
                 </div>
+            </div>
+            <div className="flex justify-end p-5">
+                <button
+                    onClick={() => saveFormTemplate()}
+                    className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                >
+                    Save Form
+                </button>
             </div>
         </div>
     );
