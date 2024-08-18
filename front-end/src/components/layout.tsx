@@ -13,10 +13,13 @@ const Layout = ({
 }) => {
     return (
         <div className="flex flex-col h-screen">
-            <NavigationBar />
+            <NavigationBar className="" />
             <div className="flex flex-1">
-                <Sidebar content={sidebarContent} className="w-1/4" />
-                <MainSection content={mainContent} className="w-3/4" />
+                <Sidebar content={sidebarContent} className="w-72 ml-5 my-5" />
+                <MainSection
+                    content={mainContent}
+                    className="w-full mx-5 my-5"
+                />
             </div>
         </div>
     );
