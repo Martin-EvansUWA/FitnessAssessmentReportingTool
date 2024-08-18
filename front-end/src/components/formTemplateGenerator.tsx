@@ -109,9 +109,9 @@ const FormTemplateGenerator = () => {
             <div>
                 <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
                 <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-                <div>
+                <div className="overflow-y-auto max-h-[42rem] my-5">
                     {categories.map((category, index) => (
-                        <div key={index} className="my-6">
+                        <div key={index} className="my-3">
                             <div>
                                 <span className="text-lg font-bold mr-5">
                                     {category}
