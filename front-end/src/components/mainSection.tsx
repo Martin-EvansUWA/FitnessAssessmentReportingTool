@@ -8,7 +8,7 @@ const MainSection = ({
     className?: string;
 }) => {
     return (
-        <main className={"rounded-2xl p-5 bg-white" + " " + className}>
+        <main className={"md:rounded-2xl p-5 bg-white" + " " + className}>
             {content}
         </main>
     );
