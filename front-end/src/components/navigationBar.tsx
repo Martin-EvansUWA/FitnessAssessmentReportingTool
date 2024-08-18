@@ -72,7 +72,7 @@ const NavigationBar = ({ className }: { className?: string }) => {
                 </div>
             </nav>
             {isMenuOpen && (
-                <div className="md:hidden flex flex-col bg-uwa-blue rounded-lg mt-16 p-4 space-y-5 float-right mx-1 absolute top-0 right-0 z-10">
+                <div className="md:hidden flex flex-col bg-uwa-blue mt-16 p-4 space-y-5 float-right absolute top-0 right-0 z-10 w-full items-end">
                     <span className="text-white text-sm font-bold">
                         Hello, Placeholder!
                     </span>
