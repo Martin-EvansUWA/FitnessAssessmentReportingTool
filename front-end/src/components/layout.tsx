@@ -12,10 +12,12 @@ const Layout = ({
     mainContent: ReactNode;
 }) => {
     return (
-        <div className="layout">
-            <Sidebar content={sidebarContent} />
+        <div className="flex flex-col h-screen">
             <NavigationBar />
-            <MainSection content={mainContent} />
+            <div className="flex flex-1">
+                <Sidebar content={sidebarContent} className="w-1/4" />
+                <MainSection content={mainContent} className="w-3/4" />
+            </div>
         </div>
     );
 };

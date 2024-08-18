@@ -31,9 +31,19 @@ const dummySidebarData: SidebarData = {
     ],
 };
 
-const Sidebar = ({ content }: { content: SidebarData }) => {
+const Sidebar = ({
+    content,
+    className,
+}: {
+    content: SidebarData;
+    className?: string;
+}) => {
     return (
-        <aside className="sidebar w-full rounded-2xl p-5 bg-uwa-blue">
+        <aside
+            className={
+                "sidebar w-full rounded-2xl p-5 bg-uwa-blue" + " " + className
+            }
+        >
             <h2 className="text-white font-bold">{content.title}</h2>
             <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
             <div>
