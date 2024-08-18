@@ -1,5 +1,6 @@
 import { ReactNode } from "react";
 import MainSection from "./mainSection";
+import NavigationBar from "./navigationBar";
 import Sidebar from "./sidebar";
 
 const Layout = ({
@@ -12,6 +13,7 @@ const Layout = ({
     return (
         <div className="layout">
             <Sidebar content={sidebarContent} />
+            <NavigationBar />
             <MainSection content={mainContent} />
         </div>
     );
