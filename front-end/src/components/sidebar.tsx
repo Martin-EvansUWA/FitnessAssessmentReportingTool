@@ -11,12 +11,12 @@ const Sidebar = ({
     return (
         <aside
             className={
-                "sidebar w-full rounded-2xl p-5 bg-uwa-blue grid grid-rows-10 grid-flow-col gap-4" +
+                "sidebar w-full rounded-2xl p-5 bg-uwa-blue flex-col" +
                 " " +
                 className
             }
         >
-            <div className="row-start-1 row-end-10">
+            <div className="flex-grow">
                 <h2 className="text-white font-bold">{content.title}</h2>
                 <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
                 <div className="overflow-y-auto max-h-[42rem]">
@@ -36,7 +36,7 @@ const Sidebar = ({
                     ))}
                 </div>
             </div>
-            <div className="row-start-10">
+            <div className="mt-auto">
                 <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
                 <button
                     onClick={content.footer.onClick}
