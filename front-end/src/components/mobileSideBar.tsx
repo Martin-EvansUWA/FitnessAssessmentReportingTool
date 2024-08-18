@@ -2,6 +2,7 @@ import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { SidebarData } from "../interface/sidebarInterface";
+import Sidebar from "./sidebar";
 
 const MobileSideBar = ({
     content,
@@ -17,31 +18,24 @@ const MobileSideBar = ({
     };
 
     return (
-        <div
-            className={
-                "flex-col items-center justify-center h-14 bg-uwa-blue text-white font-bold" +
-                " " +
-                className
-            }
-        >
-            <button
-                onClick={toggleMenu}
-                className="flex flex-col justify-center items-center w-full h-full"
-            >
-                {content.title}
-                {isMenuOpen && (
+        <div className={"flex flex-col " + className}>
+            <div className="flex items-center justify-between h-14 bg-uwa-blue text-white font-bold">
+                <button
+                    onClick={toggleMenu}
+                    className="flex flex-col items-center justify-center w-full h-full"
+                >
+                    {content.title}
                     <FontAwesomeIcon
-                        icon={faCaretUp}
+                        icon={isMenuOpen ? faCaretUp : faCaretDown}
                         className="ml-2 text-xl"
                     />
-                )}
-                {!isMenuOpen && (
-                    <FontAwesomeIcon
-                        icon={faCaretDown}
-                        className="ml-2 text-xl"
-                    />
-                )}
-            </button>
+                </button>
+            </div>
+            {isMenuOpen && (
+                <div className="absolute flex-grow overflow-y-auto w-full mt-14">
+                    <Sidebar content={content} />
+                </div>
+            )}
         </div>
     );
 };
