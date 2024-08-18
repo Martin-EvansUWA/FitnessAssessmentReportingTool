@@ -105,13 +105,13 @@ const FormTemplateGenerator = () => {
     const categories = useMemo(() => Object.keys(template), [template]);
 
     return (
-        <div>
-            <div>
+        <div className="flex flex-col min-h-full">
+            <div className="flex-grow">
                 <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
                 <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-                <div className="overflow-y-auto max-h-[42rem] my-5">
+                <div className="overflow-y-auto max-h-[42rem]">
                     {categories.map((category, index) => (
-                        <div key={index} className="my-3">
+                        <div key={index} className="my-5">
                             <div>
                                 <span className="text-lg font-bold mr-5">
                                     {category}
@@ -251,12 +251,14 @@ const FormTemplateGenerator = () => {
                     </div>
                 </div>
             </div>
-            <button
-                onClick={() => saveFormTemplate()}
-                className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00] absolute bottom-5 right-5 m-5"
-            >
-                Save Form
-            </button>
+            <div className="flex justify-end p-5">
+                <button
+                    onClick={() => saveFormTemplate()}
+                    className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                >
+                    Save Form
+                </button>
+            </div>
         </div>
     );
 };
