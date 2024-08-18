@@ -1,5 +1,6 @@
-import { faChevronCircleDown } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const MobileSideBar = ({
@@ -9,6 +10,12 @@ const MobileSideBar = ({
     content: SidebarData;
     className?: string;
 }) => {
+    const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+    const toggleMenu = () => {
+        setIsMenuOpen((isMenuOpen) => !isMenuOpen);
+    };
+
     return (
         <div
             className={
@@ -17,12 +24,23 @@ const MobileSideBar = ({
                 className
             }
         >
-            <button>
+            <button
+                onClick={toggleMenu}
+                className="flex flex-col justify-center items-center w-full h-full"
+            >
                 {content.title}
-                <FontAwesomeIcon
-                    icon={faChevronCircleDown}
-                    className="ml-2 text-xl"
-                />
+                {isMenuOpen && (
+                    <FontAwesomeIcon
+                        icon={faCaretUp}
+                        className="ml-2 text-xl"
+                    />
+                )}
+                {!isMenuOpen && (
+                    <FontAwesomeIcon
+                        icon={faCaretDown}
+                        className="ml-2 text-xl"
+                    />
+                )}
             </button>
         </div>
     );
