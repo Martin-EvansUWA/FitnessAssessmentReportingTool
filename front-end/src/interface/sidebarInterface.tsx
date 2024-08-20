@@ -16,6 +16,6 @@ export interface SideBarFooterButton {
 
 export interface SidebarData {
     title: string;
-    footer: SideBarFooterButton;
+    footer: SideBarFooterButton[];
     sections: SidebarSection[];
 }
