@@ -2,8 +2,8 @@ import { ReactNode } from "react";
 import { SidebarData } from "../interface/sidebarInterface";
 import MainSection from "./mainSection";
 import MobileSideBar from "./mobileSideBar";
-import NavigationBar from "./navigationBar";
 import Sidebar from "./sidebar";
+import NavigationBar from "./navigationBar";
 
 // Generic layout component that takes in sidebar content and main content to create a page layout
 const Layout = ({
@@ -20,7 +20,7 @@ const Layout = ({
                 content={sidebarContent}
                 className="flex md:hidden"
             />
-            <div className="flex flex-1 md:mx-[5%] lg:mx-[10%]">
+            <div className="flex flex-1">
                 <Sidebar
                     content={sidebarContent}
                     className="hidden md:flex w-96 ml-5 my-5"
