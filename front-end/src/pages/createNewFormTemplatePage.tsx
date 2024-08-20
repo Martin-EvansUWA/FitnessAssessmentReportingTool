@@ -5,13 +5,15 @@ import { SidebarData } from "../interface/sidebarInterface";
 
 const dummySidebarData: SidebarData = {
     title: "Form Manager",
-    footer: {
-        text: "Create a new form",
-        fontAwesomeIcon: faPlus,
-        onClick: () => {
-            console.log("Footer button clicked");
+    footer: [
+        {
+            text: "Create a new form",
+            fontAwesomeIcon: faPlus,
+            onClick: () => {
+                console.log("Footer button clicked");
+            },
         },
-    },
+    ],
     sections: [
         {
             "SSEH2201 - Sem 1 2024": {
