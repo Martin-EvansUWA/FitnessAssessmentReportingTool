@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
+import DataEntryPage from "./pages/dataEntryPage";
 import LandingPage from "./pages/landingPage";
 
 function App() {
@@ -18,6 +19,8 @@ function App() {
                     path="/create-new-form-template"
                     element={<CreateNewFormTemplatePage />}
                 />
+                <Route path="/data-entry" element={<DataEntryPage />} />
+                <Route path="*" element={<LandingPage />} />
             </Routes>
             <ConditionalLinks />
         </Router>
@@ -36,6 +39,7 @@ const ConditionalLinks = () => {
                     <Link to="/create-new-form-template">
                         Create New Form Template
                     </Link>
+                    <Link to="/data-entry">Data Entry</Link>
                 </div>
             )}
         </>
