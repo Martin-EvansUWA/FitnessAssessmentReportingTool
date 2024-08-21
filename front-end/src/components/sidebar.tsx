@@ -11,7 +11,7 @@ const Sidebar = ({
     return (
         <aside
             className={
-                "sidebar w-full md:rounded-2xl p-5 bg-uwa-blue flex-col" +
+                "sidebar md:rounded-2xl p-5 bg-uwa-blue flex-col" +
                 " " +
                 className
             }

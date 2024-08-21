@@ -109,7 +109,7 @@ const FormTemplateGenerator = () => {
             <div className="flex-grow">
                 <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
                 <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-                <div className="overflow-y-auto max-h-[40rem]">
+                <div className="overflow-y-auto max-h-[60vh]">
                     {categories.map((category, index) => (
                         <div key={index} className="my-5">
                             <div>

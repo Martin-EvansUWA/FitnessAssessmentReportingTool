@@ -20,7 +20,7 @@ const Layout = ({
                 content={sidebarContent}
                 className="flex md:hidden"
             />
-            <div className="flex flex-1">
+            <div className="flex flex-1 md:mx-[5%] lg:mx-[10%]">
                 <Sidebar
                     content={sidebarContent}
                     className="hidden md:flex w-96 ml-5 my-5"
