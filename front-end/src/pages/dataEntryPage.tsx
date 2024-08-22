@@ -23,6 +23,18 @@ const dummyFormTemplateJSON: { [key: string]: { [key: string]: string } } = {
         "Test Measurement 3": "Float",
         "Test Measurement 4": "Boolean",
     },
+    Test3: {
+        "Test Measurement 1": "Integer",
+        "Test Measurement 2": "String",
+        "Test Measurement 3": "Float",
+        "Test Measurement 4": "Boolean",
+    },
+    Test4: {
+        "Test Measurement 1": "Integer",
+        "Test Measurement 2": "String",
+        "Test Measurement 3": "Float",
+        "Test Measurement 4": "Boolean",
+    },
 };
 
 const dummySidebarTemplateJSON: SidebarData = {

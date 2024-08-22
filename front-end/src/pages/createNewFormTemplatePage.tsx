@@ -22,12 +22,16 @@ const dummySidebarData: SidebarData = {
                     console.log("SSEH2201 - Sem 1 2024 clicked");
                 },
             },
+        },
+        {
             "SSEH3301 - Sem 2 2023": {
                 sectionName: "SSEH3301 - Sem 2 2023",
                 sectionOnClick: () => {
                     console.log("SSEH3301 - Sem 2 2023 clicked");
                 },
             },
+        },
+        {
             "SSEH3301 - Sem 1 2023": {
                 sectionName: "SSEH3301 - Sem 1 2023",
                 sectionOnClick: () => {
