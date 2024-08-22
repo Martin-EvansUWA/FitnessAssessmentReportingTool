@@ -18,21 +18,18 @@ const dummySidebarData: SidebarData = {
         {
             "SSEH2201 - Sem 1 2024": {
                 sectionName: "SSEH2201 - Sem 1 2024",
-                sectionLink: "/get-form-content/SSEH2201-Sem1-2024",
                 sectionOnClick: () => {
                     console.log("SSEH2201 - Sem 1 2024 clicked");
                 },
             },
             "SSEH3301 - Sem 2 2023": {
                 sectionName: "SSEH3301 - Sem 2 2023",
-                sectionLink: "/get-form-content/SSEH3301-Sem2-2023",
                 sectionOnClick: () => {
                     console.log("SSEH3301 - Sem 2 2023 clicked");
                 },
             },
             "SSEH3301 - Sem 1 2023": {
                 sectionName: "SSEH3301 - Sem 1 2023",
-                sectionLink: "/get-form-content/SSEH3301-Sem1-2023",
                 sectionOnClick: () => {
                     console.log("SSEH3301 - Sem 1 2023 clicked");
                 },
