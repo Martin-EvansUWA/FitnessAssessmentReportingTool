@@ -1,4 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const Sidebar = ({
@@ -8,6 +9,15 @@ const Sidebar = ({
     content: SidebarData;
     className?: string;
 }) => {
+    const [selectedSection, setSelectedSection] = useState<number | null>(null);
+
+    const toggleSelectedSection = (index: number) => {
+        setSelectedSection(index);
+    };
+
+    const selectedSectionStyling: string =
+        "bg-uwa-yellow text-black font-bold rounded-md my-3";
+
     return (
         <aside
             className={
@@ -23,10 +33,24 @@ const Sidebar = ({
                     {content.sections.map((section, index) => (
                         <ul key={index}>
                             {Object.entries(section).map(([key, value]) => (
-                                <li key={key} className="my-3">
+                                <li
+                                    key={key}
+                                    className={
+                                        selectedSection === index
+                                            ? selectedSectionStyling
+                                            : "my-3"
+                                    }
+                                >
                                     <button
-                                        onClick={value.sectionOnClick}
-                                        className="text-white"
+                                        onClick={() => {
+                                            toggleSelectedSection(index);
+                                            value.sectionOnClick();
+                                        }}
+                                        className={
+                                            selectedSection === index
+                                                ? "text-black p-1"
+                                                : "text-white p-1"
+                                        }
                                     >
                                         {value.sectionName}
                                     </button>
