@@ -1,10 +1,17 @@
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 
 const AddNewForm = () => {
+    const [formTemplateID, setFormTemplateID] = useState<string>("");
+
     // TODO: Implement the handleGetRequest function
     const handleGetRequest = () => {
-        console.log("Get request sent");
+        console.log("Get request sent: ", formTemplateID);
+    };
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setFormTemplateID(event.target.value);
     };
 
     return (
@@ -22,7 +29,8 @@ const AddNewForm = () => {
                     <input
                         type="text"
                         placeholder="Form Template ID"
-                        className="border-2 border-gray-300 rounded-md p-2 w-96"
+                        className="border-2 border-gray-300 rounded-md p-2 w-full md:w-2/5"
+                        onChange={handleChange}
                     />
                 </div>
             </div>
