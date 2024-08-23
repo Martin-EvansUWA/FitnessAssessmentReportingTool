@@ -8,6 +8,7 @@ import {
 import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DataEntryPage from "./pages/dataEntryPage";
+import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
                     path="/create-new-form-template"
                     element={<CreateNewFormTemplatePage />}
                 />
+                <Route path="/get-new-form" element={<GetNewFormPage />} />
                 <Route path="/data-entry" element={<DataEntryPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
@@ -39,6 +41,7 @@ const ConditionalLinks = () => {
                     <Link to="/create-new-form-template">
                         Create New Form Template
                     </Link>
+                    <Link to="/get-new-form">Get New Form</Link>
                     <Link to="/data-entry">Data Entry</Link>
                 </div>
             )}
