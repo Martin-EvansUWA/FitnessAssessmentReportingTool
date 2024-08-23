@@ -1,3 +1,8 @@
+import {
+    faChevronLeft,
+    faChevronRight,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { createContext, useState } from "react";
 import {
     FormTemplate as FormTemplateInterface,
@@ -6,9 +11,17 @@ import {
 
 const formContext = createContext({});
 const FormTemplate = ({
+    previousSection,
+    nextSection,
     formTemplate,
+    onNextPage,
+    onPreviousPage,
 }: {
+    previousSection: string;
+    nextSection: string;
     formTemplate: FormTemplateInterface;
+    onNextPage: () => void;
+    onPreviousPage: () => void;
 }) => {
     const [formState, setFormState] = useState<{ [key: string]: string }>({});
     const updateFormState = (currFormState: { [key: string]: string }) => {
@@ -16,7 +29,7 @@ const FormTemplate = ({
     };
     return (
         <formContext.Provider value={{ formState, updateFormState }}>
-            <div className="flex flex-col min-h-full">
+            <div className="flex flex-col min-h-full justify-between">
                 <div className="overflow-y-auto max-h-[100%]">
                     {Object.keys(formTemplate).map((section, index) => (
                         <div key={index}>
@@ -75,6 +88,30 @@ const FormTemplate = ({
                             </ul>
                         </div>
                     ))}
+                </div>
+                <div className="text-black w-full flex flex-row justify-between">
+                    <button
+                        title="previous-section"
+                        className="font-bold"
+                        onClick={onPreviousPage}
+                    >
+                        <FontAwesomeIcon
+                            icon={faChevronLeft}
+                            className="fa-2xl"
+                        />
+                        {previousSection}
+                    </button>
+                    <button
+                        title="next-section"
+                        className="font-bold"
+                        onClick={onNextPage}
+                    >
+                        {nextSection}
+                        <FontAwesomeIcon
+                            icon={faChevronRight}
+                            className="fa-2xl"
+                        />
+                    </button>
                 </div>
             </div>
         </formContext.Provider>

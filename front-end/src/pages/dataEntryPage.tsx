@@ -74,21 +74,56 @@ dummySidebarTemplateJSON.sections = getSectionsFromFormTemplate(
 
 const DataEntryPage = () => {
     const [selectedSection, setSelectedSection] = useState<string | null>(null);
+    const [previousSection, setPreviousSection] = useState<string | null>(null);
+    const [nextSection, setNextSection] = useState<string | null>(null);
+    const [fullFormState, setFullFormState] = useState<{
+        [key: string]: string;
+    }>({});
+    const currFormContext = useContext(formContext);
+
+    const sections = Object.keys(dummyFormTemplateJSON);
+
+    const updateSectionNavigation = (sectionName: string) => {
+        const currentIndex = sections.indexOf(sectionName);
+        setPreviousSection(
+            currentIndex > 0 ? sections[currentIndex - 1] : null
+        );
+        setNextSection(
+            currentIndex < sections.length - 1
+                ? sections[currentIndex + 1]
+                : null
+        );
+    };
 
     // Update the onClick handlers to set the selected section
     const sidebarContent = {
         ...dummySidebarTemplateJSON,
-        sections: dummySidebarTemplateJSON.sections.map((section) => {
+        sections: dummySidebarTemplateJSON.sections.map((section, index) => {
             const sectionName = Object.keys(section)[0];
             return {
                 [sectionName]: {
                     ...section[sectionName],
                     sectionOnClick: () => {
                         setSelectedSection(sectionName);
+                        updateSectionNavigation(sectionName);
                     },
                 },
             };
         }),
+    };
+
+    const handleNextPage = () => {
+        if (nextSection) {
+            setSelectedSection(nextSection);
+            updateSectionNavigation(nextSection);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (previousSection) {
+            setSelectedSection(previousSection);
+            updateSectionNavigation(previousSection);
+        }
     };
 
     const introComponent = (
@@ -100,16 +135,19 @@ const DataEntryPage = () => {
             </div>
         </>
     );
+
     const selectedSectionComponent = (
         <FormTemplate
+            previousSection={previousSection as string}
+            nextSection={nextSection as string}
             formTemplate={{
                 [selectedSection as string]:
                     dummyFormTemplateJSON[selectedSection as string],
             }}
+            onNextPage={handleNextPage}
+            onPreviousPage={handlePreviousPage}
         />
     );
-
-    const context = useContext(formContext);
 
     return (
         <Layout
