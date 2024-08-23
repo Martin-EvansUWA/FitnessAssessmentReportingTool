@@ -95,7 +95,7 @@ const DataEntryPage = () => {
         <>
             <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
             <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-            <div className="my-5">
+            <div className="my-5 font-bold">
                 Start by selecting a section from the sidebar!
             </div>
         </>
