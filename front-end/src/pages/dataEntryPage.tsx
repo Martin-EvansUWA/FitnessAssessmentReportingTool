@@ -76,8 +76,12 @@ const DataEntryPage = () => {
     const [selectedSection, setSelectedSection] = useState<number | null>(null);
     const [previousSection, setPreviousSection] = useState<number | null>(null);
     const [nextSection, setNextSection] = useState<number | null>(null);
+    const [formData, setFormData] = useState<{ [key: string]: any }>({});
 
-    const sections = Object.keys(dummyFormTemplateJSON);
+    const sidebarContentJSON = dummySidebarTemplateJSON; // TODO: Fetch sidebar data from the backend
+    const formContentJSON = dummyFormTemplateJSON; // TODO: Fetch form data from the backend
+    
+    const sections = Object.keys(formContentJSON);
 
     const updateSectionNavigation = (currentIndex: number) => {
         setPreviousSection(currentIndex > 0 ? currentIndex - 1 : null);
@@ -88,8 +92,8 @@ const DataEntryPage = () => {
 
     // Update the onClick handlers to set the selected section
     const sidebarContent = {
-        ...dummySidebarTemplateJSON,
-        sections: dummySidebarTemplateJSON.sections.map((section, index) => {
+        ...sidebarContentJSON,
+        sections: sidebarContentJSON.sections.map((section, index) => {
             const sectionName = Object.keys(section)[0];
             return {
                 [sectionName]: {
@@ -115,6 +119,21 @@ const DataEntryPage = () => {
             setSelectedSection(previousSection);
             updateSectionNavigation(previousSection);
         }
+    };
+
+    const handleInputChange = (section: string, field: string, value: any) => {
+        setFormData((prevData) => ({
+            ...prevData,
+            [section]: {
+                ...prevData[section],
+                [field]: value,
+            },
+        }));
+    };
+
+    // TODO: Implement the save and exit functionality and connect with the backend
+    const handleSaveAndExit = () => {
+        console.log("Form Data:", formData);
     };
 
     const introComponent = (
@@ -143,12 +162,13 @@ const DataEntryPage = () => {
                 checkTruthy(selectedSection)
                     ? {
                           [sections[selectedSection!]]:
-                              dummyFormTemplateJSON[sections[selectedSection!]],
+                              formContentJSON[sections[selectedSection!]],
                       }
                     : {}
             }
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
+            onInputChange={handleInputChange} // Pass the input change handler
         />
     );
 

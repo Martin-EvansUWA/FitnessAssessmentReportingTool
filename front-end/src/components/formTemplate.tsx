@@ -3,7 +3,6 @@ import {
     faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
 import {
     FormTemplate as FormTemplateInterface,
     MeasurementType,
@@ -15,14 +14,26 @@ const FormTemplate = ({
     formTemplate,
     onNextPage,
     onPreviousPage,
+    onInputChange,
 }: {
     previousSection: string | null;
     nextSection: string | null;
     formTemplate: FormTemplateInterface;
     onNextPage: () => void;
     onPreviousPage: () => void;
+    onInputChange: (
+        section: string,
+        field: string,
+        value: string | number | boolean | null
+    ) => void;
 }) => {
-    const [formState, setFormState] = useState<{ [key: string]: string }>({});
+    const handleChange = (
+        section: string,
+        field: string,
+        event: React.ChangeEvent<HTMLInputElement>
+    ) => {
+        onInputChange(section, field, event.target?.value);
+    };
     return (
         <div className="flex flex-col min-h-full justify-between">
             <div className="overflow-y-auto max-h-[100%]">
@@ -69,6 +80,13 @@ const FormTemplate = ({
                                                 MeasurementType.bool
                                                     ? "border border-gray-300 rounded-md p-1 w-1/3"
                                                     : "border border-gray-300 rounded-md p-1 w-6 h-6"
+                                            }
+                                            onChange={(event) =>
+                                                handleChange(
+                                                    section,
+                                                    field,
+                                                    event
+                                                )
                                             }
                                         />
                                     </li>
