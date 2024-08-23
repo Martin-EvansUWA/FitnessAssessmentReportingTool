@@ -1,6 +1,6 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
-import { useContext, useState } from "react";
-import FormTemplate, { formContext } from "../components/formTemplate";
+import { useState } from "react";
+import FormTemplate from "../components/formTemplate";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -59,7 +59,7 @@ const dummySidebarTemplateJSON: SidebarData = {
 };
 
 const getSectionsFromFormTemplate = (formTemplate: any) => {
-    return Object.keys(formTemplate).map((section, index) => ({
+    return Object.keys(formTemplate).map((section) => ({
         [section]: {
             sectionName: section,
             sectionOnClick: () => {},
@@ -73,25 +73,16 @@ dummySidebarTemplateJSON.sections = getSectionsFromFormTemplate(
 );
 
 const DataEntryPage = () => {
-    const [selectedSection, setSelectedSection] = useState<string | null>(null);
-    const [previousSection, setPreviousSection] = useState<string | null>(null);
-    const [nextSection, setNextSection] = useState<string | null>(null);
-    const [fullFormState, setFullFormState] = useState<{
-        [key: string]: string;
-    }>({});
-    const currFormContext = useContext(formContext);
+    const [selectedSection, setSelectedSection] = useState<number | null>(null);
+    const [previousSection, setPreviousSection] = useState<number | null>(null);
+    const [nextSection, setNextSection] = useState<number | null>(null);
 
     const sections = Object.keys(dummyFormTemplateJSON);
 
-    const updateSectionNavigation = (sectionName: string) => {
-        const currentIndex = sections.indexOf(sectionName);
-        setPreviousSection(
-            currentIndex > 0 ? sections[currentIndex - 1] : null
-        );
+    const updateSectionNavigation = (currentIndex: number) => {
+        setPreviousSection(currentIndex > 0 ? currentIndex - 1 : null);
         setNextSection(
-            currentIndex < sections.length - 1
-                ? sections[currentIndex + 1]
-                : null
+            currentIndex < sections.length - 1 ? currentIndex + 1 : null
         );
     };
 
@@ -104,8 +95,8 @@ const DataEntryPage = () => {
                 [sectionName]: {
                     ...section[sectionName],
                     sectionOnClick: () => {
-                        setSelectedSection(sectionName);
-                        updateSectionNavigation(sectionName);
+                        setSelectedSection(index);
+                        updateSectionNavigation(index);
                     },
                 },
             };
@@ -113,14 +104,14 @@ const DataEntryPage = () => {
     };
 
     const handleNextPage = () => {
-        if (nextSection) {
+        if (nextSection !== null) {
             setSelectedSection(nextSection);
             updateSectionNavigation(nextSection);
         }
     };
 
     const handlePreviousPage = () => {
-        if (previousSection) {
+        if (previousSection !== null) {
             setSelectedSection(previousSection);
             updateSectionNavigation(previousSection);
         }
@@ -136,14 +127,26 @@ const DataEntryPage = () => {
         </>
     );
 
+    const checkTruthy = (value: any) => {
+        return (value !== null && value !== undefined) || value === 0;
+    };
+
     const selectedSectionComponent = (
         <FormTemplate
-            previousSection={previousSection as string}
-            nextSection={nextSection as string}
-            formTemplate={{
-                [selectedSection as string]:
-                    dummyFormTemplateJSON[selectedSection as string],
-            }}
+            previousSection={
+                checkTruthy(previousSection) ? sections[previousSection!] : null
+            }
+            nextSection={
+                checkTruthy(nextSection) ? sections[nextSection!] : null
+            }
+            formTemplate={
+                checkTruthy(selectedSection)
+                    ? {
+                          [sections[selectedSection!]]:
+                              dummyFormTemplateJSON[sections[selectedSection!]],
+                      }
+                    : {}
+            }
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
         />
@@ -153,8 +156,12 @@ const DataEntryPage = () => {
         <Layout
             sidebarContent={sidebarContent}
             mainContent={
-                selectedSection ? selectedSectionComponent : introComponent
+                checkTruthy(selectedSection)
+                    ? selectedSectionComponent
+                    : introComponent
             }
+            selectedSectionProp={selectedSection} // Pass selectedSection to Layout
+            setSelectedSectionProp={setSelectedSection} // Pass setSelectedSection to Layout
         ></Layout>
     );
 };
