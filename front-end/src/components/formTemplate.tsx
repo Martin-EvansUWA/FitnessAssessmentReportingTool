@@ -22,7 +22,9 @@ const FormTemplate = ({
                                         key={index}
                                         className="my-2 flex flex-row justify-between items-center md:w-1/2"
                                     >
-                                        <label>{field}:</label>
+                                        <label className="font-bold">
+                                            {field}:
+                                        </label>
                                         <input
                                             type={
                                                 formTemplate[section][field] ===
