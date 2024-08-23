@@ -32,7 +32,14 @@ const FormTemplate = ({
         field: string,
         event: React.ChangeEvent<HTMLInputElement>
     ) => {
-        onInputChange(section, field, event.target?.value);
+        const typeOfInput = event.target?.type;
+        if (typeOfInput === "checkbox") {
+            onInputChange(section, field, event.target?.checked);
+        } else if (typeOfInput === "number") {
+            onInputChange(section, field, parseFloat(event.target?.value));
+        } else {
+            onInputChange(section, field, event.target?.value);
+        }
     };
     return (
         <div className="flex flex-col min-h-full justify-between">
@@ -99,7 +106,11 @@ const FormTemplate = ({
             <div className="text-black w-full flex flex-row justify-between">
                 <button
                     title="previous-section"
-                    className="font-bold"
+                    className={
+                        previousSection === null
+                            ? "font-bold invisible"
+                            : "font-bold"
+                    }
                     onClick={onPreviousPage}
                 >
                     <FontAwesomeIcon icon={faChevronLeft} className="fa-2xl" />
@@ -107,7 +118,11 @@ const FormTemplate = ({
                 </button>
                 <button
                     title="next-section"
-                    className="font-bold"
+                    className={
+                        nextSection === null
+                            ? "font-bold invisible"
+                            : "font-bold"
+                    }
                     onClick={onNextPage}
                 >
                     {nextSection}
