@@ -9,9 +9,13 @@ import Sidebar from "./sidebar";
 const Layout = ({
     sidebarContent,
     mainContent,
+    selectedSectionProp,
+    setSelectedSectionProp,
 }: {
     sidebarContent: SidebarData;
     mainContent: ReactNode;
+    selectedSectionProp?: number | null; // Optional prop for external control
+    setSelectedSectionProp?: (index: number) => void; // Optional callback when a section is selected
 }) => {
     return (
         <div className="flex flex-col h-screen">
@@ -20,10 +24,12 @@ const Layout = ({
                 content={sidebarContent}
                 className="flex md:hidden"
             />
-            <div className="flex flex-1 md:mx-[5%] lg:mx-[10%]">
+            <div className="flex flex-1">
                 <Sidebar
                     content={sidebarContent}
                     className="hidden md:flex w-96 ml-5 my-5"
+                    selectedSectionProp={selectedSectionProp}
+                    setSelectedSectionProp={setSelectedSectionProp}
                 />
                 <MainSection
                     content={mainContent}
