@@ -71,6 +71,33 @@ def create_dim_form_template(db: Session, dim_form_template: schemas.DimFormTemp
     db.refresh(db_dim_form_template)
     return db_dim_form_template
 
+def create_form(db: Session, form_template: schemas.DimFormTemplateCreate):
+    db_form_template = models.DimFormTemplate(
+        Title = form_template.Title,
+        Description = form_template.Description
+    )
+    db.add(db_form_template)
+    db.commit()
+    db.refersh(db_form_template)
+    return db_form_template
+
+def get_forms_by_admin(db: Session, admin_id:int):
+    return db.query(models.DimFormTemplate).filter(models.DimFormTemplate.AdminId == admin_id).all()
+    
+def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
+    db_student_form = models.FactUserForm(
+        FormTemplateId=student_form.FormTemplateId,
+        UserId=student_form.UserId,
+        SubjectUserId=student_form.SubjectUserId,
+        IsComplete=student_form.IsComplete,
+        CreatedAt=student_form.CreatedAt,
+        CompleteAt=student_form.CompleteAt
+    )
+    db.add(db_student_form)
+    db.commit()
+    db.refresh(db_student_form)
+    return db_student_form
+
 # DimUserFormResponse CRUD operations
 def get_dim_user_form_response(db: Session, response_id: int):
     return db.query(models.DimUserFormResponse).filter(models.DimUserFormResponse.UserFormResponseId == response_id).first()
