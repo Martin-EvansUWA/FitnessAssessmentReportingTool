@@ -1,4 +1,4 @@
-import FormTemplateGenerator from "../components/formTemplateGenerator";
+import DashboardGenerator from "../components/dashboardGenerator";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -22,7 +22,7 @@ const DashboardPage = () => {
     return (
         <Layout
             sidebarContent={dummySidebarData}
-            mainContent={<FormTemplateGenerator />}
+            mainContent={<DashboardGenerator />}
         ></Layout>
     );
 };

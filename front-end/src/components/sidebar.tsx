@@ -36,19 +36,21 @@ const Sidebar = ({
                     ))}
                 </div>
             </div>
-            <div className="mt-auto">
-                <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
-                <button
-                    onClick={content.footer.onClick}
-                    className="text-white font-bold flex items-end"
-                >
-                    {content.footer.text}
-                    <FontAwesomeIcon
-                        icon={content.footer.fontAwesomeIcon}
-                        className="ml-2 text-xl"
-                    />
-                </button>
-            </div>
+            {content.footer && (
+                <div className="mt-auto">
+                    <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
+                    <button
+                        onClick={content.footer.onClick}
+                        className="text-white font-bold flex items-end"
+                    >
+                        {content.footer.text}
+                        <FontAwesomeIcon
+                            icon={content.footer.fontAwesomeIcon}
+                            className="ml-2 text-xl"
+                        />
+                    </button>
+                </div>
+            )}
         </aside>
     );
 };

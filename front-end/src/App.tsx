@@ -1,10 +1,10 @@
 import "./App.css";
-import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
+import DashboardPage from "./pages/dashboardPage";
 
 function App() {
     return (
         <>
-            <CreateNewFormTemplatePage />
+            <DashboardPage />
         </>
     );
 }
