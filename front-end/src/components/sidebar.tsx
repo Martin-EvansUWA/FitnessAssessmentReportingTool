@@ -5,14 +5,29 @@ import { SidebarData } from "../interface/sidebarInterface";
 const Sidebar = ({
     content,
     className,
+    selectedSectionProp,
+    setSelectedSectionProp,
 }: {
     content: SidebarData;
     className?: string;
+    selectedSectionProp?: number | null; // Optional prop for external control
+    setSelectedSectionProp?: (index: number) => void; // Optional callback when a section is selected
 }) => {
-    const [selectedSection, setSelectedSection] = useState<number | null>(null);
+    const [internalSelectedSection, setInternalSelectedSection] = useState<
+        number | null
+    >(null);
+
+    // Use the external prop if provided, otherwise use internal state
+    const selectedSection =
+        selectedSectionProp !== undefined
+            ? selectedSectionProp
+            : internalSelectedSection;
 
     const toggleSelectedSection = (index: number) => {
-        setSelectedSection(index);
+        setInternalSelectedSection(index); // Update internal state
+        if (setSelectedSectionProp) {
+            setSelectedSectionProp(index); // Update external state if callback is provided
+        }
     };
 
     const selectedSectionStyling: string =
