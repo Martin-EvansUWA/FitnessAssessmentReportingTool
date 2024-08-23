@@ -78,7 +78,7 @@ const DataEntryPage = () => {
     const [nextSection, setNextSection] = useState<number | null>(null);
     const [formData, setFormData] = useState<{ [key: string]: any }>({});
 
-    useEffect(() => {});
+    useEffect(() => {}, []);
 
     const sidebarContentJSON = dummySidebarTemplateJSON; // TODO: Fetch sidebar data from the backend
     const formContentJSON = dummyFormTemplateJSON; // TODO: Fetch form data from the backend
@@ -107,7 +107,7 @@ const DataEntryPage = () => {
                 },
             };
         }),
-        footer: sidebarContentJSON.footer.map((footer, index) => ({
+        footer: sidebarContentJSON.footer.map((footer) => ({
             ...footer,
             onClick: () => {
                 handleSaveAndExit();
@@ -155,7 +155,7 @@ const DataEntryPage = () => {
     );
 
     const checkTruthy = (value: any) => {
-        return (value !== null && value !== undefined) || value === 0;
+        return value !== null && value !== undefined;
     };
 
     const selectedSectionComponent = (
@@ -174,6 +174,7 @@ const DataEntryPage = () => {
                       }
                     : {}
             }
+            formData={formData}
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
             onInputChange={handleInputChange} // Pass the input change handler
