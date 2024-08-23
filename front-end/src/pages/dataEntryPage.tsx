@@ -1,5 +1,5 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import FormTemplate from "../components/formTemplate";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
@@ -78,9 +78,11 @@ const DataEntryPage = () => {
     const [nextSection, setNextSection] = useState<number | null>(null);
     const [formData, setFormData] = useState<{ [key: string]: any }>({});
 
+    useEffect(() => {});
+
     const sidebarContentJSON = dummySidebarTemplateJSON; // TODO: Fetch sidebar data from the backend
     const formContentJSON = dummyFormTemplateJSON; // TODO: Fetch form data from the backend
-    
+
     const sections = Object.keys(formContentJSON);
 
     const updateSectionNavigation = (currentIndex: number) => {
@@ -105,6 +107,12 @@ const DataEntryPage = () => {
                 },
             };
         }),
+        footer: sidebarContentJSON.footer.map((footer, index) => ({
+            ...footer,
+            onClick: () => {
+                handleSaveAndExit();
+            },
+        })),
     };
 
     const handleNextPage = () => {
