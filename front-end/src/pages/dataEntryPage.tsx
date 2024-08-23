@@ -1,6 +1,6 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
-import { useState } from "react";
-import FormTemplate from "../components/formTemplate";
+import { useContext, useState } from "react";
+import FormTemplate, { formContext } from "../components/formTemplate";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -108,6 +108,8 @@ const DataEntryPage = () => {
             }}
         />
     );
+
+    const context = useContext(formContext);
 
     return (
         <Layout
