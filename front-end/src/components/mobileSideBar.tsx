@@ -19,7 +19,7 @@ const MobileSideBar = ({
 
     return (
         <div className={"flex flex-col " + className}>
-            <div className="flex items-center justify-between h-14 bg-uwa-blue text-white font-bold">
+            <div className="flex items-center justify-between h-14 bg-uwa-blue text-white font-bold z-20">
                 <button
                     onClick={toggleMenu}
                     className="flex flex-col items-center justify-center w-full h-full"
@@ -32,8 +32,14 @@ const MobileSideBar = ({
                 </button>
             </div>
             {isMenuOpen && (
-                <div className="absolute flex-grow overflow-y-auto w-full mt-14">
-                    <Sidebar content={content} />
+                <div>
+                    <div className="absolute flex-grow overflow-y-auto w-full z-20">
+                        <Sidebar content={content} />
+                    </div>
+                    <div
+                        className="fixed inset-0 bg-black opacity-50 z-10 cursor-pointer"
+                        onClick={toggleMenu}
+                    ></div>
                 </div>
             )}
         </div>
