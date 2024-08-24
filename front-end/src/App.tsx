@@ -24,13 +24,12 @@ function App() {
                 <Route path="/data-entry" element={<DataEntryPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
-            <ConditionalLinks />
         </Router>
     );
 }
 
 // Temporary links for testing purposes
-const ConditionalLinks = () => {
+export const ConditionalLinks = () => {
     const location = useLocation();
 
     return (
