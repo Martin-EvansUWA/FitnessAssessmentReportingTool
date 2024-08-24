@@ -29,11 +29,11 @@ function App() {
 }
 
 // Temporary links for testing purposes
-export const ConditionalLinks = () => {
+export const ConditionalLinks = ({ className }: { className: string }) => {
     const location = useLocation();
 
     return (
-        <>
+        <div className={className}>
             {location.pathname === "/" && (
                 <div className="flex space-x-10 justify-center">
                     <Link to="/">Home</Link>
@@ -44,7 +44,7 @@ export const ConditionalLinks = () => {
                     <Link to="/data-entry">Data Entry</Link>
                 </div>
             )}
-        </>
+        </div>
     );
 };
 
