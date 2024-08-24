@@ -19,7 +19,7 @@ const Layout = ({
 }) => {
     return (
         <div className="flex flex-col h-screen">
-            <NavigationBar className="" />
+            <NavigationBar className="z-50" />
             <MobileSideBar
                 content={sidebarContent}
                 className="flex md:hidden"
