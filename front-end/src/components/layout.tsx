@@ -1,28 +1,32 @@
-import { ReactNode } from "react";
-import { SidebarData } from "../interface/sidebarInterface";
+import { useState } from "react";
+import { LayoutProps } from "../interface/layoutInterface";
 import MainSection from "./mainSection";
 import MobileSideBar from "./mobileSideBar";
 import NavigationBar from "./navigationBar";
 import Sidebar from "./sidebar";
 
-// Generic layout component that takes in sidebar content and main content to create a page layout
-const Layout = ({
+const Layout: React.FC<LayoutProps> = ({
     sidebarContent,
     mainContent,
     selectedSectionProp,
     setSelectedSectionProp,
-}: {
-    sidebarContent: SidebarData;
-    mainContent: ReactNode;
-    selectedSectionProp?: number | null; // Optional prop for external control
-    setSelectedSectionProp?: (index: number) => void; // Optional callback when a section is selected
 }) => {
+    const [isNavBarMenuOpen, setIsNavBarMenuOpen] = useState(false);
+
+    const toggleNavBarMenu = () => {
+        setIsNavBarMenuOpen((prev) => !prev);
+    };
+
     return (
         <div className="flex flex-col h-screen">
-            <NavigationBar className="z-50" />
+            <NavigationBar
+                className="z-50"
+                setNavBarStatusProp={toggleNavBarMenu}
+            />
             <MobileSideBar
                 content={sidebarContent}
                 className="flex md:hidden"
+                isNavBarMenuOpen={isNavBarMenuOpen}
             />
             <div className="flex flex-1">
                 <Sidebar
