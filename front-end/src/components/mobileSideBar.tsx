@@ -1,24 +1,28 @@
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useState } from "react";
-import { SidebarData } from "../interface/sidebarInterface";
+import { useEffect, useState } from "react";
+import { MobileSideBarProps } from "../interface/mobileSidebarInterface";
 import Sidebar from "./sidebar";
 
-const MobileSideBar = ({
+const MobileSideBar: React.FC<MobileSideBarProps> = ({
     content,
-    className,
-}: {
-    content: SidebarData;
-    className?: string;
+    className = "",
+    isNavBarMenuOpen = false,
 }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
-        setIsMenuOpen((isMenuOpen) => !isMenuOpen);
+        setIsMenuOpen((prev) => !prev);
     };
 
+    useEffect(() => {
+        if (isNavBarMenuOpen) {
+            setIsMenuOpen(false);
+        }
+    }, [isNavBarMenuOpen]);
+
     return (
-        <div className={"flex flex-col " + className}>
+        <div className={`flex flex-col ${className}`}>
             <div className="flex items-center justify-between h-14 bg-uwa-blue text-white font-bold z-20">
                 <button
                     onClick={toggleMenu}
