@@ -8,6 +8,10 @@ const LandingPage = () => {
             <NavigationBar className="" />
             <div className="flex flex-1 flex-row justify-between w-full">
                 <div className="w-3/5">
+                    <p className="text-lg text-center font-bold">
+                        This is a temporary landing page. In the future, this
+                        page will include the login/register components.
+                    </p>
                     <ConditionalLinks />
                 </div>
                 <img
