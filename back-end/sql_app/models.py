@@ -13,9 +13,14 @@ class DimUser(Base):
     UserId = Column(Integer, primary_key=True)
     FirstName = Column(String, unique=True, index=True)
     LastName = Column(String, unique=True, index=True)
-    StudentId = Column(Integer, primary_key=True)
+    StudentId = Column(Integer, unique=True,index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    
+    def __repr__(self):
+        return (f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
+                f"LastName='{self.LastName}', StudentId={self.StudentId}, "
+                f"email='{self.email}')")
 
 
 class DimAdmin(Base):

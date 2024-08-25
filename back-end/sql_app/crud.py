@@ -3,7 +3,7 @@ import models, schemas
 
 # DimUser CRUD operations
 def get_DimUser(db: Session, DimUser_id: int):
-    return db.query(models.DimUser).filter(models.DimUser.DimUserId == DimUser_id).first()
+    return db.query(models.DimUser).filter(models.DimUser.UserId == DimUser_id).first()
 
 def get_DimUser_by_email(db: Session, email: str):
     return db.query(models.DimUser).filter(models.DimUser.email == email).first()
@@ -14,11 +14,12 @@ def get_DimUsers(db: Session, skip: int = 0, limit: int = 100):
 def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     fake_hashed_password = DimUser.password + "notreallyhashed"  # Replace with actual hashing
     db_DimUser = models.DimUser(
+        UserId=0,
         email=DimUser.email,
         hashed_password=fake_hashed_password,
-        FirstName="",  # Default or handle according to your logic
-        LastName="",   # Default or handle according to your logic
-        DimUserId=0    # Default or derive from logic
+        FirstName=DimUser.FirstName,  # Default or handle according to your logic
+        LastName=DimUser.LastName,   # Default or handle according to your logic
+        StudentId=1
     )
     db.add(db_DimUser)
     db.commit()
