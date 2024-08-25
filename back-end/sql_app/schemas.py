@@ -59,6 +59,9 @@ class DimUserBase(BaseModel):
     email: str
 
 class DimUserCreate(DimUserBase):
+    UserId: int
+    FirstName: str
+    LastName: str
     password: str
 
 class DimUser(DimUserBase):
