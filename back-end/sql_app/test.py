@@ -24,6 +24,8 @@ temp_user = schemas.DimUserCreate(
     password="password1234"
 )
 
+sample_user = schemas.DimUser(UserId=1)
+
 
 def test_create_admin():
     db = SessionLocal()  # Correctly get a Session object
@@ -40,7 +42,17 @@ def test_create_user():
         print(created_user)
     finally:
         db.close()
+        
+        
+def test_get_user():
+    db = SessionLocal()
+    try: 
+        get_user = crud.get_DimUser(db,sample_user)
+    finally:
+        db.close()
+        
 
 
 test_create_admin()
 test_create_user()
+
