@@ -1,7 +1,7 @@
-import { ConditionalLinks } from "../App";
 import uwaSportScienceImg2 from "../assets/uwa-sport-science-2.jpg";
 import uwaSportScienceImg3 from "../assets/uwa-sport-science-3.jpg";
 import uwaSportScienceImg from "../assets/uwa-sport-science.jpg";
+import ConditionalLinks from "../components/conditionalLinks";
 import NavigationBar from "../components/navigationBar";
 
 const LandingPage = () => {
