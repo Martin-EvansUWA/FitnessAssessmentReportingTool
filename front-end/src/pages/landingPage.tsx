@@ -57,8 +57,7 @@ const temporaryRegisterContent = (
 );
 
 const LandingPage = () => {
-    const imgCss =
-        "hidden md:flex object-cover w-1/3 border-8 rounded-3xl border-[#e0e0e0]";
+    const imgCss = "object-cover w-1/3 border-8 rounded-3xl border-[#e0e0e0]";
 
     return (
         <div className="flex flex-col h-screen">
@@ -66,9 +65,9 @@ const LandingPage = () => {
             <LoginAndRegisterLayout
                 loginContent={temporaryLoginContent}
                 registerContent={temporaryRegisterContent}
-                className="absolute h-full w-full flex flex-row justify-center items-center"
+                className="flex md:absolute h-full w-full justify-center items-center"
             />
-            <div className="flex flex-1 flex-row justify-between w-full border-8 border-[#e0e0e0]">
+            <div className="hidden md:flex flex-1 flex-row justify-between w-full border-8 border-[#e0e0e0]">
                 <img
                     src={uwaSportScienceImg}
                     alt="UWA Sport Science"
