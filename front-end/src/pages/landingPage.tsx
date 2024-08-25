@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import uwaSportScienceImg2 from "../assets/uwa-sport-science-2.jpg";
 import uwaSportScienceImg3 from "../assets/uwa-sport-science-3.jpg";
 import uwaSportScienceImg from "../assets/uwa-sport-science.jpg";
@@ -9,8 +10,21 @@ const temporaryLoginContent = (
     <div className="flex items-center justify-center h-full">
         <div>
             <p className="font-bold text-2xl text-center m-20">
-                This is placeholder login component. Below are the links to
-                different pages for testing purposes.
+                {"This is placeholder LOGIN component. Below are the links to different pages for testing purposes."
+                    .split(" ")
+                    .map((el, i) => (
+                        <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                                duration: 0.25,
+                                delay: i / 10,
+                            }}
+                            key={i}
+                        >
+                            {el}{" "}
+                        </motion.span>
+                    ))}
             </p>
             <ConditionalLinks className={"font-bold mx-10"} />
         </div>
@@ -21,8 +35,21 @@ const temporaryRegisterContent = (
     <div className="flex items-center justify-center h-full">
         <div>
             <p className="font-bold text-2xl text-center m-20">
-                This is placeholder register component. Below are the links to
-                different pages for testing purposes.
+                {"This is placeholder REGISTER component. Below are the links to different pages for testing purposes."
+                    .split(" ")
+                    .map((el, i) => (
+                        <motion.span
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                                duration: 0.25,
+                                delay: i / 10,
+                            }}
+                            key={i}
+                        >
+                            {el}{" "}
+                        </motion.span>
+                    ))}
             </p>
             <ConditionalLinks className={"font-bold mx-10"} />
         </div>
