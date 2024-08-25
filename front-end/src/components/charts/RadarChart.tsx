@@ -1,14 +1,10 @@
 import React, { useState, ChangeEvent } from 'react';
 import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, RadialLinearScale, Title, Tooltip, Legend } from 'chart.js';
+import { ChartData, ChartOptions } from 'chart.js';
 
 // Registering necessary components
-ChartJS.register(
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(RadialLinearScale, Title, Tooltip, Legend);
 
 // Define types
 interface Student {
@@ -20,11 +16,18 @@ interface Student {
 
 interface RadarChartProps {
   data: Student[];
+  specificStudentData: Student;
 }
 
-const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
+const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
+  const [showStudentData, setShowStudentData] = useState<boolean>(true);
+  const [showMaxValues, setShowMaxValues] = useState<boolean>(true);
+  
+  // State for colors
+  const [studentColor, setStudentColor] = useState<string>('rgba(75, 192, 192, 1)');
+  const [maxValuesColor, setMaxValuesColor] = useState<string>('rgba(255, 99, 132, 1)');
 
   // Extract categories and exercises from data
   const categories: { [key: string]: string[] } = {
@@ -33,67 +36,118 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
     'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
   };
 
-  // Handle category selection
-  const handleCategoryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    setSelectedCategories(prevState =>
-      checked ? [...prevState, value] : prevState.filter(category => category !== value)
-    );
-  };
+  // Initialize max values object to store max values of each exercise
+  const maxValues: Record<string, number> = {};
 
-  // Handle checkbox change for exercises
-  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = event.target;
-    setSelectedExercises(prevState =>
-      checked ? [...prevState, value] : prevState.filter(exercise => exercise !== value)
-    );
-  };
-
-  // Prepare chart data based on selected exercises
-  const chartData = {
-    labels: selectedExercises,
-    datasets: data.map(item => ({
-      label: item.Name,
-      data: selectedExercises.map(exercise => {
-        // Safely access properties using type assertions
-        let value = 0;
-        for (const category of selectedCategories) {
-          const categoryData = item[category as keyof Student];
-          if (categoryData) {
-            value = value || (categoryData as Record<string, number>)[exercise];
+  // Loop through each category to compute max values
+  Object.keys(categories).forEach((category) => {
+    categories[category].forEach((exercise) => {
+      maxValues[exercise] = Math.max(
+        ...data.map((student) => {
+          const categoryData = student[category as keyof Student];
+          if (categoryData && typeof categoryData === 'object') {
+            return (categoryData as Record<string, number>)[exercise] || 0;
           }
-        }
-        return value || 0;
-      }),
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
-      borderWidth: 1,
-    }))
+          return 0;
+        })
+      );
+    });
+  });
+
+  // Find the maximum value from the data to dynamically adjust the scale
+  const overallMaxValue = Math.max(
+    ...selectedExercises.map((exercise) => maxValues[exercise] || 0)
+  );
+
+  // Prepare chart data
+  const chartData: ChartData<'radar'> = {
+    labels: selectedExercises,
+    datasets: [
+      ...(showStudentData
+        ? [
+            {
+              label: specificStudentData.Name,
+              data: selectedExercises.map((exercise) => {
+                let value = 0;
+                for (const category of selectedCategories) {
+                  const categoryData = specificStudentData[category as keyof Student];
+                  if (categoryData && typeof categoryData === 'object') {
+                    value = value || (categoryData as Record<string, number>)[exercise];
+                  }
+                }
+                return value || 0;
+              }),
+              backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
+              borderColor: studentColor, // Use selected color
+              borderWidth: 2, // Adjust the border width if needed
+            },
+          ]
+        : []),
+      ...(showMaxValues
+        ? [
+            {
+              label: 'Max Values',
+              data: selectedExercises.map((exercise) => maxValues[exercise] || 0),
+              backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
+              borderColor: maxValuesColor, // Use selected color
+              borderWidth: 2, // Adjust the border width if needed
+            },
+          ]
+        : []),
+    ],
   };
 
   // Radar chart options
-  const options = {
+  const options: ChartOptions<'radar'> = {
     responsive: true,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'top',
       },
-      tooltip: {
-        enabled: true,
-      },
+      tooltip: { enabled: true },
     },
     scales: {
       r: {
-        angleLines: {
-          display: false,
-        },
+        angleLines: { display: false },
         suggestedMin: 0,
-        suggestedMax: 100,
+        // Dynamically set the maximum value
+        suggestedMax: Math.ceil(overallMaxValue * 1.2), // Add a buffer (20% more than the max value)
         ticks: {
-          stepSize: 10,
+          stepSize: Math.ceil(overallMaxValue / 5), // Adjust step size based on data
         },
       },
     },
+  };
+
+  // Handlers for checkbox changes
+  const handleCategoryChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    setSelectedCategories((prevState) =>
+      checked ? [...prevState, value] : prevState.filter((category) => category !== value)
+    );
+  };
+
+  const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value, checked } = event.target;
+    setSelectedExercises((prevState) =>
+      checked ? [...prevState, value] : prevState.filter((exercise) => exercise !== value)
+    );
+  };
+
+  const handleShowStudentDataChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setShowStudentData(event.target.checked);
+  };
+
+  const handleShowMaxValuesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setShowMaxValues(event.target.checked);
+  };
+
+  const handleStudentColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setStudentColor(event.target.value);
+  };
+
+  const handleMaxValuesColorChange = (event: ChangeEvent<HTMLInputElement>) => {
+    setMaxValuesColor(event.target.value);
   };
 
   return (
@@ -102,14 +156,14 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
         {/* Category Selectors */}
         <div style={{ flex: '1', marginRight: '20px' }}>
           <h2>Select Categories:</h2>
-          {Object.keys(categories).map(category => (
+          {Object.keys(categories).map((category) => (
             <div key={category}>
               <label>
-                <input 
-                  type="checkbox" 
-                  value={category} 
-                  checked={selectedCategories.includes(category)} 
-                  onChange={handleCategoryChange} 
+                <input
+                  type="checkbox"
+                  value={category}
+                  checked={selectedCategories.includes(category)}
+                  onChange={handleCategoryChange}
                 />
                 {category}
               </label>
@@ -121,15 +175,15 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
         {selectedCategories.length > 0 && (
           <div style={{ flex: '1' }}>
             <h3>Select Exercises:</h3>
-            {selectedCategories.flatMap(category =>
-              categories[category].map(exercise => (
+            {selectedCategories.flatMap((category) =>
+              categories[category].map((exercise) => (
                 <div key={exercise}>
                   <label>
-                    <input 
-                      type="checkbox" 
-                      value={exercise} 
-                      checked={selectedExercises.includes(exercise)} 
-                      onChange={handleCheckboxChange} 
+                    <input
+                      type="checkbox"
+                      value={exercise}
+                      checked={selectedExercises.includes(exercise)}
+                      onChange={handleCheckboxChange}
                     />
                     {exercise}
                   </label>
@@ -138,6 +192,46 @@ const RadarChart: React.FC<RadarChartProps> = ({ data }) => {
             )}
           </div>
         )}
+      </div>
+
+      {/* Toggle Checkboxes */}
+      <div style={{ marginTop: '20px' }}>
+        <label>
+          <input
+            type="checkbox"
+            checked={showStudentData}
+            onChange={handleShowStudentDataChange}
+          />
+          Show Student Data
+        </label>
+        <label style={{ marginLeft: '20px' }}>
+          <input
+            type="checkbox"
+            checked={showMaxValues}
+            onChange={handleShowMaxValuesChange}
+          />
+          Show Max Values
+        </label>
+      </div>
+
+      {/* Color Pickers */}
+      <div style={{ marginTop: '20px' }}>
+        <label>
+          Student Data Line Color:
+          <input
+            type="color"
+            value={studentColor}
+            onChange={handleStudentColorChange}
+          />
+        </label>
+        <label style={{ marginLeft: '20px' }}>
+          Max Values Line Color:
+          <input
+            type="color"
+            value={maxValuesColor}
+            onChange={handleMaxValuesColorChange}
+          />
+        </label>
       </div>
 
       {/* Radar Chart */}

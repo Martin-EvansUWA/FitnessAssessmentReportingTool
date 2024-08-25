@@ -26,6 +26,10 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
   const [yExercise, setYExercise] = useState<string>('');
   const [sizeCategory, setSizeCategory] = useState<string>('');
   const [sizeExercise, setSizeExercise] = useState<string>('');
+  const [borderColor, setBorderColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default border color
+  const [fillColor, setFillColor] = useState<string>('rgba(75, 192, 192, 0.5)'); // Default fill color
+  const [showXAxisZero, setShowXAxisZero] = useState<boolean>(true); // Option to set x-axis to zero
+  const [showYAxisZero, setShowYAxisZero] = useState<boolean>(true); // Option to set y-axis to zero
 
   // Extract categories and exercises
   const categories = {
@@ -103,8 +107,8 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
         y: yAxisData[index],
         r: sizeData[index] || 5, // Default size if no data
       })),
-      backgroundColor: 'rgba(75, 192, 192, 0.5)',
-      borderColor: 'rgba(75, 192, 192, 1)',
+      backgroundColor: fillColor,
+      borderColor: borderColor,
       borderWidth: 1,
     }]
   };
@@ -127,83 +131,117 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
           display: true,
           text: xCategory || 'X-Axis',
         },
+        beginAtZero: showXAxisZero,
       },
       y: {
         title: {
           display: true,
           text: yCategory || 'Y-Axis',
         },
+        beginAtZero: showYAxisZero,
       },
     },
   };
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-        <div>
-          <label>X-Axis Category:</label>
-          <select value={xCategory} onChange={handleXCategoryChange}>
-            <option value="">Select Category</option>
-            {Object.keys(categories).map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div>
+            <label>X-Axis Category:</label>
+            <select value={xCategory} onChange={handleXCategoryChange}>
+              <option value="">Select Category</option>
+              {Object.keys(categories).map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
 
-          {xCategory && (
-            <div>
-              <label>X-Axis Exercise:</label>
-              <select value={xExercise} onChange={handleXExerciseChange}>
-                <option value="">Select Exercise</option>
-                {(categories[xCategory as keyof typeof categories] || []).map((exercise: string) => (
-                  <option key={exercise} value={exercise}>{exercise}</option>
-                ))}
-              </select>
-            </div>
-          )}
+            {xCategory && (
+              <div>
+                <label>X-Axis Exercise:</label>
+                <select value={xExercise} onChange={handleXExerciseChange}>
+                  <option value="">Select Exercise</option>
+                  {(categories[xCategory as keyof typeof categories] || []).map((exercise: string) => (
+                    <option key={exercise} value={exercise}>{exercise}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label>Y-Axis Category:</label>
+            <select value={yCategory} onChange={handleYCategoryChange}>
+              <option value="">Select Category</option>
+              {Object.keys(categories).map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+
+            {yCategory && (
+              <div>
+                <label>Y-Axis Exercise:</label>
+                <select value={yExercise} onChange={handleYExerciseChange}>
+                  <option value="">Select Exercise</option>
+                  {(categories[yCategory as keyof typeof categories] || []).map((exercise: string) => (
+                    <option key={exercise} value={exercise}>{exercise}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
+
+          <div>
+            <label>Size Category:</label>
+            <select value={sizeCategory} onChange={handleSizeCategoryChange}>
+              <option value="">Select Category</option>
+              {Object.keys(categories).map(category => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+
+            {sizeCategory && (
+              <div>
+                <label>Size Exercise:</label>
+                <select value={sizeExercise} onChange={handleSizeExerciseChange}>
+                  <option value="">Select Exercise</option>
+                  {(categories[sizeCategory as keyof typeof categories] || []).map((exercise: string) => (
+                    <option key={exercise} value={exercise}>{exercise}</option>
+                  ))}
+                </select>
+              </div>
+            )}
+          </div>
         </div>
 
         <div>
-          <label>Y-Axis Category:</label>
-          <select value={yCategory} onChange={handleYCategoryChange}>
-            <option value="">Select Category</option>
-            {Object.keys(categories).map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+          <label>Bubble Border Color:</label>
+          <input
+            type="color"
+            value={borderColor}
+            onChange={(e) => setBorderColor(e.target.value)}
+          />
 
-          {yCategory && (
-            <div>
-              <label>Y-Axis Exercise:</label>
-              <select value={yExercise} onChange={handleYExerciseChange}>
-                <option value="">Select Exercise</option>
-                {(categories[yCategory as keyof typeof categories] || []).map((exercise: string) => (
-                  <option key={exercise} value={exercise}>{exercise}</option>
-                ))}
-              </select>
-            </div>
-          )}
-        </div>
+          <label>Bubble Fill Color:</label>
+          <input
+            type="color"
+            value={fillColor}
+            onChange={(e) => setFillColor(e.target.value)}
+          />
 
-        <div>
-          <label>Size Category:</label>
-          <select value={sizeCategory} onChange={handleSizeCategoryChange}>
-            <option value="">Select Category</option>
-            {Object.keys(categories).map(category => (
-              <option key={category} value={category}>{category}</option>
-            ))}
-          </select>
+          <label>Show X-Axis Starting at Zero:</label>
+          <input
+            type="checkbox"
+            checked={showXAxisZero}
+            onChange={(e) => setShowXAxisZero(e.target.checked)}
+          />
 
-          {sizeCategory && (
-            <div>
-              <label>Size Exercise:</label>
-              <select value={sizeExercise} onChange={handleSizeExerciseChange}>
-                <option value="">Select Exercise</option>
-                {(categories[sizeCategory as keyof typeof categories] || []).map((exercise: string) => (
-                  <option key={exercise} value={exercise}>{exercise}</option>
-                ))}
-              </select>
-            </div>
-          )}
+          <label>Show Y-Axis Starting at Zero:</label>
+          <input
+            type="checkbox"
+            checked={showYAxisZero}
+            onChange={(e) => setShowYAxisZero(e.target.checked)}
+          />
         </div>
       </div>
 

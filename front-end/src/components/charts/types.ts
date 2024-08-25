@@ -1,5 +1,5 @@
 // src/types.ts
-
+declare module 'regression';
 export type Student = {
     Name: string;
     Age: number;
