@@ -1,10 +1,4 @@
-import {
-    Link,
-    Route,
-    BrowserRouter as Router,
-    Routes,
-    useLocation,
-} from "react-router-dom";
+import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DataEntryPage from "./pages/dataEntryPage";
@@ -24,29 +18,8 @@ function App() {
                 <Route path="/data-entry" element={<DataEntryPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
-            <ConditionalLinks />
         </Router>
     );
 }
-
-// Temporary links for testing purposes
-const ConditionalLinks = () => {
-    const location = useLocation();
-
-    return (
-        <>
-            {location.pathname === "/" && (
-                <div className="flex space-x-10 justify-center">
-                    <Link to="/">Home</Link>
-                    <Link to="/create-new-form-template">
-                        Create New Form Template
-                    </Link>
-                    <Link to="/get-new-form">Get New Form</Link>
-                    <Link to="/data-entry">Data Entry</Link>
-                </div>
-            )}
-        </>
-    );
-};
 
 export default App;

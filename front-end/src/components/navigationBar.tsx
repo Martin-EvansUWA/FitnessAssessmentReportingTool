@@ -17,7 +17,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
     };
 
     return (
-        <div className={`relative w-full h-16 ${className}`}>
+        <div className={`${className}`}>
             <nav className="top-0 left-0 flex justify-between items-center pl-4 bg-white font-bold w-full h-16 z-10">
                 <div className="flex items-center">
                     <Link to="/" className="inline-flex items-center">
