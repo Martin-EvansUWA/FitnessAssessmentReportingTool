@@ -1,13 +1,13 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import FormTemplateGenerator from "../components/formTemplateGenerator";
+import AddNewForm from "../components/addNewForm";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const dummySidebarData: SidebarData = {
-    title: "Form Manager",
+    title: "My Forms",
     footer: [
         {
-            text: "Create a new form",
+            text: "Add a new form",
             fontAwesomeIcon: faPlus,
             onClick: () => {
                 console.log("Footer button clicked");
@@ -42,13 +42,13 @@ const dummySidebarData: SidebarData = {
     ],
 };
 
-const CreateNewFormTemplatePage = () => {
+const GetNewFormPage = () => {
     return (
         <Layout
             sidebarContent={dummySidebarData}
-            mainContent={<FormTemplateGenerator />}
+            mainContent={<AddNewForm />}
         ></Layout>
     );
 };
 
-export default CreateNewFormTemplatePage;
+export default GetNewFormPage;

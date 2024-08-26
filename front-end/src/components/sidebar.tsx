@@ -1,13 +1,38 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const Sidebar = ({
     content,
     className,
+    selectedSectionProp,
+    setSelectedSectionProp,
 }: {
     content: SidebarData;
     className?: string;
+    selectedSectionProp?: number | null; // Optional prop for external control
+    setSelectedSectionProp?: (index: number) => void; // Optional callback when a section is selected
 }) => {
+    const [internalSelectedSection, setInternalSelectedSection] = useState<
+        number | null
+    >(null);
+
+    // Use the external prop if provided, otherwise use internal state
+    const selectedSection =
+        selectedSectionProp !== undefined
+            ? selectedSectionProp
+            : internalSelectedSection;
+
+    const toggleSelectedSection = (index: number) => {
+        setInternalSelectedSection(index); // Update internal state
+        if (setSelectedSectionProp) {
+            setSelectedSectionProp(index); // Update external state if callback is provided
+        }
+    };
+
+    const selectedSectionStyling: string =
+        "bg-uwa-yellow text-black font-bold rounded-md my-3";
+
     return (
         <aside
             className={
@@ -23,10 +48,24 @@ const Sidebar = ({
                     {content.sections.map((section, index) => (
                         <ul key={index}>
                             {Object.entries(section).map(([key, value]) => (
-                                <li key={key} className="my-3">
+                                <li
+                                    key={key}
+                                    className={
+                                        selectedSection === index
+                                            ? selectedSectionStyling
+                                            : "my-3"
+                                    }
+                                >
                                     <button
-                                        onClick={value.sectionOnClick}
-                                        className="text-white"
+                                        onClick={() => {
+                                            toggleSelectedSection(index);
+                                            value.sectionOnClick();
+                                        }}
+                                        className={
+                                            selectedSection === index
+                                                ? "text-black p-1"
+                                                : "text-white p-1"
+                                        }
                                     >
                                         {value.sectionName}
                                     </button>
@@ -36,21 +75,19 @@ const Sidebar = ({
                     ))}
                 </div>
             </div>
-            {content.footer && (
-                <div className="mt-auto">
-                    <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
+            <div className="mt-auto">
+                <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
+                {content.footer.map((footerButton, index) => (
                     <button
-                        onClick={content.footer.onClick}
-                        className="text-white font-bold flex items-end"
+                        key={index}
+                        onClick={footerButton.onClick}
+                        className="flex items-center text-white"
                     >
-                        {content.footer.text}
-                        <FontAwesomeIcon
-                            icon={content.footer.fontAwesomeIcon}
-                            className="ml-2 text-xl"
-                        />
+                        <FontAwesomeIcon icon={footerButton.fontAwesomeIcon} />
+                        <p className="ml-2">{footerButton.text}</p>
                     </button>
-                </div>
-            )}
+                ))}
+            </div>
         </aside>
     );
 };
