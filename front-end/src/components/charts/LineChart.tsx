@@ -168,21 +168,21 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
         </div>
 
         <div>
-          <label>Line Color:</label>
+          <label>Line Color: </label>
           <input
             type="color"
             value={lineColor}
             onChange={(e) => setLineColor(e.target.value)}
           />
 
-          <label>Show X-Axis Starting at Zero:</label>
+          <label> Show X-Axis Starting at Zero: </label>
           <input
             type="checkbox"
             checked={showXAxisZero}
             onChange={(e) => setShowXAxisZero(e.target.checked)}
           />
 
-          <label>Show Y-Axis Starting at Zero:</label>
+          <label> Show Y-Axis Starting at Zero: </label>
           <input
             type="checkbox"
             checked={showYAxisZero}
@@ -190,7 +190,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
           />
         </div>
       </div>
-
+        <br></br>
       <Line data={chartData} options={options} />
     </div>
   );

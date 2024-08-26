@@ -193,41 +193,48 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
           </div>
         </div>
 
-        <div>
-          <label>Show Line of Best Fit:</label>
-          <input
-            type="checkbox"
-            checked={showRegression}
-            onChange={(e) => setShowRegression(e.target.checked)}
-          />
-        </div>
+        {/* Group options and color pickers */}
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }}>
+          <div>
+            <label>Show Line of Best Fit: </label>
+            <input
+              type="checkbox"
+              checked={showRegression}
+              onChange={(e) => setShowRegression(e.target.checked)}
+            />
+          </div>
 
-        <div>
-          <label>Point Color:</label>
-          <input
-            type="color"
-            value={pointColor}
-            onChange={(e) => setPointColor(e.target.value)}
-          />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <div>
+              <label>Start Axes from 0: </label>
+              <input
+                type="checkbox"
+                checked={startFromZero}
+                onChange={handleStartFromZeroChange}
+              />
+            </div>
 
-          <label>Line Color:</label>
-          <input
-            type="color"
-            value={lineColor}
-            onChange={(e) => setLineColor(e.target.value)}
-          />
-        </div>
+            <div>
+              <label>Point Color: </label>
+              <input
+                type="color"
+                value={pointColor}
+                onChange={(e) => setPointColor(e.target.value)}
+              />
+            </div>
 
-        <div>
-          <label>Start Axes from 0:</label>
-          <input
-            type="checkbox"
-            checked={startFromZero}
-            onChange={handleStartFromZeroChange}
-          />
+            <div>
+              <label>Line Color: </label>
+              <input
+                type="color"
+                value={lineColor}
+                onChange={(e) => setLineColor(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
-
+            <br></br>
       <Scatter data={chartData} options={options} />
     </div>
   );

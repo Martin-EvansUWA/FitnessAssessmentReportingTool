@@ -215,28 +215,28 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
         </div>
 
         <div>
-          <label>Bubble Border Color:</label>
+          <label>Bubble Border Color: </label>
           <input
             type="color"
             value={borderColor}
             onChange={(e) => setBorderColor(e.target.value)}
           />
 
-          <label>Bubble Fill Color:</label>
+          <label> Bubble Fill Color:</label>
           <input
             type="color"
             value={fillColor}
             onChange={(e) => setFillColor(e.target.value)}
           />
 
-          <label>Show X-Axis Starting at Zero:</label>
+          <label> Show X-Axis Starting at Zero: </label>
           <input
             type="checkbox"
             checked={showXAxisZero}
             onChange={(e) => setShowXAxisZero(e.target.checked)}
           />
 
-          <label>Show Y-Axis Starting at Zero:</label>
+          <label> Show Y-Axis Starting at Zero: </label>
           <input
             type="checkbox"
             checked={showYAxisZero}
@@ -244,7 +244,7 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
           />
         </div>
       </div>
-
+       <br></br>
       <Bubble data={chartData} options={options} />
     </div>
   );

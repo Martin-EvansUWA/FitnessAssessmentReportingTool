@@ -152,7 +152,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start' }}>
         {/* Category Selectors */}
         <div style={{ flex: '1', marginRight: '20px' }}>
           <h2>Select Categories:</h2>
@@ -171,9 +171,10 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
           ))}
         </div>
 
-        {/* Exercise Selectors */}
-        {selectedCategories.length > 0 && (
-          <div style={{ flex: '1' }}>
+        {/* Exercise Selectors and Options */}
+        <div style={{ flex: '2', display: 'flex', alignItems: 'flex-start' }}>
+          {/* Select Exercises */}
+          <div style={{ flex: '2' }}>
             <h3>Select Exercises:</h3>
             {selectedCategories.flatMap((category) =>
               categories[category].map((exercise) => (
@@ -191,47 +192,51 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
               ))
             )}
           </div>
-        )}
-      </div>
 
-      {/* Toggle Checkboxes */}
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          <input
-            type="checkbox"
-            checked={showStudentData}
-            onChange={handleShowStudentDataChange}
-          />
-          Show Student Data
-        </label>
-        <label style={{ marginLeft: '20px' }}>
-          <input
-            type="checkbox"
-            checked={showMaxValues}
-            onChange={handleShowMaxValuesChange}
-          />
-          Show Max Values
-        </label>
-      </div>
+          {/* Options and Color Pickers */}
+          <div style={{ flex: '1', marginLeft: '20px', display: 'flex', flexDirection: 'column' }}>
+            {/* Show Options */}
+            <div style={{ marginTop: '10px' }}>
+              <label>
+                Show Student Data: 
+                <input
+                  type="checkbox"
+                  checked={showStudentData}
+                  onChange={handleShowStudentDataChange}
+                />
+              </label>
+              <br></br>
+              <label style={{ marginTop: '10px' }}>
+                Show Max Values: 
+                <input
+                  type="checkbox"
+                  checked={showMaxValues}
+                  onChange={handleShowMaxValuesChange}
+                />
+              </label>
+            </div>
 
-      {/* Color Pickers */}
-      <div style={{ marginTop: '20px' }}>
-        <label>
-          Student Data Line Color:
-          <input
-            type="color"
-            value={studentColor}
-            onChange={handleStudentColorChange}
-          />
-        </label>
-        <label style={{ marginLeft: '20px' }}>
-          Max Values Line Color:
-          <input
-            type="color"
-            value={maxValuesColor}
-            onChange={handleMaxValuesColorChange}
-          />
-        </label>
+            {/* Color Pickers */}
+            <div style={{ marginTop: '20px' }}>
+              <label>
+                Student Data Line Color: 
+                <input
+                  type="color"
+                  value={studentColor}
+                  onChange={handleStudentColorChange}
+                />
+              </label>
+              <label style={{ marginTop: '10px' }}>
+                Max Values Line Color: 
+                <input
+                  type="color"
+                  value={maxValuesColor}
+                  onChange={handleMaxValuesColorChange}
+                />
+              </label>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Radar Chart */}
