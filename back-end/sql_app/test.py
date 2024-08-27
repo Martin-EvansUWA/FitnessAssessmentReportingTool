@@ -6,6 +6,7 @@ import json
 import crud, models, schemas
 from database import SessionLocal, engine
 
+models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
 
 '''temp_admin = schemas.DimAdminCreate(
@@ -20,7 +21,13 @@ temp_user = schemas.DimUserCreate(
     email="temp_user1@gmail.com",
     FirstName="Steve",
     LastName="Barnes",
-    UserId=0,
+    password="password1234",
+    StudentId=2
+)
+temp_user2 = schemas.DimUserCreate(
+    email="temp_user2@gmail.com",
+    FirstName="James",
+    LastName="Barnes",
     password="password1234",
     StudentId=1
 )
@@ -37,8 +44,10 @@ temp_user = schemas.DimUserCreate(
 def test_create_user():
     db = SessionLocal()
     try:
-        created_user = crud.create_DimUser(db,temp_user)
-        print(created_user)
+        created_user1 = crud.create_DimUser(db,temp_user)
+        created_user2 = crud.create_DimUser(db,temp_user2)
+        print(created_user1)
+        print(created_user2)
     finally:
         db.close()
         
@@ -54,6 +63,6 @@ def test_get_user():
 
 
 #test_create_admin()
-#test_create_user()
-test_get_user()
+test_create_user()
+#test_get_user()
 

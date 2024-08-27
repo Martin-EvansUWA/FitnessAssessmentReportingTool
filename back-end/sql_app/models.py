@@ -10,9 +10,9 @@ from database import Base
 class DimUser(Base):
     __tablename__ = "DimUser"
 
-    UserId = Column(Integer, primary_key=True)
-    FirstName = Column(String, unique=True, index=True)
-    LastName = Column(String, unique=True, index=True)
+    UserId = Column(Integer, primary_key=True,autoincrement=True)
+    FirstName = Column(String, index=True)
+    LastName = Column(String, index=True)
     StudentId = Column(Integer, unique=True,index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
