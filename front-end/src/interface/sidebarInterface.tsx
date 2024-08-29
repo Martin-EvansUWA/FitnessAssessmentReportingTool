@@ -3,6 +3,7 @@ import { IconProp } from "@fortawesome/fontawesome-svg-core";
 export interface SidebarSection {
     [key: string]: {
         sectionName: string;
+        sectionLink: string;
         sectionOnClick: () => void;
     };
 }
@@ -15,6 +16,6 @@ export interface SideBarFooterButton {
 
 export interface SidebarData {
     title: string;
-    footer: SideBarFooterButton[];
+    footer: SideBarFooterButton | undefined;
     sections: SidebarSection[];
 }

@@ -4,11 +4,11 @@ from sqlalchemy import JSON
 from sqlalchemy import TIMESTAMP
 from sqlalchemy.sql import func
 
-from database import Base
+from .database import Base
 
 
-class DimUser(Base):
-    __tablename__ = "DimUser"
+class Student(Base):
+    __tablename__ = "Student"
 
     UserId = Column(Integer, primary_key=True)
     FirstName = Column(String, unique=True, index=True)
@@ -17,8 +17,9 @@ class DimUser(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
+    items = relationship("Item", back_populates="owner")
 
-class DimAdmin(Base):
+class Admin(Base):
     __tablename__ = "Admin"
 
     AdminId = Column(Integer, primary_key=True)
@@ -28,6 +29,7 @@ class DimAdmin(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
+    items = relationship("DimFormTemplate", back_populates="owner")
 
 
 

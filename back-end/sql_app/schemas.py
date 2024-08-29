@@ -2,6 +2,57 @@ from pydantic import BaseModel
 from typing import Dict, Any, List, Optional
 from datetime import datetime
 
+# Item Schema
+class ItemBase(BaseModel):
+    title: str
+    description: Optional[str] = None
+
+class ItemCreate(ItemBase):
+    pass
+
+class Item(ItemBase):
+    id: int
+    owner_id: int
+
+    class Config:
+        orm_mode = True
+
+# Student Schema
+class StudentBase(BaseModel):
+    email: str
+
+class StudentCreate(StudentBase):
+    password: str
+
+class Student(StudentBase):
+    UserId: int
+    FirstName: str
+    LastName: str
+    StudentId: int
+    hashed_password: str
+    items: List[Item] = []
+
+    class Config:
+        orm_mode = True
+
+# Admin Schema
+class AdminBase(BaseModel):
+    email: str
+
+class AdminCreate(AdminBase):
+    password: str
+
+class Admin(AdminBase):
+    AdminId: int
+    FirstName: str
+    LastName: str
+    StaffId: int
+    hashed_password: str
+    items: List[DimFormTemplate] = []  # Assuming `items` relates to `DimFormTemplate`
+
+    class Config:
+        orm_mode = True
+
 # DimFormTemplate Schema
 class DimFormTemplateBase(BaseModel):
     Title: str
@@ -50,42 +101,3 @@ class FactUserForm(FactUserFormBase):
 
     class Config:
         orm_mode = True
-
-
-# DimUser Schema
-class DimUserBase(BaseModel):
-    email: str
-
-class DimUserCreate(DimUserBase):
-    password: str
-
-class DimUser(DimUserBase):
-    UserId: int
-    FirstName: str
-    LastName: str
-    DimUserId: int
-    hashed_password: str
-
-    class Config:
-        orm_mode = True
-
-# Admin Schema
-class AdminBase(BaseModel):
-    email: str
-
-class DimAdminCreate(AdminBase):
-    FirstName: str
-    LastName: str
-    StaffID: int
-    password: str
-
-class DimAdmin(AdminBase):
-    AdminId: int
-    FirstName: str
-    LastName: str
-    StaffId: int
-    hashed_password: str
-
-    class Config:
-        orm_mode = True
-

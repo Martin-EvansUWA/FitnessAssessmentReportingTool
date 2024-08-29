@@ -1,31 +1,28 @@
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import uwaLogo from "../assets/uwa_logo.png";
-import { NavigationBarProps } from "../interface/navigationBarInterface";
 
-const NavigationBar: React.FC<NavigationBarProps> = ({
-    className = "",
-    setNavBarStatusProp,
-}) => {
+const NavigationBar = ({ className }: { className?: string }) => {
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     const toggleMenu = () => {
-        setIsMenuOpen((prev) => !prev);
-        setNavBarStatusProp && setNavBarStatusProp();
+        setIsMenuOpen((isMenuOpen) => !isMenuOpen);
     };
 
     return (
-        <div className={`${className}`}>
+        <div className={"relative w-full h-16" + " " + className}>
             <nav className="top-0 left-0 flex justify-between items-center pl-4 bg-white font-bold w-full h-16 z-10">
                 <div className="flex items-center">
-                    <Link to="/" className="inline-flex items-center">
+                    <a
+                        href="#landing-page"
+                        className="inline-flex items-center"
+                    >
                         <img src={uwaLogo} alt="UWA Logo" className="h-8" />
                         <span className="ml-5 text-uwa-blue text-sm md:text-base mr-10">
                             Fitness Assessment Reporting Tool
                         </span>
-                    </Link>
+                    </a>
                 </div>
                 <div className="hidden md:flex space-x-5 h-full items-center">
                     <a
@@ -56,6 +53,7 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                         onClick={toggleMenu}
                         className="focus:outline-none text-uwa-blue m-5"
                     >
+                        {/* Asset from W3C for menu icon. Change in future if needed */}
                         <svg
                             className="w-6 h-6"
                             fill="none"
@@ -74,10 +72,11 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                 </div>
             </nav>
             {isMenuOpen && (
-                <div className="md:hidden flex flex-col bg-uwa-blue mt-16 p-4 space-y-5 absolute top-0 right-0 z-10 w-full items-end">
+                <div className="md:hidden flex flex-col bg-uwa-blue mt-16 p-4 space-y-5 float-right absolute top-0 right-0 z-10 w-full items-end">
                     <span className="text-white text-sm font-bold">
                         Hello, Placeholder!
                     </span>
+
                     <a
                         href="#tutorial"
                         onClick={toggleMenu}

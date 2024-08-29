@@ -1,49 +1,54 @@
 from sqlalchemy.orm import Session
-import models, schemas
+from . import models, schemas
 
-# DimUser CRUD operations
-def get_DimUser(db: Session, DimUser_id: int):
-    return db.query(models.DimUser).filter(models.DimUser.DimUserId == DimUser_id).first()
+# Student CRUD operations
+def get_student(db: Session, student_id: int):
+    return db.query(models.Student).filter(models.Student.StudentId == student_id).first()
 
-def get_DimUser_by_email(db: Session, email: str):
-    return db.query(models.DimUser).filter(models.DimUser.email == email).first()
+def get_student_by_email(db: Session, email: str):
+    return db.query(models.Student).filter(models.Student.email == email).first()
 
-def get_DimUsers(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.DimUser).offset(skip).limit(limit).all()
+def get_students(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.Student).offset(skip).limit(limit).all()
 
-def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
-    fake_hashed_password = DimUser.password + "notreallyhashed"  # Replace with actual hashing
-    db_DimUser = models.DimUser(
-        email=DimUser.email,
+def create_student(db: Session, student: schemas.StudentCreate):
+    fake_hashed_password = student.password + "notreallyhashed"  # Replace with actual hashing
+    db_student = models.Student(
+        email=student.email,
         hashed_password=fake_hashed_password,
         FirstName="",  # Default or handle according to your logic
         LastName="",   # Default or handle according to your logic
-        DimUserId=0    # Default or derive from logic
+        StudentId=0    # Default or derive from logic
     )
-    db.add(db_DimUser)
+    db.add(db_student)
     db.commit()
-    db.refresh(db_DimUser)
-    return db_DimUser
+    db.refresh(db_student)
+    return db_student
 
+def create_student_item(db: Session, item: schemas.ItemCreate, student_id: int):
+    db_item = models.Item(**item.dict(), owner_id=student_id)
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 # Admin CRUD operations
 def get_admin(db: Session, admin_id: int):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.AdminId == admin_id).first()
+    return db.query(models.Admin).filter(models.Admin.AdminId == admin_id).first()
 
 def get_admin_by_email(db: Session, email: str):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.email == email).first()
+    return db.query(models.Admin).filter(models.Admin.email == email).first()
 
 def get_admins(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.DimAdmin).offset(skip).limit(limit).all()
+    return db.query(models.Admin).offset(skip).limit(limit).all()
 
-def create_admin(db: Session, new_admin: schemas.DimAdminCreate):
-    fake_hashed_password = new_admin.password + "notreallyhashed"  # Replace with actual hashing
-    db_admin = models.DimAdmin(
-        AdminId=2,
-        email=new_admin.email,
+def create_admin(db: Session, admin: schemas.AdminCreate):
+    fake_hashed_password = admin.password + "notreallyhashed"  # Replace with actual hashing
+    db_admin = models.Admin(
+        email=admin.email,
         hashed_password=fake_hashed_password,
-        FirstName=new_admin.FirstName,  # Default or handle according to your logic
-        LastName=new_admin.LastName,   # Default or handle according to your logic
+        FirstName="",  # Default or handle according to your logic
+        LastName="",   # Default or handle according to your logic
         StaffId=0      # Default or derive from logic
     )
     db.add(db_admin)
