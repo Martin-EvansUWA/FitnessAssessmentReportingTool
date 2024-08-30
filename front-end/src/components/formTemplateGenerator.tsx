@@ -159,6 +159,9 @@ const FormTemplateGenerator = () => {
                             type="text"
                             placeholder="Title"
                             className="border-2 border-gray-300 rounded-md"
+                            onChange={(e) =>
+                                setFormTemplateName(e.target.value)
+                            }
                         />
                     </div>
                     <div className="flex flex-col w-full">
@@ -168,6 +171,9 @@ const FormTemplateGenerator = () => {
                         <textarea
                             placeholder="Description"
                             className="border-2 border-gray-300 rounded-md resize"
+                            onChange={(e) =>
+                                setFormTemplateDescription(e.target.value)
+                            }
                         ></textarea>
                     </div>
                 </div>
