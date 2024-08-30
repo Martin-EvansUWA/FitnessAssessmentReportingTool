@@ -165,4 +165,4 @@ cython_debug/
 venv
 *.venv
 launch.json
-.db
+*.db

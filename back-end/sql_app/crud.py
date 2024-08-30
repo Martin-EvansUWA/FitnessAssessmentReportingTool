@@ -2,10 +2,16 @@ import models
 import schemas
 from sqlalchemy.orm import Session
 
-
 # DimUser CRUD operations
-def get_DimUser(db: Session, DimUser_id: int):
-    return db.query(models.DimUser).filter(models.DimUser.UserId == DimUser_id).first()
+
+
+# Get Student via their StudentID
+def get_DimUser(db: Session, DimStudent_ID: int):
+    return (
+        db.query(models.DimUser)
+        .filter(models.DimUser.StudentID == DimStudent_ID)
+        .first()
+    )
 
 
 def get_DimUser_by_email(db: Session, email: str):
@@ -33,9 +39,20 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     return db_DimUser
 
 
+def delete_DimUser(db: Session, DimStudent_ID: int):
+    temp_user = (
+        db.query(models.DimUser)
+        .filter(models.DimUser.StudentID == DimStudent_ID)
+        .first()
+    )
+    db.delete(temp_user)
+    db.commit()
+    return {"msg": "Student deleted successfully"}
+
+
 # Admin CRUD operations
-def get_admin(db: Session, admin_id: int):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.AdminId == admin_id).first()
+def get_admin(db: Session, staff_id: int):
+    return db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == staff_id).first()
 
 
 def get_admin_by_email(db: Session, email: str):
@@ -51,17 +68,25 @@ def create_admin(db: Session, new_admin: schemas.DimAdminCreate):
         new_admin.password + "notreallyhashed"
     )  # Replace with actual hashing
     db_admin = models.DimAdmin(
-        AdminId=2,
         email=new_admin.email,
         hashed_password=fake_hashed_password,
         FirstName=new_admin.FirstName,  # Default or handle according to your logic
         LastName=new_admin.LastName,  # Default or handle according to your logic
-        StaffId=0,  # Default or derive from logic
+        StaffID=new_admin.StaffID,  # Default or derive from logic
     )
     db.add(db_admin)
     db.commit()
     db.refresh(db_admin)
     return db_admin
+
+
+def delete_admin(db: Session, Staff_ID: int):
+    temp_admin = (
+        db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == Staff_ID).first()
+    )
+    db.delete(temp_admin)
+    db.commit()
+    return {"msg": "Admin deleted successfully"}
 
 
 # DimFormTemplate CRUD operations
@@ -81,7 +106,7 @@ def create_dim_form_template(
     db: Session, dim_form_template: schemas.DimFormTemplateCreate
 ):
     db_dim_form_template = models.DimFormTemplate(
-        AdminId=0,  # Set AdminId appropriately
+        AdminID=dim_form_template.AdminID,  # Set AdminId appropriately
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
@@ -132,7 +157,7 @@ def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DimUserFormResponseCreate
 ):
     db_dim_user_form_response = models.DimUserFormResponse(
-        UserFormResponseId=0,  # Default or derive from logic
+        UserFormResponseId=0,  # TODO: Change this to appropriate value
         UserFormResponse=dim_user_form_response.UserFormResponse,
     )
     db.add(db_dim_user_form_response)
