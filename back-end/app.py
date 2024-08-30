@@ -77,11 +77,11 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     try:
         # Process form data and add to database
         processed_data = createFormTemplateSchema(form_data.dict())
-        crud.create_dim_form_template(db, processed_data)
+        created_form_template = crud.create_dim_form_template(db, processed_data)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {"status": "success"}
+    return {"FormTemplateID": created_form_template.FormTemplateID}
 
 
 # view requested form, with everything except adminID
