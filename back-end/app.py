@@ -92,6 +92,9 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
+    if form_template is None:
+        raise HTTPException(status_code=404, detail="Form template not found")
+
     return jsonable_encoder(form_template)
 
 

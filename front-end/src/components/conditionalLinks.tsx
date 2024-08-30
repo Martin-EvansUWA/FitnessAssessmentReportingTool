@@ -8,12 +8,10 @@ const ConditionalLinks = ({ className }: { className: string }) => {
         <div className={className}>
             {location.pathname === "/" && (
                 <div className="flex space-x-10 justify-center">
-                    <Link to="/">Home</Link>
                     <Link to="/create-new-form-template">
                         Create New Form Template
                     </Link>
                     <Link to="/get-new-form">Get New Form</Link>
-                    <Link to="/data-entry">Data Entry</Link>
                 </div>
             )}
         </div>

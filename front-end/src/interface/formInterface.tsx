@@ -15,3 +15,12 @@ export const MeasurementType: { [key: string]: string } = {
 export interface FormTemplateCreateResponse {
     FormTemplateID: number;
 }
+
+export interface FormTemplateJSON {
+    FormTemplateID: number;
+    StaffID: number;
+    FormTemplate: FormTemplate;
+    Title: string;
+    Description: string;
+    CreatedAt: string;
+}

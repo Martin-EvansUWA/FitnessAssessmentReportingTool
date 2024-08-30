@@ -2,11 +2,15 @@ import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { backEndUrl } from "../constants";
+import { FormTemplateJSON } from "../interface/formInterface";
 
 const AddNewForm = () => {
     const [formTemplateID, setFormTemplateID] = useState<string>("");
     const [fetchState, setFetchState] = useState<string>("");
+
+    const navigate = useNavigate();
 
     const handleGetRequest = () => {
         // Send GET request to backend with formTemplateID
@@ -16,6 +20,9 @@ const AddNewForm = () => {
                 .then((response) => {
                     console.log("Success:", response.data);
                     setFetchState(""); // Clear fetch state on success
+                    navigate("/data-entry", {
+                        state: { data: response.data as FormTemplateJSON },
+                    }); // Redirect and pass data
                 })
                 .catch((error) => {
                     console.error("Error:", error);
