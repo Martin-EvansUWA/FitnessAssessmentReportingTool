@@ -12,7 +12,7 @@ class DimFormTemplateCreate(DimFormTemplateBase):
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
-    AdminId: int
+    AdminID: int
     FormTemplate: Dict[str, Any]  # JSON data
     CreatedAt: datetime
 
@@ -85,10 +85,10 @@ class DimAdminCreate(AdminBase):
     password: str
 
 class DimAdmin(AdminBase):
-    AdminId: int
+    AdminID: int
     FirstName: str
     LastName: str
-    StaffId: int
+    StaffID: int
     hashed_password: str
 
     class Config:

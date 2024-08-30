@@ -31,12 +31,12 @@ def delete_DimUser(db: Session, DimStudent_ID: int):
     temp_user = db.query(models.DimUser).filter(models.DimUser.StudentID == DimStudent_ID).first()
     db.delete(temp_user)
     db.commit()
-    return {"msg" : "Item deleted successfully"}
+    return {"msg" : "Student deleted successfully"}
 
 
 # Admin CRUD operations
-def get_admin(db: Session, admin_id: int):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.AdminId == admin_id).first()
+def get_admin(db: Session, staff_id: int):
+    return db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == staff_id).first()
 
 def get_admin_by_email(db: Session, email: str):
     return db.query(models.DimAdmin).filter(models.DimAdmin.email == email).first()
@@ -47,17 +47,22 @@ def get_admins(db: Session, skip: int = 0, limit: int = 100):
 def create_admin(db: Session, new_admin: schemas.DimAdminCreate):
     fake_hashed_password = new_admin.password + "notreallyhashed"  # Replace with actual hashing
     db_admin = models.DimAdmin(
-        AdminId=2,
         email=new_admin.email,
         hashed_password=fake_hashed_password,
         FirstName=new_admin.FirstName,  # Default or handle according to your logic
         LastName=new_admin.LastName,   # Default or handle according to your logic
-        StaffId=0      # Default or derive from logic
+        StaffID=new_admin.StaffID     # Default or derive from logic
     )
     db.add(db_admin)
     db.commit()
     db.refresh(db_admin)
     return db_admin
+
+def delete_admin(db: Session, Staff_ID: int):
+    temp_admin = db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == Staff_ID).first()
+    db.delete(temp_admin)
+    db.commit()
+    return {"msg" : "Admin deleted successfully"}
 
 # DimFormTemplate CRUD operations
 def get_dim_form_template(db: Session, form_template_id: int):
@@ -68,8 +73,8 @@ def get_dim_form_templates(db: Session, skip: int = 0, limit: int = 100):
 
 def create_dim_form_template(db: Session, dim_form_template: schemas.DimFormTemplateCreate):
     db_dim_form_template = models.DimFormTemplate(
-        FormTemplateId=0,  # Default or derive from logic
-        AdminId=0,         # Set AdminId appropriately
+        FormTemplateId=dim,  # Default or derive from logic
+        AdminID=dim_form_template.AdminID,         # Set AdminId appropriately
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
@@ -90,7 +95,7 @@ def create_form(db: Session, form_template: schemas.DimFormTemplateCreate):
     return db_form_template
 
 def get_forms_by_admin(db: Session, admin_id:int):
-    return db.query(models.DimFormTemplate).filter(models.DimFormTemplate.AdminId == admin_id).all()
+    return db.query(models.DimFormTemplate).filter(models.DimFormTemplate.AdminID == admin_id).all()
     
 def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
     db_student_form = models.FactUserForm(
