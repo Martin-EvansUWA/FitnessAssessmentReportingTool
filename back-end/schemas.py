@@ -8,19 +8,17 @@ from pydantic import BaseModel
 class DimFormTemplateBase(BaseModel):
     Title: str
     Description: Optional[str] = None
+    StaffID: int
+    FormTemplate: Dict[str, Any]  # JSON data
+    CreatedAt: str
 
 
 class DimFormTemplateCreate(DimFormTemplateBase):
-    AdminID: int
-    FormTemplate: Dict[str, Any]  # JSON data
-    CreatedAt: str
+    pass
 
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
-    AdminID: int
-    FormTemplate: Dict[str, Any]  # JSON data
-    CreatedAt: str
 
     class Config:
         orm_mode = True
@@ -32,11 +30,12 @@ class DimUserFormResponseBase(BaseModel):
 
 
 class DimUserFormResponseCreate(DimUserFormResponseBase):
+    UserFormResponse: Dict[str, Any]  # JSON data
     pass
 
 
 class DimUserFormResponse(DimUserFormResponseBase):
-    UserFormResponseId: int
+    UserFormResponseID: int
     UserFormResponse: Dict[str, Any]  # JSON data
 
     class Config:
@@ -46,21 +45,21 @@ class DimUserFormResponse(DimUserFormResponseBase):
 # FactUserForm Schema
 class FactUserFormBase(BaseModel):
     IsComplete: bool
-    CreatetAt: Optional[datetime] = None
-    CompleteAt: Optional[datetime] = None
+    CreatedAt: str
+    CompleteAt: str
 
 
 class FactUserFormCreate(FactUserFormBase):
-    FormTemplateId: int
-    UserId: int
-    SubjectUserId: int
+    UserFormResponseID: int
+    StudentID: int
+    SubjectStudentID: int
 
 
 class FactUserForm(FactUserFormBase):
-    UserFormResponseId: int
-    FormTemplateId: int
-    UserId: int
-    SubjectUserId: int
+    UserFormResponseID: int
+    FormTemplateID: int
+    StudentID: int
+    SubjectStudentID: int
 
     class Config:
         orm_mode = True
@@ -68,21 +67,17 @@ class FactUserForm(FactUserFormBase):
 
 # DimUser Schema
 class DimUserBase(BaseModel):
+    StudentID: int
     email: str
+    FirstName: str
+    LastName: str
 
 
 class DimUserCreate(DimUserBase):
-    FirstName: str
-    LastName: str
     password: str
-    StudentID: int
 
 
 class DimUser(DimUserBase):
-    UserId: int
-    FirstName: str
-    LastName: str
-    StudentID: int
     hashed_password: str
 
     class Config:
@@ -92,20 +87,16 @@ class DimUser(DimUserBase):
 # Admin Schema
 class AdminBase(BaseModel):
     email: str
-
-
-class DimAdminCreate(AdminBase):
     FirstName: str
     LastName: str
     StaffID: int
+
+
+class DimAdminCreate(AdminBase):
     password: str
 
 
 class DimAdmin(AdminBase):
-    AdminID: int
-    FirstName: str
-    LastName: str
-    StaffID: int
     hashed_password: str
 
     class Config:

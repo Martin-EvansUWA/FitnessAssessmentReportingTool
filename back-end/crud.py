@@ -107,7 +107,7 @@ def create_dim_form_template(
     db: Session, dim_form_template: schemas.DimFormTemplateCreate
 ):
     db_dim_form_template = models.DimFormTemplate(
-        AdminID=dim_form_template.AdminID,  # Set AdminId appropriately
+        StaffID=dim_form_template.StaffID,  # Set AdminId appropriately
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
@@ -146,7 +146,7 @@ def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
 def get_dim_user_form_response(db: Session, response_id: int):
     return (
         db.query(models.DimUserFormResponse)
-        .filter(models.DimUserFormResponse.UserFormResponseId == response_id)
+        .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
         .first()
     )
 
@@ -159,7 +159,6 @@ def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DimUserFormResponseCreate
 ):
     db_dim_user_form_response = models.DimUserFormResponse(
-        UserFormResponseId=0,  # TODO: Change this to appropriate value
         UserFormResponse=dim_user_form_response.UserFormResponse,
     )
     db.add(db_dim_user_form_response)
@@ -171,35 +170,41 @@ def create_dim_user_form_response(
 # FactUserForm CRUD operations
 def get_fact_user_form(
     db: Session,
-    user_form_response_id: int,
-    form_template_id: int,
     user_id: int,
     subject_user_id: int,
 ):
     return (
         db.query(models.FactUserForm)
         .filter(
-            models.FactUserForm.UserFormResponseId == user_form_response_id,
-            models.FactUserForm.FormTemplateId == form_template_id,
-            models.FactUserForm.UserId == user_id,
-            models.FactUserForm.SubjectUserId == subject_user_id,
+            models.FactUserForm.StudentID == user_id,
+            models.FactUserForm.SubjectStudentID == subject_user_id,
         )
         .first()
     )
 
+def get_fact_multiple_user_forms(
+    db: Session,
+    student_id: int,
+    subject_user_id: int,
+):
+    return (
+        db.query(models.FactUserForm)
+        .filter(
+            models.FactUserForm.StudentID == student_id,
+        )
+    )
 
-def get_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
+def get_all_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.FactUserForm).offset(skip).limit(limit).all()
 
 
 def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreate):
     db_fact_user_form = models.FactUserForm(
-        UserFormResponseId=fact_user_form.UserFormResponseId,
-        FormTemplateId=fact_user_form.FormTemplateId,
-        UserId=fact_user_form.UserId,
-        SubjectUserId=fact_user_form.SubjectUserId,
+        UserFormResponseID=fact_user_form.UserFormResponseID,
+        StudentID=fact_user_form.StudentID,
+        SubjectStudentID=fact_user_form.SubjectStudentID,
         IsComplete=fact_user_form.IsComplete,
-        CreatetAt=fact_user_form.CreatetAt,
+        CreatedAt=fact_user_form.CreatedAt,
         CompleteAt=fact_user_form.CompleteAt,
     )
     db.add(db_fact_user_form)

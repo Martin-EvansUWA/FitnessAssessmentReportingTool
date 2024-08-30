@@ -7,10 +7,9 @@ from sqlalchemy.sql import func
 class DimUser(Base):
     __tablename__ = "DimUser"
 
-    UserId = Column(Integer, primary_key=True, autoincrement=True)
+    StudentID = Column(Integer, primary_key=True)
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
-    StudentID = Column(Integer, unique=True,index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
@@ -23,10 +22,9 @@ class DimUser(Base):
 class DimAdmin(Base):
     __tablename__ = "Admin"
 
-    AdminID = Column(Integer, primary_key=True, autoincrement=True)
+    StaffID = Column(Integer, primary_key=True)
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
-    StaffID = Column(Integer, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
@@ -34,27 +32,27 @@ class DimAdmin(Base):
 class DimFormTemplate(Base):
     __tablename__ = "dim_form_templates"
 
-    FormTemplateId = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    AdminID = Column(Integer, ForeignKey(DimAdmin.AdminID))
+    FormTemplateID = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    StaffID = Column(Integer, ForeignKey(DimAdmin.StaffID))
     FormTemplate = Column(JSON)
     Title = Column(String)
     Description = Column(String)
-    CreatedAt = Column(String)  # Automatically sets timestamp to current time
+    CreatedAt = Column(String)  
     
 class DimUserFormResponse(Base):
     __tablename__ = "dim_user_form_response"
 
-    UserFormResponseId = Column(Integer, primary_key=True)
+    UserFormResponseID = Column(Integer, primary_key=True)
     UserFormResponse = Column(JSON)
 
 
 class FactUserForm(Base):
     __tablename__ = "fact_user_form"
 
-    UserFormResponseId = Column(Integer, primary_key=True, index=True)
-    FormTemplateId = Column(Integer, primary_key=True, index=True)
-    UserId = Column(Integer, primary_key=True, index=True)
-    SubjectUserId = Column(Integer, primary_key=True, index=True)
+    UserFormResponseID = Column(Integer, ForeignKey(DimUserFormResponse.UserFormResponseID), index=True)
+    FormTemplateID = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    StudentID = Column(Integer, ForeignKey(DimUser.StudentID), index=True)
+    SubjectStudentID = Column(Integer, ForeignKey(DimUser.StudentID), index=True)
     IsComplete = Column(Boolean, default=True)
-    CreatetAt = Column(TIMESTAMP, server_default=func.now())
-    CompleteAt = Column(TIMESTAMP, server_default=func.now())
+    CreatedAt = Column(String)
+    CompleteAt = Column(String)
