@@ -20,6 +20,9 @@ const initialTemplate: FormTemplate = {
 
 const FormTemplateGenerator = () => {
     const [template, setTemplate] = useState<FormTemplate>(initialTemplate);
+    const [formTemplateTitle, setFormTemplateName] = useState<string>("");
+    const [formTemplateDescription, setFormTemplateDescription] =
+        useState<string>("");
     const [newCategoryName, setNewCategoryName] = useState<string>("");
     const [newMeasurements, setNewMeasurements] = useState<{
         [key: string]: { name: string; type: string };
@@ -107,11 +110,11 @@ const FormTemplateGenerator = () => {
 
     const saveFormTemplate = () => {
         const formTemplate = {
-            Title: "Test Form",
-            Description: "Test Description",
-            StaffID: 1,
+            Title: formTemplateTitle,
+            Description: formTemplateDescription,
+            StaffID: 1, // TODO: Replace with actual StaffID from session when implemented
             FormTemplate: template,
-            CreatedAt: "01/01/2021",
+            CreatedAt: new Date().toISOString(),
         };
 
         // Send form template to backend
@@ -141,6 +144,35 @@ const FormTemplateGenerator = () => {
                     FormTemplateID: {responseData?.FormTemplateID}
                 </p>
             </div>
+        </>
+    );
+
+    const formMetaData = (
+        <>
+            <div className="flex justify-center">
+                <div className="flex flex-col w-full md:w-[30rem] space-y-3">
+                    <div className="flex flex-row justify-between">
+                        <label className="font-bold" htmlFor="formTitle">
+                            Form Title:
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            className="border-2 border-gray-300 rounded-md"
+                        />
+                    </div>
+                    <div className="flex flex-col w-full">
+                        <label className="font-bold" htmlFor="formDescription">
+                            Form Description:
+                        </label>
+                        <textarea
+                            placeholder="Description"
+                            className="border-2 border-gray-300 rounded-md resize"
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+            <hr className="w-full border-t-2 border-gray-300 mt-2" />
         </>
     );
 
@@ -176,7 +208,12 @@ const FormTemplateGenerator = () => {
                             Create New Form
                         </h1>
                         <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-                        <div className="overflow-y-auto max-h-[60vh]">
+                        <p className="font-bold my-5">
+                            Create a new form template by adding categories and
+                            measurements.
+                        </p>
+                        {formMetaData}
+                        <div>
                             {categories.map((category, index) => (
                                 <div key={index} className="my-5">
                                     <div>
