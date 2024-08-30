@@ -2,10 +2,12 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-import pytest
+from datetime import datetime, date
 import models
-from schemas import DimAdminCreate, DimUserCreate
+from schemas import DimAdminCreate, DimUserCreate, DimFormTemplateCreate
 from crud import create_admin, get_admin, get_DimUser, create_DimUser, delete_DimUser, delete_admin
+
+from crud import create_dim_form_template
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./back-end/sql_app/test.db"
 
@@ -74,6 +76,31 @@ def test_admin_creation():
     assert q_admin.LastName == "Reginald"
 
 
+# Test Form Creation
+def test_create_form():
+    temp_layout = {
+        "bench" : ""
+    }
+
+    temp_test = DimFormTemplateCreate(
+        Title="My Newest Form",
+        Description="A form to determine the best bench press in the class",
+        AdminID=77771111,
+        CreatedAt= date.today().strftime("%d/%m/%Y") + datetime.now().strftime("%H:%M:%S"),
+        FormTemplate=temp_layout
+    )
+
+
+    temp_test2 = DimFormTemplateCreate(
+        Title="My Newest Form",
+        Description="A form to determine the best bench press in the class",
+        AdminID=77771111,
+        CreatedAt= date.today().strftime("%d/%m/%Y") + datetime.now().strftime("%H:%M:%S"),
+        FormTemplate=temp_layout
+    )
+    create_dim_form_template(db, temp_test)
+    create_dim_form_template(db, temp_test2)
+
 
     
 
@@ -90,4 +117,5 @@ def test_user_deletion():
 def test_admin_deletion():
     response = delete_admin(db, 77771111)
     assert response['msg'] == "Admin deleted successfully"
+
 db.close()

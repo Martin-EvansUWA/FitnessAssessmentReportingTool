@@ -73,7 +73,6 @@ def get_dim_form_templates(db: Session, skip: int = 0, limit: int = 100):
 
 def create_dim_form_template(db: Session, dim_form_template: schemas.DimFormTemplateCreate):
     db_dim_form_template = models.DimFormTemplate(
-        FormTemplateId=dim,  # Default or derive from logic
         AdminID=dim_form_template.AdminID,         # Set AdminId appropriately
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,

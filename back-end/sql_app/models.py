@@ -39,12 +39,12 @@ class DimAdmin(Base):
 class DimFormTemplate(Base):
     __tablename__ = "dim_form_templates"
 
-    FormTemplateId = Column(Integer, primary_key=True, index=True)
-    AdminID = Column(Integer, primary_key=True)
+    FormTemplateId = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    AdminID = Column(Integer, ForeignKey(DimAdmin.AdminID))
     FormTemplate = Column(JSON)
     Title = Column(String)
     Description = Column(String)
-    CreatedAt = Column(TIMESTAMP, server_default=func.now())  # Automatically sets timestamp to current time
+    CreatedAt = Column(String)  # Automatically sets timestamp to current time
     
 class DimUserFormResponse(Base):
     __tablename__ = "dim_user_form_response"

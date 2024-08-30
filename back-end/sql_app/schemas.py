@@ -8,13 +8,15 @@ class DimFormTemplateBase(BaseModel):
     Description: Optional[str] = None
 
 class DimFormTemplateCreate(DimFormTemplateBase):
-    pass
+    AdminID: int
+    FormTemplate: Dict[str, Any]  # JSON data
+    CreatedAt: str
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
     AdminID: int
     FormTemplate: Dict[str, Any]  # JSON data
-    CreatedAt: datetime
+    CreatedAt: str
 
     class Config:
         orm_mode = True
