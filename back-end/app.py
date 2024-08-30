@@ -86,9 +86,13 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 
 # [Student] Retrieve form template by form id
 @app.get("/retrieve_form_template/{form_id}")
-def retrieve_form_template(form_id: int):
-    form = get_form(form_id)
-    return jsonable_encoder(form)
+def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
+    try:
+        form_template = crud.get_dim_form_template(db, form_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return jsonable_encoder(form_template)
 
 
 # Save student form data
