@@ -1,6 +1,7 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { backEndUrl } from "../constants";
 import { FormTemplate, MeasurementType } from "../interface/formInterface";
 
 const initialTemplate: FormTemplate = {
@@ -97,9 +98,36 @@ const FormTemplateGenerator = () => {
         []
     );
 
-    // TODO: Implement saveFormTemplate function
     const saveFormTemplate = () => {
-        // Save form template to database
+        // {title: "hello", description: "test description", admin_id: 1, created_at: "01/01/2021", form_template:{test: test1}}
+        const formTemplate = {
+            title: "Test Form",
+            description: "Test Description",
+            admin_id: 1,
+            created_at: "01/01/2021",
+            form_template: template,
+        };
+
+        fetch(`${backEndUrl}/create_form/`, {
+            method: "POST",
+            mode: "cors",
+            body: JSON.stringify(formTemplate),
+            headers: {
+                "Content-Type": "application/json",
+            },
+        })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Network response was not ok");
+                }
+                return response.json();
+            })
+            .then((data) => {
+                console.log("Success:", data);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+            });
     };
 
     const categories = useMemo(() => Object.keys(template), [template]);
