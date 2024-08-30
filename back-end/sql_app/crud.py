@@ -2,8 +2,10 @@ from sqlalchemy.orm import Session
 import models, schemas
 
 # DimUser CRUD operations
-def get_DimUser(db: Session, DimUser_id: int):
-    return db.query(models.DimUser).filter(models.DimUser.UserId == DimUser_id).first()
+
+# Get Student via their StudentID
+def get_DimUser(db: Session, DimStudent_ID: int):
+    return db.query(models.DimUser).filter(models.DimUser.StudentID == DimStudent_ID).first()
 
 def get_DimUser_by_email(db: Session, email: str):
     return db.query(models.DimUser).filter(models.DimUser.email == email).first()
@@ -24,6 +26,12 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     db.commit()
     db.refresh(db_DimUser)
     return db_DimUser
+
+def delete_DimUser(db: Session, DimStudent_ID: int):
+    temp_user = db.query(models.DimUser).filter(models.DimUser.StudentID == DimStudent_ID).first()
+    db.delete(temp_user)
+    db.commit()
+    return {"msg" : "Item deleted successfully"}
 
 
 # Admin CRUD operations

@@ -13,7 +13,7 @@ class DimUser(Base):
     UserId = Column(Integer, primary_key=True,autoincrement=True)
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
-    StudentId = Column(Integer, unique=True,index=True)
+    StudentID = Column(Integer, unique=True,index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     

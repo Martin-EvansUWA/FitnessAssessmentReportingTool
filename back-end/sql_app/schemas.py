@@ -62,13 +62,13 @@ class DimUserCreate(DimUserBase):
     FirstName: str
     LastName: str
     password: str
-    StudentId: int
+    StudentID: int
 
 class DimUser(DimUserBase):
     UserId: int
     FirstName: str
     LastName: str
-    DimUserId: int
+    StudentID: int
     hashed_password: str
 
     class Config:
