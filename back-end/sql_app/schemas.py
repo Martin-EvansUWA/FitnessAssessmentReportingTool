@@ -40,7 +40,9 @@ class FactUserFormBase(BaseModel):
     CompleteAt: Optional[datetime] = None
 
 class FactUserFormCreate(FactUserFormBase):
-    pass
+    FormTemplateId: int
+    UserId: int
+    SubjectUserId: int
 
 class FactUserForm(FactUserFormBase):
     UserFormResponseId: int
@@ -57,7 +59,10 @@ class DimUserBase(BaseModel):
     email: str
 
 class DimUserCreate(DimUserBase):
+    FirstName: str
+    LastName: str
     password: str
+    StudentId: int
 
 class DimUser(DimUserBase):
     UserId: int
