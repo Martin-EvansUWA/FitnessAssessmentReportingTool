@@ -1,16 +1,20 @@
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
+
 
 # DimFormTemplate Schema
 class DimFormTemplateBase(BaseModel):
     Title: str
     Description: Optional[str] = None
 
+
 class DimFormTemplateCreate(DimFormTemplateBase):
     AdminID: int
     FormTemplate: Dict[str, Any]  # JSON data
     CreatedAt: str
+
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
@@ -21,12 +25,15 @@ class DimFormTemplate(DimFormTemplateBase):
     class Config:
         orm_mode = True
 
+
 # DimUserFormResponse Schema
 class DimUserFormResponseBase(BaseModel):
     pass  # You may want to include fields if known
 
+
 class DimUserFormResponseCreate(DimUserFormResponseBase):
     pass
+
 
 class DimUserFormResponse(DimUserFormResponseBase):
     UserFormResponseId: int
@@ -35,16 +42,19 @@ class DimUserFormResponse(DimUserFormResponseBase):
     class Config:
         orm_mode = True
 
+
 # FactUserForm Schema
 class FactUserFormBase(BaseModel):
     IsComplete: bool
     CreatetAt: Optional[datetime] = None
     CompleteAt: Optional[datetime] = None
 
+
 class FactUserFormCreate(FactUserFormBase):
     FormTemplateId: int
     UserId: int
     SubjectUserId: int
+
 
 class FactUserForm(FactUserFormBase):
     UserFormResponseId: int
@@ -60,11 +70,13 @@ class FactUserForm(FactUserFormBase):
 class DimUserBase(BaseModel):
     email: str
 
+
 class DimUserCreate(DimUserBase):
     FirstName: str
     LastName: str
     password: str
     StudentID: int
+
 
 class DimUser(DimUserBase):
     UserId: int
@@ -76,15 +88,18 @@ class DimUser(DimUserBase):
     class Config:
         orm_mode = True
 
+
 # Admin Schema
 class AdminBase(BaseModel):
     email: str
+
 
 class DimAdminCreate(AdminBase):
     FirstName: str
     LastName: str
     StaffID: int
     password: str
+
 
 class DimAdmin(AdminBase):
     AdminID: int
@@ -95,4 +110,3 @@ class DimAdmin(AdminBase):
 
     class Config:
         orm_mode = True
-
