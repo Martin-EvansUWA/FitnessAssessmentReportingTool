@@ -1,10 +1,10 @@
 import "./App.css";
-import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
+import RegisterModal from './components/registerModal'
 
 function App() {
     return (
         <>
-            <CreateNewFormTemplatePage />
+    <RegisterModal />
         </>
     );
 }
