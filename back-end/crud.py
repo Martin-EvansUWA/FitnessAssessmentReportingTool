@@ -1,6 +1,7 @@
+from sqlalchemy.orm import Session
+
 import models
 import schemas
-from sqlalchemy.orm import Session
 
 # DimUser CRUD operations
 
@@ -110,6 +111,7 @@ def create_dim_form_template(
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
+        CreatedAt=dim_form_template.CreatedAt,
     )
     db.add(db_dim_form_template)
     db.commit()
