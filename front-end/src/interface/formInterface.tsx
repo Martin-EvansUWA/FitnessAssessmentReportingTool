@@ -11,3 +11,7 @@ export const MeasurementType: { [key: string]: string } = {
     float: "Float",
     bool: "Boolean",
 };
+
+export interface FormTemplateCreateResponse {
+    FormTemplateID: number;
+}

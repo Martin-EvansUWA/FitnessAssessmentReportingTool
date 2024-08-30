@@ -1,14 +1,16 @@
 import json
+from http.client import HTTPException
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.encoders import jsonable_encoder
-from starlette.responses import FileResponse
+from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 import crud
 import models
-import schemas
 from database import SessionLocal, engine
 from process import createFormTemplateSchema
+from schemas import DimFormTemplateCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -24,6 +26,14 @@ def get_db():
 
 # app implementation
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],  # Add your frontend origin here
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
@@ -63,10 +73,15 @@ def retrieve_admin_templates(admin_id: int):
 
 # Create new form
 @app.post("/create_form")
-def add_form(form_data):
-    processed_data = createFormTemplateSchema(form_data)
-    crud.create_dim_form_template(get_db(), processed_data)
-    return 200
+def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
+    try:
+        # Process form data and add to database
+        processed_data = createFormTemplateSchema(form_data.dict())
+        created_form_template = crud.create_dim_form_template(db, processed_data)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    return {"FormTemplateID": created_form_template.FormTemplateID}
 
 
 # view requested form, with everything except adminID

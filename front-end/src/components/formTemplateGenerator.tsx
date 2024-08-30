@@ -1,8 +1,13 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { backEndUrl } from "../constants";
-import { FormTemplate, MeasurementType } from "../interface/formInterface";
+import {
+    FormTemplate,
+    FormTemplateCreateResponse,
+    MeasurementType,
+} from "../interface/formInterface";
 
 const initialTemplate: FormTemplate = {
     "Student Details": {
@@ -15,10 +20,15 @@ const initialTemplate: FormTemplate = {
 
 const FormTemplateGenerator = () => {
     const [template, setTemplate] = useState<FormTemplate>(initialTemplate);
+    const [formTemplateTitle, setFormTemplateName] = useState<string>("");
+    const [formTemplateDescription, setFormTemplateDescription] =
+        useState<string>("");
     const [newCategoryName, setNewCategoryName] = useState<string>("");
     const [newMeasurements, setNewMeasurements] = useState<{
         [key: string]: { name: string; type: string };
     }>({});
+    const [responseData, setResponseData] =
+        useState<FormTemplateCreateResponse | null>(null); // State to store response data
 
     useEffect(() => {
         console.log("Template updated:", template);
@@ -99,193 +109,283 @@ const FormTemplateGenerator = () => {
     );
 
     const saveFormTemplate = () => {
-        // {title: "hello", description: "test description", admin_id: 1, created_at: "01/01/2021", form_template:{test: test1}}
         const formTemplate = {
-            title: "Test Form",
-            description: "Test Description",
-            admin_id: 1,
-            created_at: "01/01/2021",
-            form_template: template,
+            Title: formTemplateTitle,
+            Description: formTemplateDescription,
+            StaffID: 1, // TODO: Replace with actual StaffID from session when implemented in backend
+            FormTemplate: template,
+            CreatedAt: new Date().toISOString(),
         };
 
-        fetch(`${backEndUrl}/create_form/`, {
-            method: "POST",
-            mode: "cors",
-            body: JSON.stringify(formTemplate),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
+        // Send form template to backend
+        axios
+            .post(`${backEndUrl}/create_form`, formTemplate, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
             })
-            .then((data) => {
-                console.log("Success:", data);
+            .then((response) => {
+                console.log("Success:", response.data);
+                setResponseData(response.data as FormTemplateCreateResponse); // Update responseData with the response data
             })
             .catch((error) => {
                 console.error("Error:", error);
             });
     };
 
+    // Display the Form Template ID after saving
+    const showFormTemplateIdScreen = (
+        <>
+            <h1 className="text-2xl font-bold mb-5">Form Template Created</h1>
+            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+            <div className="mt-5 font-bold w-full text-center space-y-5">
+                <p>Share this Form Template ID with your students!</p>
+                <p className="text-xl">
+                    FormTemplateID: {responseData?.FormTemplateID}
+                </p>
+            </div>
+        </>
+    );
+
+    const formMetaData = (
+        <>
+            <div className="flex justify-center">
+                <div className="flex flex-col w-full md:w-[30rem] space-y-3">
+                    <div className="flex flex-row justify-between">
+                        <label className="font-bold" htmlFor="formTitle">
+                            Form Title:
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            className="border-2 border-gray-300 rounded-md"
+                            onChange={(e) =>
+                                setFormTemplateName(e.target.value)
+                            }
+                        />
+                    </div>
+                    <div className="flex flex-col w-full">
+                        <label className="font-bold" htmlFor="formDescription">
+                            Form Description:
+                        </label>
+                        <textarea
+                            placeholder="Description"
+                            className="border-2 border-gray-300 rounded-md resize"
+                            onChange={(e) =>
+                                setFormTemplateDescription(e.target.value)
+                            }
+                        ></textarea>
+                    </div>
+                </div>
+            </div>
+            <hr className="w-full border-t-2 border-gray-300 mt-2" />
+        </>
+    );
+
+    const returnToFormManagerButton = (
+        <button
+            onClick={() => setResponseData(null)} // TODO: Once Form Manager page is implemented, replace this with a redirect
+            className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+        >
+            Return to Form Manager
+        </button>
+    );
+
+    // Save Form button
+    const saveFormTemplateButton = (
+        <button
+            onClick={() => saveFormTemplate()}
+            className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+        >
+            Save Form
+        </button>
+    );
+
     const categories = useMemo(() => Object.keys(template), [template]);
 
     return (
         <div className="flex flex-col min-h-full">
             <div className="flex-grow">
-                <h1 className="text-2xl font-bold mb-5">Create New Form</h1>
-                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-                <div className="overflow-y-auto max-h-[60vh]">
-                    {categories.map((category, index) => (
-                        <div key={index} className="my-5">
-                            <div>
-                                <span className="text-lg font-bold mr-5">
-                                    {category}
-                                </span>
-                                <button
-                                    onClick={() => removeCategory(category)}
-                                    className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
-                                    style={{
-                                        background: "none",
-                                        border: "none",
-                                    }}
-                                >
-                                    <FontAwesomeIcon icon={faTrash} />
-                                </button>
-                            </div>
-                            <ul className="w-full md:w-80">
-                                {Object.keys(template[category]).map(
-                                    (measurement, index) => (
-                                        <li
-                                            key={index}
-                                            className="ml-2 md:ml-14 my-2"
+                {responseData ? (
+                    showFormTemplateIdScreen
+                ) : (
+                    <>
+                        <h1 className="text-2xl font-bold mb-5">
+                            Create New Form
+                        </h1>
+                        <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                        <p className="font-bold my-5">
+                            Create a new form template by adding categories and
+                            measurements.
+                        </p>
+                        {formMetaData}
+                        <div>
+                            {categories.map((category, index) => (
+                                <div key={index} className="my-5">
+                                    <div>
+                                        <span className="text-lg font-bold mr-5">
+                                            {category}
+                                        </span>
+                                        <button
+                                            onClick={() =>
+                                                removeCategory(category)
+                                            }
+                                            className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
+                                            style={{
+                                                background: "none",
+                                                border: "none",
+                                            }}
                                         >
-                                            <div className="flex flex-row items-center justify-between">
-                                                <span className="text-sm basis-1/4">
-                                                    <b>{measurement}:</b>
-                                                </span>
-                                                <span className="basis-1/4">
-                                                    {
-                                                        template[category][
-                                                            measurement
-                                                        ]
-                                                    }
-                                                </span>
-                                                <button
-                                                    onClick={() =>
-                                                        removeMeasurement(
-                                                            category,
-                                                            measurement
-                                                        )
-                                                    }
-                                                    className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
-                                                    style={{
-                                                        background: "none",
-                                                        border: "none",
-                                                    }}
+                                            <FontAwesomeIcon icon={faTrash} />
+                                        </button>
+                                    </div>
+                                    <ul className="w-full md:w-80">
+                                        {Object.keys(template[category]).map(
+                                            (measurement, index) => (
+                                                <li
+                                                    key={index}
+                                                    className="ml-2 md:ml-14 my-2"
                                                 >
-                                                    <FontAwesomeIcon
-                                                        icon={faTrash}
-                                                    />
-                                                </button>
-                                            </div>
+                                                    <div className="flex flex-row items-center justify-between">
+                                                        <span className="text-sm basis-1/4">
+                                                            <b>
+                                                                {measurement}:
+                                                            </b>
+                                                        </span>
+                                                        <span className="basis-1/4">
+                                                            {
+                                                                template[
+                                                                    category
+                                                                ][measurement]
+                                                            }
+                                                        </span>
+                                                        <button
+                                                            onClick={() =>
+                                                                removeMeasurement(
+                                                                    category,
+                                                                    measurement
+                                                                )
+                                                            }
+                                                            className="hover:text-uwa-yellow text-uwa-blue p-0 m-0"
+                                                            style={{
+                                                                background:
+                                                                    "none",
+                                                                border: "none",
+                                                            }}
+                                                        >
+                                                            <FontAwesomeIcon
+                                                                icon={faTrash}
+                                                            />
+                                                        </button>
+                                                    </div>
+                                                </li>
+                                            )
+                                        )}
+                                        <li className="ml-2 md:ml-14">
+                                            <input
+                                                type="text"
+                                                placeholder="New Measurement"
+                                                value={
+                                                    newMeasurements[category]
+                                                        ?.name || ""
+                                                }
+                                                onChange={(e) =>
+                                                    handleMeasurementChange(
+                                                        category,
+                                                        "name",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="border-solid border border-uwa-blue mr-2 my-1"
+                                            />
+                                            <select
+                                                aria-label="Measurement Type"
+                                                value={
+                                                    newMeasurements[category]
+                                                        ?.type || ""
+                                                }
+                                                onChange={(e) =>
+                                                    handleMeasurementChange(
+                                                        category,
+                                                        "type",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                className="border-solid border border-uwa-blue mr-2 my-1"
+                                            >
+                                                <option disabled value="">
+                                                    - select type -
+                                                </option>
+                                                <option
+                                                    value={MeasurementType.int}
+                                                >
+                                                    Integer
+                                                </option>
+                                                <option
+                                                    value={MeasurementType.str}
+                                                >
+                                                    String
+                                                </option>
+                                                <option
+                                                    value={
+                                                        MeasurementType.float
+                                                    }
+                                                >
+                                                    Float
+                                                </option>
+                                                <option
+                                                    value={MeasurementType.bool}
+                                                >
+                                                    Boolean
+                                                </option>
+                                            </select>
+                                            <button
+                                                onClick={() =>
+                                                    addNewMeasurement(category)
+                                                }
+                                                className="text-xl my-1 text-uwa-yellow hover:text-uwa-blue"
+                                            >
+                                                <FontAwesomeIcon
+                                                    icon={faPlus}
+                                                />
+                                            </button>
                                         </li>
-                                    )
-                                )}
-                                <li className="ml-2 md:ml-14">
-                                    <input
-                                        type="text"
-                                        placeholder="New Measurement"
-                                        value={
-                                            newMeasurements[category]?.name ||
-                                            ""
-                                        }
-                                        onChange={(e) =>
-                                            handleMeasurementChange(
-                                                category,
-                                                "name",
-                                                e.target.value
-                                            )
-                                        }
-                                        className="border-solid border border-uwa-blue mr-2 my-1"
-                                    />
-                                    <select
-                                        aria-label="Measurement Type"
-                                        value={
-                                            newMeasurements[category]?.type ||
-                                            ""
-                                        }
-                                        onChange={(e) =>
-                                            handleMeasurementChange(
-                                                category,
-                                                "type",
-                                                e.target.value
-                                            )
-                                        }
-                                        className="border-solid border border-uwa-blue mr-2 my-1"
-                                    >
-                                        <option disabled value="">
-                                            - select type -
-                                        </option>
-                                        <option value={MeasurementType.int}>
-                                            Integer
-                                        </option>
-                                        <option value={MeasurementType.str}>
-                                            String
-                                        </option>
-                                        <option value={MeasurementType.float}>
-                                            Float
-                                        </option>
-                                        <option value={MeasurementType.bool}>
-                                            Boolean
-                                        </option>
-                                    </select>
-                                    <button
-                                        onClick={() =>
-                                            addNewMeasurement(category)
-                                        }
-                                        className="text-xl my-1 text-uwa-yellow hover:text-uwa-blue"
-                                    >
-                                        <FontAwesomeIcon icon={faPlus} />
-                                    </button>
-                                </li>
-                            </ul>
-                        </div>
-                    ))}
-                    <div className="w-full">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <input
-                                    type="text"
-                                    placeholder="New Category"
-                                    value={newCategoryName}
-                                    onChange={(e) =>
-                                        setNewCategoryName(e.target.value)
-                                    }
-                                    className="border-solid border border-uwa-blue mr-2"
-                                />
-                                <button
-                                    onClick={() =>
-                                        addNewCategory(newCategoryName)
-                                    }
-                                    className="text-xl text-uwa-yellow hover:text-uwa-blue"
-                                >
-                                    <FontAwesomeIcon icon={faPlus} />
-                                </button>
+                                    </ul>
+                                </div>
+                            ))}
+                            <div className="w-full">
+                                <div className="flex justify-between items-center">
+                                    <div>
+                                        <input
+                                            type="text"
+                                            placeholder="New Category"
+                                            value={newCategoryName}
+                                            onChange={(e) =>
+                                                setNewCategoryName(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className="border-solid border border-uwa-blue mr-2"
+                                        />
+                                        <button
+                                            onClick={() =>
+                                                addNewCategory(newCategoryName)
+                                            }
+                                            className="text-xl text-uwa-yellow hover:text-uwa-blue"
+                                        >
+                                            <FontAwesomeIcon icon={faPlus} />
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
+                    </>
+                )}
             </div>
             <div className="flex justify-end p-5">
-                <button
-                    onClick={() => saveFormTemplate()}
-                    className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
-                >
-                    Save Form
-                </button>
+                {responseData
+                    ? returnToFormManagerButton
+                    : saveFormTemplateButton}
             </div>
         </div>
     );
