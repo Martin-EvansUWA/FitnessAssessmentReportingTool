@@ -1,22 +1,19 @@
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
-from sqlalchemy.orm import relationship
-from sqlalchemy import JSON
-from sqlalchemy import TIMESTAMP
-from sqlalchemy.sql import func
-
 from database import Base
+from sqlalchemy import JSON, TIMESTAMP, Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql import func
 
 
 class DimUser(Base):
     __tablename__ = "DimUser"
 
-    UserId = Column(Integer, primary_key=True,autoincrement=True)
+    UserId = Column(Integer, primary_key=True, autoincrement=True)
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
     StudentID = Column(Integer, unique=True,index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    
+
     def __repr__(self):
         return (f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
                 f"LastName='{self.LastName}', StudentId={self.StudentID}, "
@@ -34,8 +31,6 @@ class DimAdmin(Base):
     hashed_password = Column(String)
 
 
-
-
 class DimFormTemplate(Base):
     __tablename__ = "dim_form_templates"
 
@@ -48,14 +43,14 @@ class DimFormTemplate(Base):
     
 class DimUserFormResponse(Base):
     __tablename__ = "dim_user_form_response"
-    
+
     UserFormResponseId = Column(Integer, primary_key=True)
     UserFormResponse = Column(JSON)
-    
-    
+
+
 class FactUserForm(Base):
     __tablename__ = "fact_user_form"
-    
+
     UserFormResponseId = Column(Integer, primary_key=True, index=True)
     FormTemplateId = Column(Integer, primary_key=True, index=True)
     UserId = Column(Integer, primary_key=True, index=True)
