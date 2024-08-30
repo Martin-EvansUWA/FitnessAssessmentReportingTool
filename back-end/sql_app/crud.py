@@ -3,7 +3,7 @@ import models, schemas
 
 # DimUser CRUD operations
 def get_DimUser(db: Session, DimUser_id: int):
-    return db.query(models.DimUser).filter(models.DimUser.DimUserId == DimUser_id).first()
+    return db.query(models.DimUser).filter(models.DimUser.UserId == DimUser_id).first()
 
 def get_DimUser_by_email(db: Session, email: str):
     return db.query(models.DimUser).filter(models.DimUser.email == email).first()
@@ -16,9 +16,9 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     db_DimUser = models.DimUser(
         email=DimUser.email,
         hashed_password=fake_hashed_password,
-        FirstName="",  # Default or handle according to your logic
-        LastName="",   # Default or handle according to your logic
-        DimUserId=0    # Default or derive from logic
+        FirstName=DimUser.FirstName,  # Default or handle according to your logic
+        LastName=DimUser.LastName,   # Default or handle according to your logic
+        StudentID=DimUser.StudentID
     )
     db.add(db_DimUser)
     db.commit()
@@ -70,6 +70,33 @@ def create_dim_form_template(db: Session, dim_form_template: schemas.DimFormTemp
     db.commit()
     db.refresh(db_dim_form_template)
     return db_dim_form_template
+
+def create_form(db: Session, form_template: schemas.DimFormTemplateCreate):
+    db_form_template = models.DimFormTemplate(
+        Title = form_template.Title,
+        Description = form_template.Description
+    )
+    db.add(db_form_template)
+    db.commit()
+    db.refersh(db_form_template)
+    return db_form_template
+
+def get_forms_by_admin(db: Session, admin_id:int):
+    return db.query(models.DimFormTemplate).filter(models.DimFormTemplate.AdminId == admin_id).all()
+    
+def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
+    db_student_form = models.FactUserForm(
+        FormTemplateId=student_form.FormTemplateId,
+        UserId=student_form.UserId,
+        SubjectUserId=student_form.SubjectUserId,
+        IsComplete=student_form.IsComplete,
+        CreatedAt=student_form.CreatedAt,
+        CompleteAt=student_form.CompleteAt
+    )
+    db.add(db_student_form)
+    db.commit()
+    db.refresh(db_student_form)
+    return db_student_form
 
 # DimUserFormResponse CRUD operations
 def get_dim_user_form_response(db: Session, response_id: int):
