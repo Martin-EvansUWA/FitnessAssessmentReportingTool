@@ -1,12 +1,14 @@
 import json
 
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from starlette.responses import FileResponse
+
 import crud
 import models
 import schemas
 from database import SessionLocal, engine
-from fastapi import FastAPI
-from fastapi.encoders import jsonable_encoder
-from starlette.responses import FileResponse
+from process import createFormTemplateSchema
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -15,7 +17,7 @@ models.Base.metadata.create_all(bind=engine)
 def get_db():
     db = SessionLocal()
     try:
-        yield db
+        return db
     finally:
         db.close()
 
@@ -62,8 +64,8 @@ def retrieve_admin_templates(admin_id: int):
 # Create new form
 @app.post("/create_form")
 def add_form(form_data):
-
-    crud.create_dim_form_template(form_data)
+    processed_data = createFormTemplateSchema(form_data)
+    crud.create_dim_form_template(get_db(), processed_data)
     return 200
 
 

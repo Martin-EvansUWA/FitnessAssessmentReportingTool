@@ -1,6 +1,8 @@
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
+
 
 # DimFormTemplate Schema
 class DimFormTemplateBase(BaseModel):
@@ -10,8 +12,10 @@ class DimFormTemplateBase(BaseModel):
     FormTemplate: Dict[str, Any]  # JSON data
     CreatedAt: str
 
+
 class DimFormTemplateCreate(DimFormTemplateBase):
     pass
+
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
@@ -19,13 +23,16 @@ class DimFormTemplate(DimFormTemplateBase):
     class Config:
         orm_mode = True
 
+
 # DimUserFormResponse Schema
 class DimUserFormResponseBase(BaseModel):
     pass  # You may want to include fields if known
 
+
 class DimUserFormResponseCreate(DimUserFormResponseBase):
     UserFormResponse: Dict[str, Any]  # JSON data
     pass
+
 
 class DimUserFormResponse(DimUserFormResponseBase):
     UserFormResponseID: int
@@ -34,16 +41,19 @@ class DimUserFormResponse(DimUserFormResponseBase):
     class Config:
         orm_mode = True
 
+
 # FactUserForm Schema
 class FactUserFormBase(BaseModel):
     IsComplete: bool
     CreatedAt: str
     CompleteAt: str
 
+
 class FactUserFormCreate(FactUserFormBase):
     UserFormResponseID: int
     StudentID: int
     SubjectStudentID: int
+
 
 class FactUserForm(FactUserFormBase):
     UserFormResponseID: int
@@ -62,14 +72,17 @@ class DimUserBase(BaseModel):
     FirstName: str
     LastName: str
 
+
 class DimUserCreate(DimUserBase):
     password: str
+
 
 class DimUser(DimUserBase):
     hashed_password: str
 
     class Config:
         orm_mode = True
+
 
 # Admin Schema
 class AdminBase(BaseModel):
@@ -78,12 +91,13 @@ class AdminBase(BaseModel):
     LastName: str
     StaffID: int
 
+
 class DimAdminCreate(AdminBase):
     password: str
+
 
 class DimAdmin(AdminBase):
     hashed_password: str
 
     class Config:
         orm_mode = True
-
