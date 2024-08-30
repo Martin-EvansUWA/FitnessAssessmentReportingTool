@@ -115,15 +115,43 @@ const DataEntryPage = () => {
     };
 
     const introComponent = (
-        <>
-            <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
-            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-            <div className="my-5 font-bold">
-                Start by selecting a section from the sidebar!
+        <div className="h-full flex flex-col justify-between">
+            <div>
+                <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
+                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                <div className="mt-5">
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">Title:</span>{" "}
+                        {formContentObj.Title}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Description:
+                        </span>{" "}
+                        {formContentObj.Description}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Created By:
+                        </span>{" "}
+                        {formContentObj.StaffID}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Created At:
+                        </span>{" "}
+                        {formContentObj.CreatedAt}
+                    </h2>
+                </div>
             </div>
-        </>
+            <button
+                className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end"
+                onClick={() => setSelectedSection(0)}
+            >
+                Start Data Entry
+            </button>
+        </div>
     );
-
     const selectedSectionComponent = (
         <FormTemplate
             previousSection={
