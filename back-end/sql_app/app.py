@@ -61,8 +61,9 @@ def retrieve_admin_templates(admin_id: int):
 
 # Create new form
 @app.post("/create_form")
-def add_form(form_info):
-    crud.create_dim_form_template(form_info)
+def add_form(form_data):
+
+    crud.create_dim_form_template(form_data)
     return 200
 
 
