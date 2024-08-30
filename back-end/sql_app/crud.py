@@ -18,7 +18,7 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
         hashed_password=fake_hashed_password,
         FirstName=DimUser.FirstName,  # Default or handle according to your logic
         LastName=DimUser.LastName,   # Default or handle according to your logic
-        StudentId=DimUser.StudentId
+        StudentID=DimUser.StudentID
     )
     db.add(db_DimUser)
     db.commit()
