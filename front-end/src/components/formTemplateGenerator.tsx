@@ -1,5 +1,6 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { backEndUrl } from "../constants";
 import { FormTemplate, MeasurementType } from "../interface/formInterface";
@@ -99,31 +100,23 @@ const FormTemplateGenerator = () => {
     );
 
     const saveFormTemplate = () => {
-        // {title: "hello", description: "test description", admin_id: 1, created_at: "01/01/2021", form_template:{test: test1}}
         const formTemplate = {
-            title: "Test Form",
-            description: "Test Description",
-            admin_id: 1,
-            created_at: "01/01/2021",
-            form_template: template,
+            Title: "Test Form",
+            Description: "Test Description",
+            StaffID: 1,
+            FormTemplate: template,
+            CreatedAt: "01/01/2021",
         };
 
-        fetch(`${backEndUrl}/create_form/`, {
-            method: "POST",
-            mode: "cors",
-            body: JSON.stringify(formTemplate),
-            headers: {
-                "Content-Type": "application/json",
-            },
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
+        // Send form template to backend
+        axios
+            .post(`${backEndUrl}/create_form`, formTemplate, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
             })
-            .then((data) => {
-                console.log("Success:", data);
+            .then((response) => {
+                console.log("Success:", response.data);
             })
             .catch((error) => {
                 console.error("Error:", error);
