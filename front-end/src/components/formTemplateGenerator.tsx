@@ -112,7 +112,7 @@ const FormTemplateGenerator = () => {
         const formTemplate = {
             Title: formTemplateTitle,
             Description: formTemplateDescription,
-            StaffID: 1, // TODO: Replace with actual StaffID from session when implemented
+            StaffID: 1, // TODO: Replace with actual StaffID from session when implemented in backend
             FormTemplate: template,
             CreatedAt: new Date().toISOString(),
         };
