@@ -8,13 +8,15 @@ class DimFormTemplateBase(BaseModel):
     Description: Optional[str] = None
 
 class DimFormTemplateCreate(DimFormTemplateBase):
-    pass
+    AdminID: int
+    FormTemplate: Dict[str, Any]  # JSON data
+    CreatedAt: str
 
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
-    AdminId: int
+    AdminID: int
     FormTemplate: Dict[str, Any]  # JSON data
-    CreatedAt: datetime
+    CreatedAt: str
 
     class Config:
         orm_mode = True
@@ -62,13 +64,13 @@ class DimUserCreate(DimUserBase):
     FirstName: str
     LastName: str
     password: str
-    StudentId: int
+    StudentID: int
 
 class DimUser(DimUserBase):
     UserId: int
     FirstName: str
     LastName: str
-    DimUserId: int
+    StudentID: int
     hashed_password: str
 
     class Config:
@@ -85,10 +87,10 @@ class DimAdminCreate(AdminBase):
     password: str
 
 class DimAdmin(AdminBase):
-    AdminId: int
+    AdminID: int
     FirstName: str
     LastName: str
-    StaffId: int
+    StaffID: int
     hashed_password: str
 
     class Config:

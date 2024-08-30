@@ -9,24 +9,6 @@ from database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 
-# Dependency
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-temp_admin = schemas.DimAdminCreate(
-    email="temp@gmail.com",
-    FirstName="Nat",
-    LastName="Benjan",
-    StaffID=0,
-    password="password1234"
-)
-
-print(crud.create_admin(get_db,temp_admin ))
-
 #app implementation
 app = FastAPI()
 
@@ -66,7 +48,7 @@ def retrieve_admin_templates(admin_id: int):
 @app.post("/create_form")
 def add_form(form_info):
     # form info contains adminID, formtemplate, title, description, created at
-    create_form(form)
+    form = create_form(form)
     return 200
 
 # view requested form, with everything except adminID
