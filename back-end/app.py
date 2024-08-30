@@ -71,7 +71,7 @@ def retrieve_admin_templates(admin_id: int):
     return sidebar_info
 
 
-# Create new form
+# [Admin] Create a new form template
 @app.post("/create_form")
 def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     try:
@@ -84,9 +84,9 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     return {"FormTemplateID": created_form_template.FormTemplateID}
 
 
-# view requested form, with everything except adminID
-@app.get("/retrieve_form/{form_id}")
-def retrieve_form(form_id: int):
+# [Student] Retrieve form template by form id
+@app.get("/retrieve_form_template/{form_id}")
+def retrieve_form_template(form_id: int):
     form = get_form(form_id)
     return jsonable_encoder(form)
 

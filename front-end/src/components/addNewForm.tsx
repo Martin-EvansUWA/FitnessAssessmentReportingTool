@@ -1,17 +1,34 @@
 import { faChevronRight } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import axios from "axios";
 import { useState } from "react";
+import { backEndUrl } from "../constants";
 
 const AddNewForm = () => {
     const [formTemplateID, setFormTemplateID] = useState<string>("");
+    const [fetchState, setFetchState] = useState<string>("");
 
-    // TODO: Implement the handleGetRequest function
     const handleGetRequest = () => {
-        console.log("Get request sent: ", formTemplateID);
+        // Send GET request to backend with formTemplateID
+        if (formTemplateID) {
+            axios
+                .get(`${backEndUrl}/retrieve_form_template/${formTemplateID}`)
+                .then((response) => {
+                    console.log("Success:", response.data);
+                    setFetchState(""); // Clear fetch state on success
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    setFetchState("Error: Form Template ID not found");
+                });
+        } else {
+            setFetchState("Please enter a Form Template ID");
+        }
     };
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setFormTemplateID(event.target.value);
+        setFetchState(""); // Clear fetch state on input change
     };
 
     return (
@@ -22,16 +39,23 @@ const AddNewForm = () => {
                     <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
                     <p className="font-bold my-5">
                         Enter the Form Template ID provided by your unit
-                        coordinator to access the form.
+                        coordinator to access your form.
                     </p>
                 </div>
                 <div className="text-center my-10">
                     <input
                         type="text"
                         placeholder="Form Template ID"
-                        className="border-2 border-gray-300 rounded-md p-2 w-full md:w-2/5"
+                        className={`border-2 rounded-md p-2 w-full md:w-2/5 ${
+                            fetchState ? "border-red-500" : "border-gray-300"
+                        }`}
                         onChange={handleChange}
                     />
+                    {fetchState && (
+                        <p className="text-red-500 mt-2 animate-pulse">
+                            {fetchState}
+                        </p>
+                    )}
                 </div>
             </div>
 
