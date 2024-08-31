@@ -206,6 +206,7 @@ const DataEntryPage = () => {
                         onKeyDown={HelperFunctions.handleKeyDown}
                         onPaste={HelperFunctions.handlePaste}
                         onChange={handleSubjectStudentIdChange}
+                        value={subjectStudentNumber}
                     />
                 </div>
             </div>
