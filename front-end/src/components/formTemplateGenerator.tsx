@@ -2,7 +2,7 @@ import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
 import {
     FormTemplate,
     FormTemplateCreateResponse,

@@ -1,10 +1,11 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
+import { HelperFunctions } from "../global_helpers/helperFunctions";
 import { FormTemplateJSON } from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -19,6 +20,8 @@ const DataEntryPage = () => {
         }[]
     >([]);
     const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+    const [subjectStudentNumber, setSubjectStudentNumber] =
+        useState<string>("");
 
     const location = useLocation();
     const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
@@ -120,7 +123,13 @@ const DataEntryPage = () => {
             UserFormResponse: formData,
         };
 
-        console.log("Saved Form Data:", formData);
+        console.log(
+            "Saved Form For: ",
+            subjectStudentNumber,
+            "\n",
+            "Saved Form Data:",
+            formData
+        );
         // Send form response data to backend
         axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
@@ -143,11 +152,18 @@ const DataEntryPage = () => {
         navigate("/"); // Navigate to the home page after saving
     };
 
+    const handleSubjectStudentIdChange = useCallback(
+        (e: React.ChangeEvent<HTMLInputElement>) => {
+            setSubjectStudentNumber(e.target.value);
+        },
+        []
+    );
+
     const introComponent = (
         <div className="h-full flex flex-col justify-between">
             <div>
-                <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
-                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                <h1 className="text-2xl font-bold">Data Entry Page</h1>
+                <hr className="w-28 border-t-2 border-uwa-yellow my-5" />
                 <div className="mt-5">
                     <h2 className="text-lg font-semibold my-3 text-gray-700">
                         <span className="text-gray-900 font-bold">Title:</span>{" "}
@@ -171,6 +187,23 @@ const DataEntryPage = () => {
                         </span>{" "}
                         {formContentObj.CreatedAt}
                     </h2>
+                </div>
+                <hr className="w-28 border-t-2 border-uwa-yellow my-5" />
+                <div className="flex flex-col md:flex-row md:space-x-10">
+                    <label className="text-lg font-semibold text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            I am completing this form for:
+                        </span>
+                    </label>
+                    <input
+                        type="text"
+                        className="h-7 border-2 border-gray-300 rounded max-w-[15rem]"
+                        aria-label="subject student number"
+                        placeholder="UWA Student Number"
+                        onKeyDown={HelperFunctions.handleKeyDown}
+                        onPaste={HelperFunctions.handlePaste}
+                        onChange={handleSubjectStudentIdChange}
+                    />
                 </div>
             </div>
             <button
