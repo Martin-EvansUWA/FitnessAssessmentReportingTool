@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 import crud
 import models
 from database import SessionLocal, engine
-from process import createFormTemplateSchema
-from schemas import DimFormTemplateCreate, DimUserFormResponseBase, DimUserFormResponseCreate
+from process import createFactUserFormSchema, createFormTemplateSchema
+from schemas import DimFormTemplateCreate, DimUserFormResponseCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -105,6 +105,10 @@ def save_form_entry(
 ):
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)
+        fact_user_form_obj = createFactUserFormSchema(form_data.dict())
+        create_fact_user_form_response = crud.create_fact_user_form(
+            db, created_form_response
+        )
     except ValueError as e:
         raise HTTPException(status_code=400, detail="Form entry failed to save")
 
