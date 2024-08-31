@@ -149,7 +149,7 @@ const FormTemplateGenerator = () => {
 
     const formMetaData = (
         <>
-            <div className="flex justify-center">
+            <div className="flex">
                 <div className="flex flex-col w-full md:w-[30rem] space-y-3">
                     <div className="flex flex-row justify-between">
                         <label className="font-bold" htmlFor="formTitle">

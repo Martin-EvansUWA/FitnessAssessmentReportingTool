@@ -71,7 +71,7 @@ def retrieve_admin_templates(admin_id: int):
     return sidebar_info
 
 
-# Create new form
+# [Admin] Create a new form template
 @app.post("/create_form")
 def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     try:
@@ -84,11 +84,18 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     return {"FormTemplateID": created_form_template.FormTemplateID}
 
 
-# view requested form, with everything except adminID
-@app.get("/retrieve_form/{form_id}")
-def retrieve_form(form_id: int):
-    form = get_form(form_id)
-    return jsonable_encoder(form)
+# [Student] Retrieve form template by form id
+@app.get("/retrieve_form_template/{form_id}")
+def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
+    try:
+        form_template = crud.get_dim_form_template(db, form_id)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+    if form_template is None:
+        raise HTTPException(status_code=404, detail="Form template not found")
+
+    return jsonable_encoder(form_template)
 
 
 # Save student form data
