@@ -1,54 +1,65 @@
-from pydantic import BaseModel
-from typing import Dict, Any, List, Optional
 from datetime import datetime
+from typing import Any, Dict, List, Optional
+
+from pydantic import BaseModel
+
 
 # DimFormTemplate Schema
 class DimFormTemplateBase(BaseModel):
     Title: str
     Description: Optional[str] = None
+    StaffID: int
+    FormTemplate: Dict[str, Any]  # JSON data
+    CreatedAt: str
+
 
 class DimFormTemplateCreate(DimFormTemplateBase):
     pass
 
+
 class DimFormTemplate(DimFormTemplateBase):
     FormTemplateId: int
-    AdminId: int
-    FormTemplate: Dict[str, Any]  # JSON data
-    CreatedAt: datetime
 
     class Config:
         orm_mode = True
+
 
 # DimUserFormResponse Schema
 class DimUserFormResponseBase(BaseModel):
     pass  # You may want to include fields if known
 
+
 class DimUserFormResponseCreate(DimUserFormResponseBase):
+    UserFormResponse: Dict[str, Any]  # JSON data
     pass
 
+
 class DimUserFormResponse(DimUserFormResponseBase):
-    UserFormResponseId: int
+    UserFormResponseID: int
     UserFormResponse: Dict[str, Any]  # JSON data
 
     class Config:
         orm_mode = True
 
+
 # FactUserForm Schema
 class FactUserFormBase(BaseModel):
     IsComplete: bool
-    CreatetAt: Optional[datetime] = None
-    CompleteAt: Optional[datetime] = None
+    CreatedAt: str
+    CompleteAt: str
+
 
 class FactUserFormCreate(FactUserFormBase):
-    FormTemplateId: int
-    UserId: int
-    SubjectUserId: int
+    UserFormResponseID: int
+    StudentID: int
+    SubjectStudentID: int
+
 
 class FactUserForm(FactUserFormBase):
-    UserFormResponseId: int
-    FormTemplateId: int
-    UserId: int
-    SubjectUserId: int
+    UserFormResponseID: int
+    FormTemplateID: int
+    StudentID: int
+    SubjectStudentID: int
 
     class Config:
         orm_mode = True
@@ -56,41 +67,37 @@ class FactUserForm(FactUserFormBase):
 
 # DimUser Schema
 class DimUserBase(BaseModel):
+    StudentID: int
     email: str
+    FirstName: str
+    LastName: str
+
 
 class DimUserCreate(DimUserBase):
-    FirstName: str
-    LastName: str
     password: str
-    StudentId: int
+
 
 class DimUser(DimUserBase):
-    UserId: int
-    FirstName: str
-    LastName: str
-    DimUserId: int
     hashed_password: str
 
     class Config:
         orm_mode = True
+
 
 # Admin Schema
 class AdminBase(BaseModel):
     email: str
-
-class DimAdminCreate(AdminBase):
     FirstName: str
     LastName: str
     StaffID: int
+
+
+class DimAdminCreate(AdminBase):
     password: str
 
+
 class DimAdmin(AdminBase):
-    AdminId: int
-    FirstName: str
-    LastName: str
-    StaffId: int
     hashed_password: str
 
     class Config:
         orm_mode = True
-
