@@ -1,46 +1,62 @@
-import React, { useState } from 'react';
-import LineChart from './charts/LineChart';
-import BubbleChart from './charts/BubbleChart';
-import ScatterChart from './charts/ScatterChart';
-import RadarChart from './charts/RadarChart';
+import React from 'react';
 
-// Expanded Dummy Data with more students
-
-
-// Specific student data
-const specificStudentData = {
-  Name: "Alice",
-  Age: 22,
-  Height: 170,
-  Mass: 60,
-  Flexibility: { "Sit & Reach Test": 6 },
-  "Muscular Strength": { "Grip Strength": 15, "Bench Press": 50, "Leg Press": 80 },
-  "Cardiovascular Endurance": { "12-minute Run": 4 }
-};
-
-const DashboardGenerator: React.FC = () => {
-  const [chartType, setChartType] = useState<string>('');
-
-  const renderChart = () => {
-    switch (chartType) {
-
-      default:
-        return <p>Please select a chart type.</p>;
-    }
+// Define the types for student data and normative results
+interface MyResultsProps {
+  studentData: {
+    Name: string;
+    Age: number;
+    Height: number;
+    Mass: number;
+    Flexibility: { [test: string]: number };
+    'Muscular Strength': { [test: string]: number };
+    'Cardiovascular Endurance': { [test: string]: number };
   };
+  normativeResults: {
+    Age: string;
+    Height: string;
+    Mass: string;
+    Flexibility: { [test: string]: string };
+    'Muscular Strength': { [test: string]: string };
+    'Cardiovascular Endurance': { [test: string]: string };
+  };
+}
+
+const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) => {
+  // Helper function to render categories
+  const renderCategory = (category: string, data: any, normative: any) => (
+    <div key={category} className="mt-6">
+      <h3 className="text-xl font-semibold mb-2">{category}</h3>
+      <div className="exercise-list">
+        {Object.entries(data).map(([test, score]) => (
+          <p key={test} className="mb-1">
+            <strong>{test}:</strong> {score} ({(normative as any)[test]})
+          </p>
+        ))}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="flex flex-col min-h-full">
-      <h1 className="text-2xl font-bold mb-1 relative">Dashboard Generator
-        <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-4">
+        My Results
+        <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
       </h1>
-
-      
-    
-      
-      {renderChart()}
+      <div className="mb-6">
+        <ul className="list-none">
+          <li className="mb-1"><strong>Age:</strong> {studentData.Age} ({normativeResults.Age})</li>
+          <li className="mb-1"><strong>Height:</strong> {studentData.Height} cm ({normativeResults.Height})</li>
+          <li className="mb-1"><strong>Mass:</strong> {studentData.Mass} kg ({normativeResults.Mass})</li>
+        </ul>
+      </div>
+      <div>
+        {Object.keys(studentData).map((category) => {
+          if (category === 'Name' || category === 'Age' || category === 'Height' || category === 'Mass') return null;
+          return renderCategory(category, studentData[category as keyof typeof studentData], normativeResults[category as keyof typeof normativeResults] as any);
+        })}
+      </div>
     </div>
   );
 };
 
-export default DashboardGenerator;
+export default MyResults;
