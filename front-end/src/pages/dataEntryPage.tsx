@@ -1,8 +1,10 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
-import FormTemplate from "../components/formTemplate";
+import { useLocation, useNavigate } from "react-router-dom";
+import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
+import { backEndUrl } from "../constants";
 import { FormTemplateJSON } from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -16,9 +18,12 @@ const DataEntryPage = () => {
             [name: string]: { sectionName: string; sectionOnClick: () => void };
         }[]
     >([]);
+    const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
     const location = useLocation();
     const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
+
+    const navigate = useNavigate(); // Used for navigation
 
     const getSectionsFromFormTemplate = (formTemplate: any) => {
         return Object.keys(formTemplate).map((section) => ({
@@ -36,7 +41,7 @@ const DataEntryPage = () => {
                 text: "Save",
                 fontAwesomeIcon: faSave,
                 onClick: () => {
-                    console.log("Save button clicked");
+                    handleSave();
                 },
             },
             {
@@ -109,9 +114,33 @@ const DataEntryPage = () => {
         }));
     };
 
+    const handleSave = () => {
+        // Formatted form data to send to the backend
+        const formattedFormData = {
+            UserFormResponse: formData,
+        };
+
+        console.log("Saved Form Data:", formData);
+        // Send form response data to backend
+        axios
+            .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then((response) => {
+                console.log("Success:", response.data);
+                setSaveSuccess(true); // TODO: Create a success message for the user to see
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                setSaveSuccess(false);
+            });
+    };
+
     const handleSaveAndExit = () => {
-        console.log("Form Data:", formData);
-        // TODO: Implement the save and exit functionality and connect with the backend
+        handleSave(); // Save the form data
+        navigate("/"); // Navigate to the home page after saving
     };
 
     const introComponent = (
@@ -146,7 +175,10 @@ const DataEntryPage = () => {
             </div>
             <button
                 className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end"
-                onClick={() => setSelectedSection(0)}
+                onClick={() => {
+                    setSelectedSection(0);
+                    updateSectionNavigation(0);
+                }}
             >
                 Start Data Entry
             </button>
