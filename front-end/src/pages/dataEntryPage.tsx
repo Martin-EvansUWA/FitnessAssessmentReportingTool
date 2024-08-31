@@ -39,6 +39,9 @@ const DataEntryPage = () => {
 
     const sidebarContentJSON: SidebarData = {
         title: formContentObj.Title,
+        titleOnClick: () => {
+            setSelectedSection(null);
+        },
         footer: [
             {
                 text: "Save",

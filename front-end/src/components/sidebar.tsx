@@ -42,7 +42,16 @@ const Sidebar = ({
             }
         >
             <div className="flex-grow">
-                <h2 className="text-white font-bold">{content.title}</h2>
+                {content.titleOnClick ? (
+                    <button
+                        onClick={content.titleOnClick}
+                        className="text-white font-bold"
+                    >
+                        {content.title}
+                    </button>
+                ) : (
+                    <h2 className="text-white font-bold">{content.title}</h2>
+                )}
                 <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
                 <div className="overflow-y-auto max-h-[42rem]">
                     {content.sections.map((section, index) => (
