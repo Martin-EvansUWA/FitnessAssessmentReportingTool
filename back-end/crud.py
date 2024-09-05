@@ -91,10 +91,10 @@ def delete_admin(db: Session, Staff_ID: int):
 
 
 # DimFormTemplate CRUD operations
-def get_dim_form_template(db: Session, form_template_id: int):
+def get_dim_form_template(db: Session, form_template_id: int) -> models.DimFormTemplate:
     return (
         db.query(models.DimFormTemplate)
-        .filter(models.DimFormTemplate.FormTemplateId == form_template_id)
+        .filter(models.DimFormTemplate.FormTemplateID == form_template_id)
         .first()
     )
 
@@ -182,17 +182,16 @@ def get_fact_user_form(
         .first()
     )
 
+
 def get_fact_multiple_user_forms(
     db: Session,
     student_id: int,
     subject_user_id: int,
 ):
-    return (
-        db.query(models.FactUserForm)
-        .filter(
-            models.FactUserForm.StudentID == student_id,
-        )
+    return db.query(models.FactUserForm).filter(
+        models.FactUserForm.StudentID == student_id,
     )
+
 
 def get_all_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.FactUserForm).offset(skip).limit(limit).all()

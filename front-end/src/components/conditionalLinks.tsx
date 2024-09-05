@@ -11,10 +11,11 @@ const ConditionalLinks = ({ className }: { className: string }) => {
                     <Link to="/">Home</Link>
                     <Link to="/dashboardGenerator">Dashboard</Link>
                     <Link to="/create-new-form-template">
-                        Create New Form Template
+                        [Admin Workflow] Create New Form Template
                     </Link>
-                    <Link to="/get-new-form">Get New Form</Link>
-                    <Link to="/data-entry">Data Entry</Link>
+                    <Link to="/get-new-form">
+                        [Student Workflow] Get New Form Template
+                    </Link>
                 </div>
             )}
         </div>

@@ -1,88 +1,64 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import FormTemplate from "../components/formTemplate";
 import Layout from "../components/layout";
+import { FormTemplateJSON } from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
-
-const dummyFormTemplateJSON: { [key: string]: { [key: string]: string } } = {
-    "Student Details": {
-        Name: "String",
-        Age: "Integer",
-        Height: "Float",
-        Weight: "Float",
-    },
-    Test: {
-        "Test Measurement 1": "Integer",
-        "Test Measurement 2": "String",
-        "Test Measurement 3": "Float",
-        "Test Measurement 4": "Boolean",
-    },
-    Test2: {
-        "Test Measurement 1": "Integer",
-        "Test Measurement 2": "String",
-        "Test Measurement 3": "Float",
-        "Test Measurement 4": "Boolean",
-    },
-    Test3: {
-        "Test Measurement 1": "Integer",
-        "Test Measurement 2": "String",
-        "Test Measurement 3": "Float",
-        "Test Measurement 4": "Boolean",
-    },
-    Test4: {
-        "Test Measurement 1": "Integer",
-        "Test Measurement 2": "String",
-        "Test Measurement 3": "Float",
-        "Test Measurement 4": "Boolean",
-    },
-};
-
-const dummySidebarTemplateJSON: SidebarData = {
-    title: "SSEH2201 Peer Fitness Testing Recording Sheet  - 2024 Sem 1",
-    footer: [
-        {
-            text: "Save",
-            fontAwesomeIcon: faSave,
-            onClick: () => {
-                console.log("Save button clicked");
-            },
-        },
-        {
-            text: "Save & Exit",
-            fontAwesomeIcon: faSignOut,
-            onClick: () => {
-                console.log("Save & Exit button clicked");
-            },
-        },
-    ],
-    sections: [],
-};
-
-const getSectionsFromFormTemplate = (formTemplate: any) => {
-    return Object.keys(formTemplate).map((section) => ({
-        [section]: {
-            sectionName: section,
-            sectionOnClick: () => {},
-        },
-    }));
-};
-
-// Update sections before rendering the component
-dummySidebarTemplateJSON.sections = getSectionsFromFormTemplate(
-    dummyFormTemplateJSON
-);
 
 const DataEntryPage = () => {
     const [selectedSection, setSelectedSection] = useState<number | null>(null);
     const [previousSection, setPreviousSection] = useState<number | null>(null);
     const [nextSection, setNextSection] = useState<number | null>(null);
     const [formData, setFormData] = useState<{ [key: string]: any }>({});
+    const [sidebarSections, setSidebarSections] = useState<
+        {
+            [name: string]: { sectionName: string; sectionOnClick: () => void };
+        }[]
+    >([]);
 
-    useEffect(() => {}, []);
+    const location = useLocation();
+    const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
 
-    const sidebarContentJSON = dummySidebarTemplateJSON; // TODO: Fetch sidebar data from the backend
-    const formContentJSON = dummyFormTemplateJSON; // TODO: Fetch form data from the backend
+    const getSectionsFromFormTemplate = (formTemplate: any) => {
+        return Object.keys(formTemplate).map((section) => ({
+            [section]: {
+                sectionName: section,
+                sectionOnClick: () => {},
+            },
+        }));
+    };
 
+    const sidebarContentJSON: SidebarData = {
+        title: formContentObj.Title,
+        footer: [
+            {
+                text: "Save",
+                fontAwesomeIcon: faSave,
+                onClick: () => {
+                    console.log("Save button clicked");
+                },
+            },
+            {
+                text: "Save & Exit",
+                fontAwesomeIcon: faSignOut,
+                onClick: () => {
+                    handleSaveAndExit();
+                },
+            },
+        ],
+        sections: [],
+    };
+
+    useEffect(() => {
+        // Update sections before rendering the component
+        const sections = getSectionsFromFormTemplate(
+            formContentObj.FormTemplate
+        );
+        setSidebarSections(sections); // Set the sidebar sections
+    }, [formContentObj]);
+
+    const formContentJSON = formContentObj.FormTemplate;
     const sections = Object.keys(formContentJSON);
 
     const updateSectionNavigation = (currentIndex: number) => {
@@ -95,7 +71,7 @@ const DataEntryPage = () => {
     // Update the onClick handlers to set the selected section
     const sidebarContent = {
         ...sidebarContentJSON,
-        sections: sidebarContentJSON.sections.map((section, index) => {
+        sections: sidebarSections.map((section, index) => {
             const sectionName = Object.keys(section)[0];
             return {
                 [sectionName]: {
@@ -107,12 +83,6 @@ const DataEntryPage = () => {
                 },
             };
         }),
-        footer: sidebarContentJSON.footer.map((footer) => ({
-            ...footer,
-            onClick: () => {
-                handleSaveAndExit();
-            },
-        })),
     };
 
     const handleNextPage = () => {
@@ -139,45 +109,67 @@ const DataEntryPage = () => {
         }));
     };
 
-    // TODO: Implement the save and exit functionality and connect with the backend
     const handleSaveAndExit = () => {
         console.log("Form Data:", formData);
+        // TODO: Implement the save and exit functionality and connect with the backend
     };
 
     const introComponent = (
-        <>
-            <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
-            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-            <div className="my-5 font-bold">
-                Start by selecting a section from the sidebar!
+        <div className="h-full flex flex-col justify-between">
+            <div>
+                <h1 className="text-2xl font-bold mb-5">Data Entry Page</h1>
+                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                <div className="mt-5">
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">Title:</span>{" "}
+                        {formContentObj.Title}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Description:
+                        </span>{" "}
+                        {formContentObj.Description}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Created By:
+                        </span>{" "}
+                        {formContentObj.StaffID}
+                    </h2>
+                    <h2 className="text-lg font-semibold my-3 text-gray-700">
+                        <span className="text-gray-900 font-bold">
+                            Created At:
+                        </span>{" "}
+                        {formContentObj.CreatedAt}
+                    </h2>
+                </div>
             </div>
-        </>
+            <button
+                className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end"
+                onClick={() => setSelectedSection(0)}
+            >
+                Start Data Entry
+            </button>
+        </div>
     );
-
-    const checkTruthy = (value: any) => {
-        return value !== null && value !== undefined;
-    };
-
     const selectedSectionComponent = (
         <FormTemplate
             previousSection={
-                checkTruthy(previousSection) ? sections[previousSection!] : null
+                previousSection !== null ? sections[previousSection] : null
             }
-            nextSection={
-                checkTruthy(nextSection) ? sections[nextSection!] : null
-            }
+            nextSection={nextSection !== null ? sections[nextSection] : null}
             formTemplate={
-                checkTruthy(selectedSection)
+                selectedSection !== null
                     ? {
-                          [sections[selectedSection!]]:
-                              formContentJSON[sections[selectedSection!]],
+                          [sections[selectedSection]]:
+                              formContentJSON[sections[selectedSection]],
                       }
                     : {}
             }
             formData={formData}
             onNextPage={handleNextPage}
             onPreviousPage={handlePreviousPage}
-            onInputChange={handleInputChange} // Pass the input change handler
+            onInputChange={handleInputChange}
         />
     );
 
@@ -185,13 +177,13 @@ const DataEntryPage = () => {
         <Layout
             sidebarContent={sidebarContent}
             mainContent={
-                checkTruthy(selectedSection)
+                selectedSection !== null
                     ? selectedSectionComponent
                     : introComponent
             }
-            selectedSectionProp={selectedSection} // Pass selectedSection to Layout
-            setSelectedSectionProp={setSelectedSection} // Pass setSelectedSection to Layout
-        ></Layout>
+            selectedSectionProp={selectedSection}
+            setSelectedSectionProp={setSelectedSection}
+        />
     );
 };
 
