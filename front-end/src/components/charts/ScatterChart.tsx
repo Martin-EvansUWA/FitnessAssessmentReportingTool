@@ -30,57 +30,53 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const [lineColor, setLineColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default line color
   const [startFromZero, setStartFromZero] = useState<boolean>(true); // Option to start axis from 0
 
-  // Extract categories and exercises
-  const categories = {
+  // Safely extract categories and exercises
+  const categories = data[0] ? {
     Flexibility: Object.keys(data[0].Flexibility || {}),
     'Muscular Strength': Object.keys(data[0]['Muscular Strength'] || {}),
     'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
-  };
+  } : {};
 
-  // Handle category change for x-axis
+  // Handle category and exercise selection
   const handleXCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXCategory(event.target.value);
     setXExercise(''); // Reset exercise when category changes
   };
 
-  // Handle exercise change for x-axis
   const handleXExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXExercise(event.target.value);
   };
 
-  // Handle category change for y-axis
   const handleYCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYCategory(event.target.value);
     setYExercise(''); // Reset exercise when category changes
   };
 
-  // Handle exercise change for y-axis
   const handleYExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYExercise(event.target.value);
   };
 
-  // Handle checkbox change for starting axis from 0
   const handleStartFromZeroChange = (event: ChangeEvent<HTMLInputElement>) => {
     setStartFromZero(event.target.checked);
   };
 
-  // Prepare x-axis data
+  // Safely prepare x-axis data
   const xAxisData: number[] = data.map((item) => {
-    if (xCategory && xExercise) {
+    if (xCategory in item) {
       const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
-      return typeof categoryData[xExercise as keyof typeof categoryData] === 'number' ? categoryData[xExercise as keyof typeof categoryData] : 0;
+      return xExercise && categoryData ? categoryData[xExercise as keyof typeof categoryData] : 0;
     }
     return typeof item[xCategory as keyof DataItem] === 'number' ? item[xCategory as keyof DataItem] : 0;
   }).filter(value => typeof value === 'number') as number[];
-
-  // Prepare y-axis data
+  
   const yAxisData: number[] = data.map((item) => {
-    if (yCategory && yExercise) {
+    if (yCategory in item) {
       const categoryData = item[yCategory as keyof DataItem] as Record<string, number>;
-      return typeof categoryData[yExercise as keyof typeof categoryData] === 'number' ? categoryData[yExercise as keyof typeof categoryData] : 0;
+      return yExercise && categoryData ? categoryData[yExercise as keyof typeof categoryData] : 0;
     }
     return typeof item[yCategory as keyof DataItem] === 'number' ? item[yCategory as keyof DataItem] : 0;
   }).filter(value => typeof value === 'number') as number[];
+  
 
   // Ensure xAxisData and yAxisData are of equal length
   const filteredData = xAxisData.map((x, index) => [x, yAxisData[index]]).filter(([x, y]) => typeof x === 'number' && typeof y === 'number') as [number, number][];
@@ -92,7 +88,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const chartData = {
     datasets: [
       {
-        label: yExercise || yCategory || 'Data',
+        label: `${xCategory || 'X'} vs ${yCategory || 'Y'}`,
         data: xAxisData.map((x, index) => ({
           x,
           y: yAxisData[index],
@@ -197,44 +193,23 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }}>
           <div>
             <label>Show Line of Best Fit: </label>
-            <input
-              type="checkbox"
-              checked={showRegression}
-              onChange={(e) => setShowRegression(e.target.checked)}
-            />
+            <input type="checkbox" checked={showRegression} onChange={(e) => setShowRegression(e.target.checked)} />
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div>
-              <label>Start Axes from 0: </label>
-              <input
-                type="checkbox"
-                checked={startFromZero}
-                onChange={handleStartFromZeroChange}
-              />
-            </div>
-
-            <div>
-              <label>Point Color: </label>
-              <input
-                type="color"
-                value={pointColor}
-                onChange={(e) => setPointColor(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label>Line Color: </label>
-              <input
-                type="color"
-                value={lineColor}
-                onChange={(e) => setLineColor(e.target.value)}
-              />
-            </div>
+          <div>
+            <label>Point Color: </label>
+            <input type="color" value={pointColor} onChange={(e) => setPointColor(e.target.value)} />
+          </div>
+          <div>
+            <label>Line Color: </label>
+            <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />
+          </div>
+          <div>
+            <label>Start Axis from Zero: </label>
+            <input type="checkbox" checked={startFromZero} onChange={handleStartFromZeroChange} />
           </div>
         </div>
       </div>
-            <br></br>
+
       <Scatter data={chartData} options={options} />
     </div>
   );
