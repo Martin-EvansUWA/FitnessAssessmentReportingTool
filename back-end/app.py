@@ -4,7 +4,11 @@ from http.client import HTTPException
 from fastapi import Depends, FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
+
+
 
 import crud
 import models
@@ -25,7 +29,11 @@ def get_db():
 
 
 # app implementation
+
 app = FastAPI()
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
+templates = Jinja2Templates(directory="templates")
 
 app.add_middleware(
     CORSMiddleware,
@@ -38,17 +46,21 @@ app.add_middleware(
 
 @app.get("/")
 def index():
-    return "temp"
+    # Add react template with template responses
+    response = {}
+    return templates.TemplateResponse("index.html", response)
 
 
 @app.get("/student")
-def student():
-    return "student"
+async def student():
+    response = {}
+    return templates.TemplateResponse("student.html", response)
 
 
 @app.get("/admin")
-def student():
-    return "admin"
+async def admin():
+    response = {}
+    return templates.TemplateResponse("admin.html", response)
 
 
 @app.post("/form")
@@ -62,13 +74,18 @@ def form(form_json):
 # Sending admin id, to receive the form id's and the form titles
 @app.get("/admin_forms/{id}")
 def retrieve_admin_templates(admin_id: int):
-    forms = get_forms(admin_id)
+    response = {}
+    forms = crud.get_formtemplates_by_admin(get_db(),admin_id)
+
+    response["admin_form_templates"] = forms
 
     sidebar_info = {}
     for form in forms:
         sidebar_info.update({form.id: form.title})
 
-    return sidebar_info
+    response["sidebar_info"] = sidebar_info
+
+    return response
 
 
 # [Admin] Create a new form template
@@ -81,7 +98,10 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    return {"FormTemplateID": created_form_template.FormTemplateID}
+    response = {
+        "FormTemplateID": created_form_template.FormTemplateID,
+    }
+    return response
 
 
 # [Student] Retrieve form template by form id
@@ -101,5 +121,9 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 # Save student form data
 @app.post("/save_form_entry")
 def save_form_entry(form):
-    save_form(form)
+    
+    try:
+        crud.save_student_form(get_db(),form)
+    except:
+        raise HTTPException(status_code=404, detail="Failure to save student form")
     return 200

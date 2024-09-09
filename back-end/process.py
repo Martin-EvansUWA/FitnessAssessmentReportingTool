@@ -1,6 +1,7 @@
 import json
 
 from schemas import DimFormTemplateCreate
+from schemas import FactUserForm
 
 
 def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
@@ -12,3 +13,9 @@ def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
         CreatedAt=form_data["CreatedAt"],
     )
     return form_schema
+
+def decodeStudentForm(form_data: dict) -> FactUserForm:
+    student_form = FactUserForm(
+
+    )
+    return student_form
