@@ -101,26 +101,28 @@ const DashboardGenerator: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-full">
-      <h1 className="text-2xl font-bold mb-1 relative">Dashboard Generator
-        <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-4">
+        Data Visualization
+        <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
       </h1>
-      <label className="mb-2">Select Chart Type:
-      <select
-        className="w-30 mb-2"
-        value={chartType}
-        onChange={(e) => setChartType(e.target.value)}
-      >
-        <option value="">Select</option>
-        <option value="line">Line</option>
-        <option value="bubble">Bubble</option>
-        <option value="scatter">Scatter</option>
-        <option value="radar">Radar</option>
-        <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-      </select>
-      
-      </label>
-      
+      <div className="mb-6">
+        <label className="mb-2">Select Chart Type:
+          <select
+            className="w-30 mb-2"
+            value={chartType}
+            onChange={(e) => setChartType(e.target.value)}
+          >
+            <option value="">Select</option>
+            <option value="line">Line</option>
+            <option value="bubble">Bubble</option>
+            <option value="scatter">Scatter</option>
+            <option value="radar">Radar</option>
+            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+          </select>
+          
+          </label>
+        </div>
       {renderChart()}
     </div>
   );
