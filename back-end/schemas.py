@@ -26,17 +26,15 @@ class DimFormTemplate(DimFormTemplateBase):
 
 # DimUserFormResponse Schema
 class DimUserFormResponseBase(BaseModel):
-    pass  # You may want to include fields if known
+    UserFormResponse: Dict[str, Any]  # JSON data
 
 
 class DimUserFormResponseCreate(DimUserFormResponseBase):
-    UserFormResponse: Dict[str, Any]  # JSON data
     pass
 
 
 class DimUserFormResponse(DimUserFormResponseBase):
     UserFormResponseID: int
-    UserFormResponse: Dict[str, Any]  # JSON data
 
     class Config:
         orm_mode = True
