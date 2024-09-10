@@ -1,29 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import DashboardGenerator from '../components/dashboardGenerator';
 import MyResults from '../components/myResults';
 import Layout from '../components/layout';
 import { SidebarData } from '../interface/sidebarInterface';
+import { backEndUrl } from '../constants';
 
-// Dummy student data
-const studentData = {
-  Name: 'Alice',
-  Age: 22,
-  Height: 170,
-  Mass: 60,
-  Flexibility: { 'Sit & Reach Test': 6 },
-  'Muscular Strength': { 'Grip Strength': 15, 'Bench Press': 50, 'Leg Press': 80 },
-  'Cardiovascular Endurance': { '12-minute Run': 4 }
-};
-
-// Dummy normative results data
-const studentResults = {
-  Age: "good",
-  Height: "good",
-  Mass: "average",
-  Flexibility: { 'Sit & Reach Test': "average" },
-  'Muscular Strength': { 'Grip Strength': "good", 'Bench Press': "average", 'Leg Press': "bad" },
-  'Cardiovascular Endurance': { '12-minute Run': "average" }
-};
+// Define generic types for fetched data
+interface Data {
+  [key: string]: any; // Flexible structure to handle any data shape
+}
 
 const initialSidebarData: SidebarData = {
   title: 'SSEH2201 - 2024 Sem1',
@@ -44,12 +30,32 @@ const initialSidebarData: SidebarData = {
   ]
 };
 
-
 const FormResults: React.FC = () => {
-  const [mainContent, setMainContent] = useState<JSX.Element>(
-    <MyResults studentData={studentData} normativeResults={studentResults} />
-  );
+  const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
   const [sidebarData, setSidebarData] = useState<SidebarData>(initialSidebarData);
+  const [studentData, setStudentData] = useState<Data | null>(null);
+  const [normativeResults, setNormativeResults] = useState<Data | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const studentResponse = await axios.get<Data>(`${backEndUrl}'/student_data'`);
+        const normativeResponse = await axios.get<Data>(`${backEndUrl}'/normative_results'`);
+        setStudentData(studentResponse.data);
+        setNormativeResults(normativeResponse.data);
+        setMainContent(
+          studentResponse.data && normativeResponse.data
+            ? <MyResults studentData={studentResponse.data} normativeResults={normativeResponse.data} />
+            : <div>No data available</div>
+        );
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setMainContent(<div>Error loading data</div>);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   // Handler for "Data Visualization" click
   const handleDataVisualizationClick = () => {
@@ -58,7 +64,9 @@ const FormResults: React.FC = () => {
 
   // Handler for "My Results" click
   const handleMyResultsClick = () => {
-    setMainContent(<MyResults studentData={studentData} normativeResults={studentResults} />);
+    if (studentData && normativeResults) {
+      setMainContent(<MyResults studentData={studentData} normativeResults={normativeResults} />);
+    }
   };
 
   // Set the onClick handlers for sidebar sections
