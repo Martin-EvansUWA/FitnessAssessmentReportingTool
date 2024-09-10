@@ -4,6 +4,7 @@ import LineChart from './charts/LineChart';
 import BubbleChart from './charts/BubbleChart';
 import ScatterChart from './charts/ScatterChart';
 import RadarChart from './charts/RadarChart';
+import { backEndUrl } from "../constants";
 
 const DashboardGenerator: React.FC = () => {
   const [chartType, setChartType] = useState<string>('');
@@ -12,7 +13,7 @@ const DashboardGenerator: React.FC = () => {
 
   useEffect(() => {
     // Fetch all student data
-    axios.get('/student_data')
+    axios.get(`${backEndUrl}/student_data/`)
       .then(response => {
         setStudentData(response.data);
       })
@@ -21,7 +22,7 @@ const DashboardGenerator: React.FC = () => {
       });
 
     // Fetch specific student data
-    axios.get('/specific_student_data')
+    axios.get(`${backEndUrl}/specific_student_data`)
       .then(response => {
         setSpecificStudentData(response.data);
       })
@@ -63,7 +64,6 @@ const DashboardGenerator: React.FC = () => {
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
             <option value="radar">Radar</option>
-            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
           </select>
         </label>
       </div>

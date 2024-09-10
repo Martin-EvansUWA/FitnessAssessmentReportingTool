@@ -2,17 +2,11 @@ import React, { useState, ChangeEvent } from 'react';
 import { Bubble } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js';
 
-// Registering necessary components for Bubble chart
 ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend);
 
+// Define types
 interface DataItem {
-  Name: string;
-  Age: number;
-  Height: number;
-  Mass: number;
-  Flexibility: { [key: string]: number };
-  "Muscular Strength": { [key: string]: number };
-  "Cardiovascular Endurance": { [key: string]: number };
+  [key: string]: any; // This allows any structure for the data
 }
 
 interface BubbleChartProps {
@@ -26,52 +20,53 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
   const [yExercise, setYExercise] = useState<string>('');
   const [sizeCategory, setSizeCategory] = useState<string>('');
   const [sizeExercise, setSizeExercise] = useState<string>('');
-  const [borderColor, setBorderColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default border color
-  const [fillColor, setFillColor] = useState<string>('rgba(75, 192, 192, 0.5)'); // Default fill color
-  const [showXAxisZero, setShowXAxisZero] = useState<boolean>(true); // Option to set x-axis to zero
-  const [showYAxisZero, setShowYAxisZero] = useState<boolean>(true); // Option to set y-axis to zero
+  const [borderColor, setBorderColor] = useState<string>('rgba(75, 192, 192, 1)');
+  const [fillColor, setFillColor] = useState<string>('rgba(75, 192, 192, 0.5)');
+  const [showXAxisZero, setShowXAxisZero] = useState<boolean>(true);
+  const [showYAxisZero, setShowYAxisZero] = useState<boolean>(true);
 
-  // Extract categories and exercises
-  const categories = {
-    Flexibility: Object.keys(data[0].Flexibility || {}),
-    'Muscular Strength': Object.keys(data[0]['Muscular Strength'] || {}),
-    'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
-  };
+  // Extract categories and exercises dynamically
+  const categories: Record<string, string[]> = {};
 
-  // Handle category change for x-axis
+  data.forEach(item => {
+    Object.keys(item).forEach(key => {
+      if (typeof item[key] === 'object' && item[key] !== null) {
+        categories[key] = Object.keys(item[key]);
+      } else if (typeof item[key] === 'number') {
+        if (!categories[key]) categories[key] = [];
+      }
+    });
+  });
+
+  // Handle category and exercise changes
   const handleXCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXCategory(event.target.value);
     setXExercise(''); // Reset exercise when category changes
   };
 
-  // Handle exercise change for x-axis
   const handleXExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXExercise(event.target.value);
   };
 
-  // Handle category change for y-axis
   const handleYCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYCategory(event.target.value);
     setYExercise(''); // Reset exercise when category changes
   };
 
-  // Handle exercise change for y-axis
   const handleYExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYExercise(event.target.value);
   };
 
-  // Handle category change for size
   const handleSizeCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSizeCategory(event.target.value);
     setSizeExercise(''); // Reset exercise when category changes
   };
 
-  // Handle exercise change for size
   const handleSizeExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setSizeExercise(event.target.value);
   };
 
-  // Prepare x-axis data
+  // Prepare data for the chart
   const xAxisData = data.map((item) => {
     if (xCategory && xExercise) {
       const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
@@ -80,7 +75,6 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
     return item[xCategory as keyof DataItem] || 0;
   });
 
-  // Prepare y-axis data
   const yAxisData = data.map((item) => {
     if (yCategory && yExercise) {
       const categoryData = item[yCategory as keyof DataItem] as Record<string, number>;
@@ -89,7 +83,6 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
     return item[yCategory as keyof DataItem] || 0;
   });
 
-  // Prepare size data
   const sizeData = data.map((item) => {
     if (sizeCategory && sizeExercise) {
       const categoryData = item[sizeCategory as keyof DataItem] as Record<string, number>;
@@ -98,11 +91,11 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
     return item[sizeCategory as keyof DataItem] || 0;
   });
 
-  // Prepare bubble chart data
+  // Bubble chart data
   const chartData = {
     datasets: [{
       label: sizeExercise || sizeCategory || 'Data',
-      data: data.map((item, index) => ({
+      data: data.map((_, index) => ({
         x: xAxisData[index],
         y: yAxisData[index],
         r: sizeData[index] || 5, // Default size if no data
@@ -161,7 +154,7 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
                 <label>X-Axis Exercise:</label>
                 <select value={xExercise} onChange={handleXExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[xCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[xCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -183,7 +176,7 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
                 <label>Y-Axis Exercise:</label>
                 <select value={yExercise} onChange={handleYExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[yCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[yCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -205,7 +198,7 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
                 <label>Size Exercise:</label>
                 <select value={sizeExercise} onChange={handleSizeExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[sizeCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[sizeCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -244,7 +237,6 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
           />
         </div>
       </div>
-       <br></br>
       <Bubble data={chartData} options={options} />
     </div>
   );

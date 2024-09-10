@@ -103,3 +103,17 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 def save_form_entry(form):
     save_form(form)
     return 200
+
+
+# get all students data 
+@app.get("/student_data")
+def get_student_data(db: Session = Depends(get_db)):
+    students = crud.get_dim_user_form_responses(db)
+    return students
+
+
+# get specific students data 
+@app.get("/specific_student_data")
+def get_specific_student_data(db: Session = Depends(get_db)):
+    student = crud.get_dim_user_form_response(db, student_id=1)  # Example with student ID 1
+    return student
