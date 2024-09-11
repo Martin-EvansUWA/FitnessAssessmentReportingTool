@@ -125,7 +125,11 @@ const DataEntryPage = () => {
         const formattedFormData = {
             StudentID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
             SubjectStudentID: subjectStudentNumber,
+            CreatedAt: new Date().toISOString(),
+            CompleteAt: new Date().toISOString(),
             IsComplete: false, //TODO: Add logic to check if the form is complete
+            UserFormResponseID: 1, //TODO: Replace Dummy UserFormResponseID with actual UserFormResponseID
+            FormTemplateID: formContentObj.FormTemplateID,
             UserFormResponse: formData,
         };
 
