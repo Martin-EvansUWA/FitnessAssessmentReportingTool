@@ -156,7 +156,7 @@ def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_dim_user_form_response(
-    db: Session, dim_user_form_response: schemas.DimUserFormResponseCreate
+    db: Session, dim_user_form_response: schemas.CombinedDimAndFactUserResponse
 ):
     db_dim_user_form_response = models.DimUserFormResponse(
         UserFormResponse=dim_user_form_response.UserFormResponse,

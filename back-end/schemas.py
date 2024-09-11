@@ -51,6 +51,7 @@ class FactUserFormBase(BaseModel):
 
 class FactUserFormCreate(FactUserFormBase):
     UserFormResponseID: int
+    FormTemplateID: int
     StudentID: int
     SubjectStudentID: int
 
@@ -101,3 +102,13 @@ class DimAdmin(AdminBase):
 
     class Config:
         orm_mode = True
+
+
+# Combined DimFormResponseCreate and FactUserFormCreate
+
+
+class CombinedDimAndFactUserResponse(BaseModel):
+    StudentID: int
+    SubjectStudentID: int
+    IsComplete: bool
+    UserFormResponse: Dict[str, Any]  # JSON data

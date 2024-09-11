@@ -10,7 +10,11 @@ import crud
 import models
 from database import SessionLocal, engine
 from process import createFactUserFormSchema, createFormTemplateSchema
-from schemas import DimFormTemplateCreate, DimUserFormResponseCreate
+from schemas import (
+    CombinedDimAndFactUserResponse,
+    DimFormTemplateCreate,
+    DimUserFormResponseCreate,
+)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -101,7 +105,7 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 # [Student] Save student form data
 @app.post("/save_form_entry")
 def save_form_entry(
-    form_data: DimUserFormResponseCreate, db: Session = Depends(get_db)
+    form_data: CombinedDimAndFactUserResponse, db: Session = Depends(get_db)
 ):
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)

@@ -15,6 +15,9 @@ def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
 
 
 def createFactUserFormSchema(form_data: dict) -> FactUserFormCreate:
+    # CreatedAt=form_data["CreatedAt"],
+    # CompleteAt=form_data["CompleteAt"],
+    # FormTemplateID=form_data["FormTemplateID"],
     form_response_schema = FactUserFormCreate(
         StudentID=form_data["StudentID"],
         SubjectStudentID=form_data["SubjectStudentID"],
@@ -22,5 +25,6 @@ def createFactUserFormSchema(form_data: dict) -> FactUserFormCreate:
         CompleteAt=form_data["CompleteAt"],
         IsComplete=form_data["IsComplete"],
         UserFormResponseID=form_data["UserFormResponseID"],
+        FormTemplateID=form_data["FormTemplateID"],
     )
     return form_response_schema
