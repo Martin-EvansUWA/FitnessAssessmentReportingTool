@@ -1,5 +1,5 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -43,7 +43,7 @@ const dummySidebarData: SidebarData = {
     ],
 };
 
-const GetNewFormPage = () => {
+const DashboardPage = () => {
     const navigate = useNavigate(); // Use useNavigate hook for routing
 
     // Modify the onClick handlers after defining the static structure
@@ -66,19 +66,21 @@ const GetNewFormPage = () => {
         <Layout
             sidebarContent={modifiedSidebarData}
             mainContent={
-                <div style={{ padding: '20px' }}>
-                    <h1 className="text-3xl font-bold mb-4">Dashboard
-                      <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
+                <div style={{ padding: "20px" }}>
+                    <h1 className="text-3xl font-bold mb-4">
+                        Dashboard
+                        <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
                     </h1>
                     <p>To get started, add a new form:</p>
                     <button
-                        onClick={() => navigate('/get-new-form')}
+                        onClick={() => navigate("/get-new-form")}
                         className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
                     >
                         + Add new form
                     </button>
-                    <p style={{ marginTop: '20px' }}>
-                        Forms are displayed on the right. To enter data, click the name of the form on the sidebar.
+                    <p style={{ marginTop: "20px" }}>
+                        Forms are displayed on the right. To enter data, click
+                        the name of the form on the sidebar.
                     </p>
                 </div>
             }
@@ -86,4 +88,4 @@ const GetNewFormPage = () => {
     );
 };
 
-export default GetNewFormPage;
+export default DashboardPage;
