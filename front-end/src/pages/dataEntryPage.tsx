@@ -22,6 +22,7 @@ const DataEntryPage = () => {
     const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
     const [subjectStudentNumber, setSubjectStudentNumber] =
         useState<string>("");
+    const [createdAtDateTime, setCreatedAtDateTime] = useState<string>("");
 
     const location = useLocation();
     const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
@@ -62,6 +63,8 @@ const DataEntryPage = () => {
     };
 
     useEffect(() => {
+        // Save the current date and time when the user starts the form
+        setCreatedAtDateTime(new Date().toISOString());
         // Update sections before rendering the component
         const sections = getSectionsFromFormTemplate(
             formContentObj.FormTemplate
@@ -125,7 +128,7 @@ const DataEntryPage = () => {
         const formattedFormData = {
             StudentID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
             SubjectStudentID: subjectStudentNumber,
-            CreatedAt: new Date().toISOString(),
+            CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
             IsComplete: false, //TODO: Add logic to check if the form is complete
             UserFormResponseID: 1, //TODO: Replace Dummy UserFormResponseID with actual UserFormResponseID
