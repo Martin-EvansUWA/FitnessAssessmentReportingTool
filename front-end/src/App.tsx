@@ -5,6 +5,7 @@ import DataEntryPage from "./pages/dataEntryPage";
 import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
 import DashboardPage from "./pages/dashboardPage";
+import FormResults from "./pages/formResults";
 
 function App() {
     return (
@@ -15,9 +16,10 @@ function App() {
                     path="/create-new-form-template"
                     element={<CreateNewFormTemplatePage />}
                 />
+                <Route path="/form-results" element={<FormResults />} />
                 <Route path="/get-new-form" element={<GetNewFormPage />} />
                 <Route path="/data-entry" element={<DataEntryPage />} />
-                <Route path="/dashboardGenerator" element={<DashboardPage />} />
+                <Route path="/dashboardPage" element={<DashboardPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
         </Router>
