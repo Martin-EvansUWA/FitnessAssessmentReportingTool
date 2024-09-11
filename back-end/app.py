@@ -107,7 +107,7 @@ def save_form_entry(
         created_form_response = crud.create_dim_user_form_response(db, form_data)
         fact_user_form_obj = createFactUserFormSchema(form_data.dict())
         create_fact_user_form_response = crud.create_fact_user_form(
-            db, created_form_response
+            db, fact_user_form_obj
         )
     except ValueError as e:
         raise HTTPException(status_code=400, detail="Form entry failed to save")

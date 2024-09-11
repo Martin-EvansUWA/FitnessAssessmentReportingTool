@@ -122,7 +122,20 @@ const DataEntryPage = () => {
 
     const handleSave = () => {
         // Formatted form data to send to the backend
+
+        // StudentID=form_data["StudentID"],
+        // SubjectStudentID=form_data["SubjectStudentID"],
+        // CreatedAt=form_data["CreatedAt"],
+        // CompleteAt=form_data["CompleteAt"],
+        // IsComplete=form_data["IsComplete"],
+        // UserFormResponseID=form_data["UserFormResponseID"],
         const formattedFormData = {
+            StudentID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
+            SubjectStudentID: subjectStudentNumber,
+            CreatedAt: new Date().toISOString(),
+            CompleteAt: new Date().toISOString(),
+            IsComplete: false, //TODO: Add logic to check if the form is complete
+            UserFormResponseID: formData.UserFormResponseID,
             UserFormResponse: formData,
         };
 
