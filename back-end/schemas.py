@@ -104,11 +104,15 @@ class DimAdmin(AdminBase):
         orm_mode = True
 
 
-# Combined DimFormResponseCreate and FactUserFormCreate
-
-
-class CombinedDimAndFactUserResponse(BaseModel):
+# Data Entry Page Submission Data Schema
+class DataEntryPageSubmissionData(BaseModel):
+    UserFormResponse: Dict[str, Any]  # JSON data
+    FormTemplateID: int
     StudentID: int
     SubjectStudentID: int
     IsComplete: bool
-    UserFormResponse: Dict[str, Any]  # JSON data
+    CreatedAt: str
+    CompleteAt: str
+
+    class Config:
+        orm_mode = True

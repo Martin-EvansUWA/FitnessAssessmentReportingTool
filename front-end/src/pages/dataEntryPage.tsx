@@ -131,7 +131,6 @@ const DataEntryPage = () => {
             CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
             IsComplete: false, //TODO: Add logic to check if the form is complete
-            UserFormResponseID: 1, //TODO: Replace Dummy UserFormResponseID with actual UserFormResponseID
             FormTemplateID: formContentObj.FormTemplateID,
             UserFormResponse: formData,
         };

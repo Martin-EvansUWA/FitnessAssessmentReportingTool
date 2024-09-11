@@ -11,7 +11,7 @@ import models
 from database import SessionLocal, engine
 from process import createFactUserFormSchema, createFormTemplateSchema
 from schemas import (
-    CombinedDimAndFactUserResponse,
+    DataEntryPageSubmissionData,
     DimFormTemplateCreate,
     DimUserFormResponseCreate,
 )
@@ -105,11 +105,14 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 # [Student] Save student form data
 @app.post("/save_form_entry")
 def save_form_entry(
-    form_data: CombinedDimAndFactUserResponse, db: Session = Depends(get_db)
+    form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
 ):
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)
-        fact_user_form_obj = createFactUserFormSchema(form_data.dict())
+        userFormResponseID = created_form_response.UserFormResponseID
+        fact_user_form_obj = createFactUserFormSchema(
+            form_data.dict(), userFormResponseID
+        )
         create_fact_user_form_response = crud.create_fact_user_form(
             db, fact_user_form_obj
         )
