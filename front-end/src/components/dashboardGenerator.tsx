@@ -7,7 +7,7 @@ import RadarChart from './charts/RadarChart';
 import { backEndUrl } from "../constants";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const StudentID = () => { "123"}
+const StudentID = () => { "1" }
 
 const DashboardGenerator: React.FC = () => {
   const [chartType, setChartType] = useState<string>('');

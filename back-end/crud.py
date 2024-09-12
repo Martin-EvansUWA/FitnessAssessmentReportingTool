@@ -1,7 +1,9 @@
 from sqlalchemy.orm import Session
-
+from sqlalchemy import select
 import models
+from models import FactUserForm, DimUserFormResponse
 import schemas
+import numpy as np
 
 # DimUser CRUD operations
 
@@ -210,3 +212,55 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     db.commit()
     db.refresh(db_fact_user_form)
     return db_fact_user_form
+
+
+#below crud applicaitons are just tempory they probably dont work and need to be fixed, just trying to get things hooked up 
+def calculate_quartiles_for_exercises(responses):
+    """Calculate quartiles for each exercise in the form responses."""
+    quartile_results = {}
+    
+    # Assuming the form responses are JSON with each key being an exercise
+    for response in responses:
+        for exercise, data_points in response.items():
+            # Ensure we're dealing with numerical data for the exercises
+            if isinstance(data_points, list) and all(isinstance(x, int) for x in data_points):
+                # Calculate quartiles for each exercise
+                q1 = np.percentile(data_points, 25)
+                q2 = np.percentile(data_points, 50)  # Median
+                q3 = np.percentile(data_points, 75)
+                
+                quartile_results[exercise] = {
+                    "Q1": q1,
+                    "Q2": q2,
+                    "Q3": q3
+                }
+    
+    return quartile_results
+
+def determine_student_quartiles(student_response, quartile_data):
+    """Determine where the student's results fall for each exercise."""
+    student_quartile_results = {}
+    
+    for exercise, result in student_response.items():
+        if exercise in quartile_data:
+            q1, q2, q3 = quartile_data[exercise]["Q1"], quartile_data[exercise]["Q2"], quartile_data[exercise]["Q3"]
+            
+            if result >= q3:
+                student_quartile_results[exercise] = "upper quartile"
+            elif result >= q2:
+                student_quartile_results[exercise] = "middle quartile"
+            else:
+                student_quartile_results[exercise] = "lower quartile"
+    
+    return student_quartile_results
+
+
+def get_form_responses(db: Session, student_id: int, form_template_id: int):
+    """Fetch all form responses for a specific student and form template."""
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.StudentID == student_id, FactUserForm.FormTemplateID == form_template_id)
+    ).scalars().all()
+
+    return responses

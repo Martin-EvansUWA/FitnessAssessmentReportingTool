@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 
 import crud
 import models
+from models import *
+from crud import *
 from database import SessionLocal, engine
 from process import createFormTemplateSchema
 from schemas import DimFormTemplateCreate
@@ -62,7 +64,7 @@ def form(form_json):
 # Sending admin id, to receive the form id's and the form titles
 @app.get("/admin_forms/{id}")
 def retrieve_admin_templates(admin_id: int):
-    forms = get_forms(admin_id)
+    forms = get_forms_by_admin(admin_id)
 
     sidebar_info = {}
     for form in forms:
@@ -101,7 +103,7 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 # Save student form data
 @app.post("/save_form_entry")
 def save_form_entry(form):
-    save_form(form)
+    save_student_form(form)
     return 200
 
 
@@ -113,7 +115,30 @@ def get_student_data(db: Session = Depends(get_db)):
 
 
 # get specific students data 
-@app.get("/specific_student_data")
-def get_specific_student_data(db: Session = Depends(get_db)):
-    student = crud.get_dim_user_form_response(db, student_id=1)  # Example with student ID 1
+@app.get("/specific_student_data/{StudentID}")
+def get_specific_student_data(StudentID = int, db: Session = Depends(get_db)):
+    student = crud.get_dim_user_form_response(db, student_id=StudentID)  # Example with student ID 1
     return student
+
+## need to change for now its just here to see if connection works
+@app.get("/normative_results/{student_id}/{form_template_id}", response_model=dict)
+async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
+    # Fetch form responses for the student and form template
+    form_responses = get_form_responses(db, student_id, form_template_id)
+    
+    if not form_responses:
+        raise HTTPException(status_code=404, detail="No responses found for the specified form")
+
+    # Calculate quartiles for all exercises
+    quartile_data = calculate_quartiles_for_exercises(form_responses)
+
+    # Fetch specific student's form response (assuming latest response is used)
+    student_response = form_responses[-1]  # Modify this based on how you want to select student data
+
+    # Determine which quartiles the student's responses fall into
+    student_quartiles = determine_student_quartiles(student_response, quartile_data)
+
+    # Return only how the student's data compares to the quartiles
+    return {
+        "student_quartiles": student_quartiles
+    }
