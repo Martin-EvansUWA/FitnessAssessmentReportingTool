@@ -29,6 +29,8 @@ const initialSidebarData: SidebarData = {
     }
   ]
 };
+///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
+const StudentID = () => { "123"}
 
 const FormResults: React.FC = () => {
   const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
@@ -39,8 +41,8 @@ const FormResults: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const studentResponse = await axios.get<Data>(`${backEndUrl}'/student_data'`);
-        const normativeResponse = await axios.get<Data>(`${backEndUrl}'/normative_results'`);
+        const studentResponse = await axios.get<Data>(`${backEndUrl}'/student_data'${StudentID}`);
+        const normativeResponse = await axios.get<Data>(`${backEndUrl}'/normative_results'${StudentID}`);
         setStudentData(studentResponse.data);
         setNormativeResults(normativeResponse.data);
         setMainContent(
