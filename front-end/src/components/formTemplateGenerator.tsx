@@ -2,7 +2,7 @@ import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
 import {
     FormTemplate,
     FormTemplateCreateResponse,
@@ -158,7 +158,7 @@ const FormTemplateGenerator = () => {
                         <input
                             type="text"
                             placeholder="Title"
-                            className="border-2 border-gray-300 rounded-md"
+                            className="border-2 border-gray-300 rounded-md h-7"
                             onChange={(e) =>
                                 setFormTemplateName(e.target.value)
                             }
@@ -170,7 +170,7 @@ const FormTemplateGenerator = () => {
                         </label>
                         <textarea
                             placeholder="Description"
-                            className="border-2 border-gray-300 rounded-md resize"
+                            className="border-2 border-gray-300 rounded-md resize h-7 min-h-7"
                             onChange={(e) =>
                                 setFormTemplateDescription(e.target.value)
                             }
