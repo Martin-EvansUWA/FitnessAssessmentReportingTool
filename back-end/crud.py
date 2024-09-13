@@ -117,7 +117,7 @@ def create_dim_form_template(
     return db_dim_form_template
 
 
-def get_formtemplates_by_admin(db: Session, admin_id: int):
+def get_form_templates_by_admin(db: Session, admin_id: int):
     return (
         db.query(models.DimFormTemplate)
         .filter(models.DimFormTemplate.AdminId == admin_id)
@@ -144,22 +144,22 @@ def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
 
 
 # DimUserFormResponse CRUD operations
-def get_dim_user_form_response(db: Session, response_id: int):
+def get_fact_user_form_response(db: Session, response_id: int):
     return (
-        db.query(models.DimUserFormResponse)
-        .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
+        db.query(models.FactUserFormResponse)
+        .filter(models.FactUserFormResponse.UserFormResponseID == response_id)
         .first()
     )
 
 
 def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
+    return db.query(models.FactUserFormResponse).offset(skip).limit(limit).all()
 
 
 def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
 ):
-    db_dim_user_form_response = models.DimUserFormResponse(
+    db_dim_user_form_response = models.FactUserFormResponse(
         UserFormResponse=dim_user_form_response.UserFormResponse,
     )
     db.add(db_dim_user_form_response)

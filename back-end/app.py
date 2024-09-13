@@ -48,40 +48,12 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def index():
-    # Add react template with template responses
-    response = {}
-    return templates.TemplateResponse("index.html", response)
 
-
-@app.get("/student")
-async def student():
-    response = {}
-    return templates.TemplateResponse("student.html", response)
-
-
-@app.get("/admin")
-async def admin():
-    response = {}
-    return templates.TemplateResponse("admin.html", response)
-
-
-@app.post("/form")
-def form(form_json):
-    form_data = json.loads(form_json)
-    for key in form_data:
-        print(key + ": " + str(form_data[key]))
-    return "form"
-
-
-# Sending admin id, to receive the form id's and the form titles
-@app.get("/admin_forms/{id}")
+# [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
+@app.get("/retrieve_admin_sidebar_info")
 def retrieve_admin_templates(admin_id: int):
     response = {}
     forms = crud.get_formtemplates_by_admin(get_db(),admin_id)
-
-    response["admin_form_templates"] = forms
 
     sidebar_info = {}
     for form in forms:
@@ -89,6 +61,14 @@ def retrieve_admin_templates(admin_id: int):
 
     response["sidebar_info"] = sidebar_info
 
+    return response
+
+# [Admin] Retrieve admin form template, to display on admin dashboard
+@app.get("/retrieve_admin_form_template")
+def retrive_admin_form_template(form_template_id: int):
+    response = {}
+    form_template = crud.get_dim_form_template(get_db(), form_template_id=form_template_id)
+    response.update({form_template_id: form_template})
     return response
 
 
