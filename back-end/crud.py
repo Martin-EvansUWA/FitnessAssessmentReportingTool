@@ -152,11 +152,11 @@ def get_fact_user_form_response(db: Session, response_id: int):
     )
 
 
-def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
+def get_fact_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.FactUserFormResponse).offset(skip).limit(limit).all()
 
 
-def create_dim_user_form_response(
+def create_fact_user_form_response(
     db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
 ):
     db_dim_user_form_response = models.FactUserFormResponse(
@@ -183,17 +183,15 @@ def get_fact_user_form(
         .first()
     )
 
-def get_fact_multiple_user_forms(
+
+def get_multiple_fact_user_forms(
     db: Session,
     student_id: int,
-    subject_user_id: int,
 ):
-    return (
-        db.query(models.FactUserForm)
-        .filter(
-            models.FactUserForm.StudentID == student_id,
-        )
+    return db.query(models.FactUserForm).filter(
+        models.FactUserForm.StudentID == student_id,
     )
+
 
 def get_all_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.FactUserForm).offset(skip).limit(limit).all()
