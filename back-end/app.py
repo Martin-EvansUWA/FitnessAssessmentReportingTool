@@ -94,7 +94,12 @@ def retrieve_student_form_sidebar_info(student_id: int):
 
     sidebar_info = {}
     for form in forms:
-        sidebar_info.update({form.id: form.title})
+        form_info = {}
+        form_template = crud.get_dim_form_template(get_db(),form.FormTemplateID)
+        form_info["subjectID"] = form.SubjectStudentID
+        form_info["studentID"] = form.StudentID
+        form_info["description"] = form_template.Description
+        sidebar_info.update({form_template.Title: form_info})
     response["sidebar_info"] = sidebar_info
     return response
 
@@ -111,6 +116,21 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 
     return jsonable_encoder(form_template)
 
+# [Student] Get previous student forms
+@app.get("/get_student_form")
+def get_student_form(student_id: int, subject_id: int):
+    form = crud.get_fact_user_form(get_db(), student_id, subject_id)
+    return form
+
+# [Student] Get form description
+@app.get("/get_student_form_description")
+def get_student_form(form_template_id: int, student_id: int, subject_id: int):
+    form_info = {}
+    form_template = crud.get_dim_form_template(get_db(), form_template_id=form_template_id)
+    form_info.update({"title": form_template.Title})
+    form_info.update({"subjectID": student_id})
+    form_info.update({"studentID": subject_id})
+    return form_info
 
 # [Student] Save student form data
 @app.post("/save_form_entry")
