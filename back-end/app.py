@@ -17,7 +17,6 @@ from process import createFactUserFormSchema, createFormTemplateSchema
 from schemas import (
     DataEntryPageSubmissionData,
     DimFormTemplateCreate,
-    DimUserFormResponseCreate,
 )
 
 models.Base.metadata.create_all(bind=engine)

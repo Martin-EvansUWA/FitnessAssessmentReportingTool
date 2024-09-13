@@ -6,13 +6,13 @@ from crud import (
     create_dim_form_template,
     create_DimUser,
     create_fact_user_form,
-    create_dim_user_form_response,
+    create_fact_user_form_response,
     delete_admin,
     delete_DimUser,
     get_admin,
     get_DimUser,
     get_fact_user_form,
-    get_dim_user_form_response,
+    get_fact_user_form_response,
     get_all_fact_user_forms,
 )
 
@@ -20,7 +20,7 @@ from schemas import (
     DimAdminCreate,
     DimFormTemplateCreate,
     DimUserCreate,
-    DimUserFormResponseCreate,
+    FactUserFormResponseCreate,
     FactUserFormCreate,
 )
 from sqlalchemy import create_engine
@@ -108,12 +108,13 @@ def test_create_form():
 
 # Test User Form Data Creation
 def test_create_fact_user_form():
-    test_input = DimUserFormResponseCreate(UserFormResponse={"bench": 130})
+    test_input = FactUserFormResponseCreate(UserFormResponse={"bench": 130})
 
-    ret = create_dim_user_form_response(db, test_input)
+    ret = create_fact_user_form_response(db, test_input)
 
     test_fact_form = FactUserFormCreate(
         StudentID=23621647,
+        FormTemplateID=1,
         SubjectStudentID=17651211,
         CreatedAt=date.today().strftime("%d/%m/%Y"),
         CompleteAt="",
@@ -124,7 +125,7 @@ def test_create_fact_user_form():
     create_fact_user_form(db, test_fact_form)
 
     q_fact_form = get_fact_user_form(db, 23621647, 17651211)
-    q_user_response = get_dim_user_form_response(db, ret.UserFormResponseID)
+    q_user_response = get_fact_user_form_response(db, ret.UserFormResponseID)
 
     assert q_fact_form.StudentID == 23621647
     assert type(q_user_response.UserFormResponse) == dict
