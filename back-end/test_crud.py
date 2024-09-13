@@ -12,9 +12,17 @@ from crud import (
     get_admin,
     get_DimUser,
     get_fact_user_form,
+    get_dim_user_form_response,
+    get_all_fact_user_forms,
 )
 
-from schemas import DimAdminCreate, DimFormTemplateCreate, DimUserCreate, DimUserFormResponseCreate, FactUserFormCreate
+from schemas import (
+    DimAdminCreate,
+    DimFormTemplateCreate,
+    DimUserCreate,
+    DimUserFormResponseCreate,
+    FactUserFormCreate,
+)
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -97,43 +105,48 @@ def test_create_form():
         FormTemplate=temp_layout,
     )
 
-    temp_test2 = DimFormTemplateCreate(
-        Title="My Newest Form",
-        Description="A form to determine the best bench press in the class",
-        StaffID=77771111,
-        CreatedAt=date.today().strftime("%d/%m/%Y"),
-        FormTemplate=temp_layout,
-    )
+    
     create_dim_form_template(db, temp_test)
-    create_dim_form_template(db, temp_test2)
 
 
 # Test User Form Data Creation
 
-def test_create_fact_user_form():
-    test_input = DimUserFormResponseCreate(
-        UserFormResponse={"bench" : 130}
-    )
 
-    foo = create_dim_user_form_response(db,test_input)
-    
+def test_create_fact_user_form():
+    test_input = DimUserFormResponseCreate(UserFormResponse={"bench": 130})
+
+    ret = create_dim_user_form_response(db, test_input)
+
     test_fact_form = FactUserFormCreate(
         StudentID=23621647,
         SubjectStudentID=17651211,
-        CreatedAt=date.today().strftime("%d/%m/^Y"),
+        CreatedAt=date.today().strftime("%d/%m/%Y"),
         CompleteAt="",
         IsComplete=False,
-        UserFormResponseID=foo.UserFormResponseID
+        UserFormResponseID=ret.UserFormResponseID,
     )
 
     create_fact_user_form(db, test_fact_form)
 
-    q_fact_form = get_fact_user_form(db, 23621647,17651211)
+    q_fact_form = get_fact_user_form(db, 23621647, 17651211)
+    q_user_response = get_dim_user_form_response(db, ret.UserFormResponseID)
 
     assert q_fact_form.StudentID == 23621647
-    
+    assert type(q_user_response.UserFormResponse) == dict
 
-    
+
+# Test get all fact user forms
+
+
+def test_get_all_forms():
+    all_forms = get_all_fact_user_forms(db,0,100)
+    for form in all_forms:
+        assert form.StudentID != None
+
+
+#
+
+
 # Test User Deletion
 def test_user_deletion():
     response = delete_DimUser(db, 23621647)

@@ -4,7 +4,7 @@ import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DataEntryPage from "./pages/dataEntryPage";
 import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
-import DashboardPage from "./pages/DashboardPage";
+import DashboardPage from "./pages/dashboardPage";
 import FormResults from "./pages/formResults";
 
 function App() {

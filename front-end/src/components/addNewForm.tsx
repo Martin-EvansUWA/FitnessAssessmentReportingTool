@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
 import { FormTemplateJSON } from "../interface/formInterface";
 
 const AddNewForm = () => {

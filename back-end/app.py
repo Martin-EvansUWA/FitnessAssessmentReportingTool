@@ -13,8 +13,12 @@ from sqlalchemy.orm import Session
 import crud
 import models
 from database import SessionLocal, engine
-from process import createFormTemplateSchema
-from schemas import DimFormTemplateCreate
+from process import createFactUserFormSchema, createFormTemplateSchema
+from schemas import (
+    DataEntryPageSubmissionData,
+    DimFormTemplateCreate,
+    DimUserFormResponseCreate,
+)
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -118,12 +122,21 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
     return jsonable_encoder(form_template)
 
 
-# Save student form data
+# [Student] Save student form data
 @app.post("/save_form_entry")
-def save_form_entry(form):
-    
+def save_form_entry(
+    form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
+):
     try:
-        crud.save_student_form(get_db(),form)
-    except:
-        raise HTTPException(status_code=404, detail="Failure to save student form")
-    return 200
+        created_form_response = crud.create_dim_user_form_response(db, form_data)
+        userFormResponseID = created_form_response.UserFormResponseID
+        fact_user_form_obj = createFactUserFormSchema(
+            form_data.dict(), userFormResponseID
+        )
+        create_fact_user_form_response = crud.create_fact_user_form(
+            db, fact_user_form_obj
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail="Form entry failed to save")
+
+    return {"status": 200, "message": "Form entry saved successfully"}

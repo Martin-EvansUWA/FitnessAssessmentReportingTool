@@ -15,6 +15,7 @@ export interface SideBarFooterButton {
 
 export interface SidebarData {
     title: string;
+    titleOnClick?: () => void; // Optional button click event
     footer: SideBarFooterButton[];
     sections: SidebarSection[];
 }
