@@ -92,6 +92,7 @@ def retrieve_admin_templates(admin_id: int):
     return response
 
 
+
 # [Admin] Create a new form template
 @app.post("/create_form")
 def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
