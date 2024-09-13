@@ -156,7 +156,7 @@ def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_dim_user_form_response(
-    db: Session, dim_user_form_response: schemas.DimUserFormResponseCreate
+    db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
 ):
     db_dim_user_form_response = models.DimUserFormResponse(
         UserFormResponse=dim_user_form_response.UserFormResponse,
@@ -199,6 +199,7 @@ def get_all_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
 
 def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreate):
     db_fact_user_form = models.FactUserForm(
+        FormTemplateID=fact_user_form.FormTemplateID,
         UserFormResponseID=fact_user_form.UserFormResponseID,
         StudentID=fact_user_form.StudentID,
         SubjectStudentID=fact_user_form.SubjectStudentID,

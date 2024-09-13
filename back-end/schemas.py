@@ -49,6 +49,7 @@ class FactUserFormBase(BaseModel):
 
 class FactUserFormCreate(FactUserFormBase):
     UserFormResponseID: int
+    FormTemplateID: int
     StudentID: int
     SubjectStudentID: int
 
@@ -96,6 +97,20 @@ class DimAdminCreate(AdminBase):
 
 class DimAdmin(AdminBase):
     hashed_password: str
+
+    class Config:
+        orm_mode = True
+
+
+# Data Entry Page Submission Data Schema
+class DataEntryPageSubmissionData(BaseModel):
+    UserFormResponse: Dict[str, Any]  # JSON data
+    FormTemplateID: int
+    StudentID: int
+    SubjectStudentID: int
+    IsComplete: bool
+    CreatedAt: str
+    CompleteAt: str
 
     class Config:
         orm_mode = True
