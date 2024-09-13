@@ -1,35 +1,28 @@
 import React from 'react';
 
 // Define the types for student data and normative results
+interface CategoryData {
+  [test: string]: number | string;
+}
+
 interface MyResultsProps {
   studentData: {
-    Name: string;
-    Age: number;
-    Height: number;
-    Mass: number;
-    Flexibility: { [test: string]: number };
-    'Muscular Strength': { [test: string]: number };
-    'Cardiovascular Endurance': { [test: string]: number };
+    [key: string]: number | CategoryData;
   };
   normativeResults: {
-    Age: string;
-    Height: string;
-    Mass: string;
-    Flexibility: { [test: string]: string };
-    'Muscular Strength': { [test: string]: string };
-    'Cardiovascular Endurance': { [test: string]: string };
+    [key: string]: string | CategoryData;
   };
 }
 
 const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) => {
   // Helper function to render categories
-  const renderCategory = (category: string, data: any, normative: any) => (
+  const renderCategory = (category: string, data: CategoryData, normative: CategoryData) => (
     <div key={category} className="mt-6">
       <h3 className="text-xl font-semibold mb-2">{category}</h3>
       <div className="exercise-list">
         {Object.entries(data).map(([test, score]) => (
           <p key={test} className="mb-1">
-            <strong>{test}:</strong> {score} ({(normative as any)[test]})
+            <strong>{test}:</strong> {score} ({(normative[test] as string) || 'N/A'})
           </p>
         ))}
       </div>
@@ -44,15 +37,26 @@ const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) 
       </h1>
       <div className="mb-6">
         <ul className="list-none">
-          <li className="mb-1"><strong>Age:</strong> {studentData.Age} ({normativeResults.Age})</li>
-          <li className="mb-1"><strong>Height:</strong> {studentData.Height} cm ({normativeResults.Height})</li>
-          <li className="mb-1"><strong>Mass:</strong> {studentData.Mass} kg ({normativeResults.Mass})</li>
+          {Object.entries(studentData).map(([key, value]) => {
+            if (typeof value === 'number') {
+              return (
+                <li key={key} className="mb-1">
+                  <strong>{key}:</strong> {value} ({(normativeResults[key] as string) || 'N/A'})
+                </li>
+              );
+            }
+            return null;
+          })}
         </ul>
       </div>
       <div>
         {Object.keys(studentData).map((category) => {
-          if (category === 'Name' || category === 'Age' || category === 'Height' || category === 'Mass') return null;
-          return renderCategory(category, studentData[category as keyof typeof studentData], normativeResults[category as keyof typeof normativeResults] as any);
+          if (typeof studentData[category] !== 'object') return null;
+          return renderCategory(
+            category,
+            studentData[category] as CategoryData,
+            normativeResults[category] as CategoryData
+          );
         })}
       </div>
     </div>

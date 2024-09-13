@@ -8,6 +8,8 @@ from sqlalchemy.orm import Session
 
 import crud
 import models
+from models import *
+from crud import *
 from database import SessionLocal, engine
 from process import createFactUserFormSchema, createFormTemplateSchema
 from schemas import (
@@ -66,7 +68,7 @@ def form(form_json):
 # Sending admin id, to receive the form id's and the form titles
 @app.get("/admin_forms/{id}")
 def retrieve_admin_templates(admin_id: int):
-    forms = get_forms(admin_id)
+    forms = get_forms_by_admin(admin_id)
 
     sidebar_info = {}
     for form in forms:
@@ -108,7 +110,7 @@ def save_form_entry(
     form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
 ):
     try:
-        created_form_response = crud.create_dim_user_form_response(db, form_data)
+        created_form_response = crud.create_dim_user_student_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
         fact_user_form_obj = createFactUserFormSchema(
             form_data.dict(), userFormResponseID
@@ -120,3 +122,40 @@ def save_form_entry(
         raise HTTPException(status_code=400, detail="Form entry failed to save")
 
     return {"status": 200, "message": "Form entry saved successfully"}
+
+
+# get all students data 
+@app.get("/student_data")
+def get_student_data(db: Session = Depends(get_db)):
+    students = crud.get_dim_user_form_responses(db)
+    return students
+
+
+# get specific students data 
+@app.get("/specific_student_data/{StudentID}")
+def get_specific_student_data(StudentID = int, db: Session = Depends(get_db)):
+    student = crud.get_dim_user_form_response(db, student_id=StudentID)  # Example with student ID 1
+    return student
+
+## need to change for now its just here to see if connection works
+@app.get("/normative_results/{student_id}/{form_template_id}", response_model=dict)
+async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
+    # Fetch form responses for the student and form template
+    form_responses = get_form_responses(db, student_id, form_template_id)
+    
+    if not form_responses:
+        raise HTTPException(status_code=404, detail="No responses found for the specified form")
+
+    # Calculate quartiles for all exercises
+    quartile_data = calculate_quartiles_for_exercises(form_responses)
+
+    # Fetch specific student's form response (assuming latest response is used)
+    student_response = form_responses[-1]  # Modify this based on how you want to select student data
+
+    # Determine which quartiles the student's responses fall into
+    student_quartiles = determine_student_quartiles(student_response, quartile_data)
+
+    # Return only how the student's data compares to the quartiles
+    return {
+        "student_quartiles": student_quartiles
+    }

@@ -6,14 +6,9 @@ import regression from 'regression';
 // Register necessary components for Scatter chart
 ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement, LineElement);
 
+// Define types
 interface DataItem {
-  Name: string;
-  Age: number;
-  Height: number;
-  Mass: number;
-  Flexibility: { [key: string]: number };
-  "Muscular Strength": { [key: string]: number };
-  "Cardiovascular Endurance": { [key: string]: number };
+  [key: string]: any; // Generalized data structure to accept any data
 }
 
 interface ScatterChartProps {
@@ -25,64 +20,64 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const [xExercise, setXExercise] = useState<string>('');
   const [yCategory, setYCategory] = useState<string>('');
   const [yExercise, setYExercise] = useState<string>('');
-  const [showRegression, setShowRegression] = useState<boolean>(true); // Toggle for line of best fit
-  const [pointColor, setPointColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default point color
-  const [lineColor, setLineColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default line color
-  const [startFromZero, setStartFromZero] = useState<boolean>(true); // Option to start axis from 0
+  const [showRegression, setShowRegression] = useState<boolean>(true);
+  const [pointColor, setPointColor] = useState<string>('rgba(75, 192, 192, 1)');
+  const [lineColor, setLineColor] = useState<string>('rgba(75, 192, 192, 1)');
+  const [startFromZero, setStartFromZero] = useState<boolean>(true);
 
-  // Extract categories and exercises
-  const categories = {
-    Flexibility: Object.keys(data[0].Flexibility || {}),
-    'Muscular Strength': Object.keys(data[0]['Muscular Strength'] || {}),
-    'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
-  };
+  // Extract categories dynamically from data
+  const categories: Record<string, string[]> = {};
+  data.forEach(item => {
+    Object.keys(item).forEach(key => {
+      if (typeof item[key] === 'object' && item[key] !== null) {
+        categories[key] = Object.keys(item[key]);
+      } else if (typeof item[key] === 'number') {
+        if (!categories[key]) categories[key] = [];
+      }
+    });
+  });
 
-  // Handle category change for x-axis
+  // Handle category and exercise changes
   const handleXCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXCategory(event.target.value);
-    setXExercise(''); // Reset exercise when category changes
+    setXExercise('');
   };
 
-  // Handle exercise change for x-axis
   const handleXExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXExercise(event.target.value);
   };
 
-  // Handle category change for y-axis
   const handleYCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYCategory(event.target.value);
-    setYExercise(''); // Reset exercise when category changes
+    setYExercise('');
   };
 
-  // Handle exercise change for y-axis
   const handleYExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYExercise(event.target.value);
   };
 
-  // Handle checkbox change for starting axis from 0
   const handleStartFromZeroChange = (event: ChangeEvent<HTMLInputElement>) => {
     setStartFromZero(event.target.checked);
   };
 
-  // Prepare x-axis data
-  const xAxisData: number[] = data.map((item) => {
+  // Prepare data for the scatter plot
+  const xAxisData = data.map(item => {
     if (xCategory && xExercise) {
       const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
-      return typeof categoryData[xExercise as keyof typeof categoryData] === 'number' ? categoryData[xExercise as keyof typeof categoryData] : 0;
+      return categoryData[xExercise as keyof typeof categoryData] || 0;
     }
-    return typeof item[xCategory as keyof DataItem] === 'number' ? item[xCategory as keyof DataItem] : 0;
-  }).filter(value => typeof value === 'number') as number[];
+    return item[xCategory as keyof DataItem] || 0;
+  });
 
-  // Prepare y-axis data
-  const yAxisData: number[] = data.map((item) => {
+  const yAxisData = data.map(item => {
     if (yCategory && yExercise) {
       const categoryData = item[yCategory as keyof DataItem] as Record<string, number>;
-      return typeof categoryData[yExercise as keyof typeof categoryData] === 'number' ? categoryData[yExercise as keyof typeof categoryData] : 0;
+      return categoryData[yExercise as keyof typeof categoryData] || 0;
     }
-    return typeof item[yCategory as keyof DataItem] === 'number' ? item[yCategory as keyof DataItem] : 0;
-  }).filter(value => typeof value === 'number') as number[];
+    return item[yCategory as keyof DataItem] || 0;
+  });
 
-  // Ensure xAxisData and yAxisData are of equal length
+  // Ensure xAxisData and yAxisData have the same length
   const filteredData = xAxisData.map((x, index) => [x, yAxisData[index]]).filter(([x, y]) => typeof x === 'number' && typeof y === 'number') as [number, number][];
 
   // Perform regression if needed
@@ -92,7 +87,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const chartData = {
     datasets: [
       {
-        label: yExercise || yCategory || 'Data',
+        label: `${xCategory || 'X'} vs ${yCategory || 'Y'}`,
         data: xAxisData.map((x, index) => ({
           x,
           y: yAxisData[index],
@@ -110,8 +105,8 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
         showLine: true,
         fill: false, // No fill for line of best fit
         pointRadius: 0, // Make points on line of best fit invisible
-      }
-    ]
+      },
+    ],
   };
 
   const options = {
@@ -162,7 +157,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
                 <label>X-Axis Exercise:</label>
                 <select value={xExercise} onChange={handleXExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[xCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[xCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -184,7 +179,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
                 <label>Y-Axis Exercise:</label>
                 <select value={yExercise} onChange={handleYExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[yCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[yCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -193,48 +188,27 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
           </div>
         </div>
 
-        {/* Group options and color pickers */}
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: '16px' }}>
+        {/* Additional controls */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
           <div>
             <label>Show Line of Best Fit: </label>
-            <input
-              type="checkbox"
-              checked={showRegression}
-              onChange={(e) => setShowRegression(e.target.checked)}
-            />
+            <input type="checkbox" checked={showRegression} onChange={(e) => setShowRegression(e.target.checked)} />
           </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div>
-              <label>Start Axes from 0: </label>
-              <input
-                type="checkbox"
-                checked={startFromZero}
-                onChange={handleStartFromZeroChange}
-              />
-            </div>
-
-            <div>
-              <label>Point Color: </label>
-              <input
-                type="color"
-                value={pointColor}
-                onChange={(e) => setPointColor(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label>Line Color: </label>
-              <input
-                type="color"
-                value={lineColor}
-                onChange={(e) => setLineColor(e.target.value)}
-              />
-            </div>
+          <div>
+            <label>Point Color: </label>
+            <input type="color" value={pointColor} onChange={(e) => setPointColor(e.target.value)} />
+          </div>
+          <div>
+            <label>Line Color: </label>
+            <input type="color" value={lineColor} onChange={(e) => setLineColor(e.target.value)} />
+          </div>
+          <div>
+            <label>Start Axis from Zero: </label>
+            <input type="checkbox" checked={startFromZero} onChange={handleStartFromZeroChange} />
           </div>
         </div>
       </div>
-            <br></br>
+
       <Scatter data={chartData} options={options} />
     </div>
   );

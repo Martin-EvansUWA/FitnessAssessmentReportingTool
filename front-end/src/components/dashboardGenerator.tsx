@@ -1,100 +1,49 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import LineChart from './charts/LineChart';
 import BubbleChart from './charts/BubbleChart';
 import ScatterChart from './charts/ScatterChart';
 import RadarChart from './charts/RadarChart';
+import { backEndUrl } from "../constants";
 
-// Expanded Dummy Data with more students
-const dummyData = [
-  {
-    Name: "Alice",
-    Age: 22,
-    Height: 170,
-    Mass: 60,
-    Flexibility: { "Sit & Reach Test": 6 },
-    "Muscular Strength": { "Grip Strength": 15, "Bench Press": 50, "Leg Press": 80 },
-    "Cardiovascular Endurance": { "12-minute Run": 4 }
-  },
-  {
-    Name: "Bob",
-    Age: 25,
-    Height: 180,
-    Mass: 75,
-    Flexibility: { "Sit & Reach Test": 5 },
-    "Muscular Strength": { "Grip Strength": 20, "Bench Press": 70, "Leg Press": 100 },
-    "Cardiovascular Endurance": { "12-minute Run": 5 }
-  },
-  {
-    Name: "Carol",
-    Age: 21,
-    Height: 165,
-    Mass: 55,
-    Flexibility: { "Sit & Reach Test": 7 },
-    "Muscular Strength": { "Grip Strength": 18, "Bench Press": 60, "Leg Press": 90 },
-    "Cardiovascular Endurance": { "12-minute Run": 4.5 }
-  },
-  {
-    Name: "David",
-    Age: 28,
-    Height: 175,
-    Mass: 68,
-    Flexibility: { "Sit & Reach Test": 4 },
-    "Muscular Strength": { "Grip Strength": 22, "Bench Press": 80, "Leg Press": 110 },
-    "Cardiovascular Endurance": { "12-minute Run": 6 }
-  },
-  {
-    Name: "Eva",
-    Age: 23,
-    Height: 160,
-    Mass: 58,
-    Flexibility: { "Sit & Reach Test": 8 },
-    "Muscular Strength": { "Grip Strength": 17, "Bench Press": 55, "Leg Press": 85 },
-    "Cardiovascular Endurance": { "12-minute Run": 4.2 }
-  },
-  {
-    Name: "Frank",
-    Age: 26,
-    Height: 182,
-    Mass: 80,
-    Flexibility: { "Sit & Reach Test": 5 },
-    "Muscular Strength": { "Grip Strength": 25, "Bench Press": 85, "Leg Press": 120 },
-    "Cardiovascular Endurance": { "12-minute Run": 5.5 }
-  },
-  {
-    Name: "Grace",
-    Age: 24,
-    Height: 168,
-    Mass: 62,
-    Flexibility: { "Sit & Reach Test": 6 },
-    "Muscular Strength": { "Grip Strength": 19, "Bench Press": 65, "Leg Press": 95 },
-    "Cardiovascular Endurance": { "12-minute Run": 4.8 }
-  }
-];
-
-// Specific student data
-const specificStudentData = {
-  Name: "Alice",
-  Age: 22,
-  Height: 170,
-  Mass: 60,
-  Flexibility: { "Sit & Reach Test": 6 },
-  "Muscular Strength": { "Grip Strength": 15, "Bench Press": 50, "Leg Press": 80 },
-  "Cardiovascular Endurance": { "12-minute Run": 4 }
-};
+///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
+const StudentID = () => { "1" }
 
 const DashboardGenerator: React.FC = () => {
   const [chartType, setChartType] = useState<string>('');
+  const [studentData, setStudentData] = useState<any[]>([]);
+  const [specificStudentData, setSpecificStudentData] = useState<any>({});
+
+  useEffect(() => {
+    // Fetch all student data
+    axios.get(`${backEndUrl}/student_data/`)
+      .then(response => {
+        setStudentData(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching student data:', error);
+      });
+
+    // Fetch specific student data
+    axios.get(`${backEndUrl}/specific_student_data/${StudentID}`)
+      .then(response => {
+        setSpecificStudentData(response.data);
+      })
+      .catch(error => {
+        console.error('Error fetching specific student data:', error);
+      });
+  }, []);
 
   const renderChart = () => {
     switch (chartType) {
       case 'line':
-        return <LineChart data={dummyData} />;
+        return <LineChart data={studentData} />;
       case 'bubble':
-        return <BubbleChart data={dummyData} />;
+        return <BubbleChart data={studentData} />;
       case 'scatter':
-        return <ScatterChart data={dummyData} />;
+        return <ScatterChart data={studentData} />;
       case 'radar':
-        return <RadarChart data={dummyData} specificStudentData={specificStudentData} />;
+        return <RadarChart data={studentData} specificStudentData={specificStudentData} />;
       default:
         return <p>Please select a chart type.</p>;
     }
@@ -118,11 +67,9 @@ const DashboardGenerator: React.FC = () => {
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
             <option value="radar">Radar</option>
-            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
           </select>
-          
-          </label>
-        </div>
+        </label>
+      </div>
       {renderChart()}
     </div>
   );
