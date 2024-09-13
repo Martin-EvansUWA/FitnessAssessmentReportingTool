@@ -74,8 +74,6 @@ def test_user_creation():
 
 
 # Create Admin Creation
-
-
 def test_admin_creation():
     temp_admin = DimAdminCreate(
         email="admin1234@outlook.com",
@@ -108,10 +106,7 @@ def test_create_form():
     
     create_dim_form_template(db, temp_test)
 
-
 # Test User Form Data Creation
-
-
 def test_create_fact_user_form():
     test_input = DimUserFormResponseCreate(UserFormResponse={"bench": 130})
 
