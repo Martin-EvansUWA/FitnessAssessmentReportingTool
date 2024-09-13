@@ -121,7 +121,6 @@ def test_create_fact_user_form():
         CompleteAt="",
         IsComplete=False,
         UserFormResponseID=ret.UserFormResponseID,
-        FormTemplateID=1,
     )
 
     create_fact_user_form(db, test_fact_form)
