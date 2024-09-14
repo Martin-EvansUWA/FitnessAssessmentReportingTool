@@ -130,7 +130,7 @@ def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
     students = crud.get_form_responses(db, form_template_id=FormID)
     if not students:
         raise HTTPException(status_code=404, detail="Form responses not found")
-    print(students)
+
     return students
 
 
@@ -141,25 +141,54 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
     
     return student
 
-## need to change for now its just here to see if connection works
+## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
 async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
-    # Fetch form responses for the student and form template
+    # Fetch form responses for the cohort (all students) and form template
     form_responses = get_form_responses(db, form_template_id)
     
     if not form_responses:
-        raise HTTPException(status_code=404, detail="No responses found for the specified form")
+        raise HTTPException(status_code=404, detail="No responses found for the specified form template")
 
-    # Calculate quartiles for all exercises
+    # Calculate quartiles for all exercises based on the cohort
     quartile_data = calculate_quartiles_for_exercises(form_responses)
+    
+    # Fetch specific student's form response
+    student_responses = get_student_form_response(db, form_template_id, student_id)
+    
+    if not student_responses:
+        raise HTTPException(status_code=404, detail="No responses found for the specified student and form template")
 
-    # Fetch specific student's form response (assuming latest response is used)
-    student_response = form_responses[-1]  # Modify this based on how you want to select student data
+    # Assuming the latest response is used for the student
+    student_response = student_responses[-1] if student_responses else None
+    
+    if student_response is None:
+        raise HTTPException(status_code=404, detail="No responses found for the specified student")
 
     # Determine which quartiles the student's responses fall into
     student_quartiles = determine_student_quartiles(student_response, quartile_data)
 
-    # Return only how the student's data compares to the quartiles
-    return {
-        "student_quartiles": student_quartiles
+    # Construct dynamic response
+    student_details = student_response.get('Student Details', {})
+    normative_results = {
+        "Student Details": {
+            key: student_quartiles.get(key, "not available in quartile data")
+            for key in student_details.keys()
+        }
     }
+
+    print("//////////Normative Results:" + str(normative_results))  # Debugging print
+    return [
+  {
+    "Student Details": {
+      "Name": "low", 
+      "Age": "high", 
+      "Height": "midume", 
+      "Weight": "low", 
+      "idk": "high" 
+    },
+    "felx": {
+      "strech": "low" 
+    }
+  }
+]

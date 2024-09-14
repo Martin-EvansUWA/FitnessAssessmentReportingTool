@@ -4,7 +4,7 @@ import models
 from models import FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
-
+from typing import List, Dict, Any
 # DimUser CRUD operations
 
 
@@ -215,49 +215,71 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     return db_fact_user_form
 
 
-#below crud applicaitons are just tempory they probably dont work and need to be fixed, just trying to get things hooked up 
+
+
+# Function to calculate quartiles
 def calculate_quartiles_for_exercises(responses):
-    """Calculate quartiles for each exercise in the form responses."""
+    """Calculate quartiles for each exercise from the form responses."""
     quartile_results = {}
     
-    # Assuming the form responses are JSON with each key being an exercise
+    # Accumulate all responses for each exercise
+    exercise_data = {}
+    
     for response in responses:
         for exercise, data_points in response.items():
-            # Ensure we're dealing with numerical data for the exercises
+            if isinstance(data_points, int):  # Handle single integer response
+                data_points = [data_points]
+            
             if isinstance(data_points, list) and all(isinstance(x, int) for x in data_points):
-                # Calculate quartiles for each exercise
-                q1 = np.percentile(data_points, 25)
-                q2 = np.percentile(data_points, 50)  # Median
-                q3 = np.percentile(data_points, 75)
-                
-                quartile_results[exercise] = {
-                    "Q1": q1,
-                    "Q2": q2,
-                    "Q3": q3
-                }
+                if exercise not in exercise_data:
+                    exercise_data[exercise] = []
+                exercise_data[exercise].extend(data_points)
+    
+    # Calculate quartiles for each exercise
+    for exercise, data_points in exercise_data.items():
+        if len(data_points) > 0:
+            q1 = np.percentile(data_points, 25)
+            q2 = np.percentile(data_points, 50)  # Median
+            q3 = np.percentile(data_points, 75)
+            
+            quartile_results[exercise] = {
+                "Q1": q1,
+                "Q2": q2,
+                "Q3": q3
+            }
     
     return quartile_results
 
+
+# Function to determine student quartiles
 def determine_student_quartiles(student_response, quartile_data):
     """Determine where the student's results fall for each exercise."""
     student_quartile_results = {}
     
     for exercise, result in student_response.items():
-        if exercise in quartile_data:
-            q1, q2, q3 = quartile_data[exercise]["Q1"], quartile_data[exercise]["Q2"], quartile_data[exercise]["Q3"]
-            
-            if result >= q3:
-                student_quartile_results[exercise] = "upper quartile"
-            elif result >= q2:
-                student_quartile_results[exercise] = "middle quartile"
+        if isinstance(result, int):  # Ensure result is an integer
+            if exercise in quartile_data:
+                q1, q2, q3 = quartile_data[exercise]["Q1"], quartile_data[exercise]["Q2"], quartile_data[exercise]["Q3"]
+                
+                if result >= q3:
+                    student_quartile_results[exercise] = "upper quartile"
+                elif result >= q2:
+                    student_quartile_results[exercise] = "middle quartile"
+                else:
+                    student_quartile_results[exercise] = "lower quartile"
             else:
-                student_quartile_results[exercise] = "lower quartile"
+                student_quartile_results[exercise] = "not available in quartile data"
+        else:
+            student_quartile_results[exercise] = "not an int"
     
     return student_quartile_results
 
 
+
+
 def get_form_responses(db: Session, form_template_id: int):
     """Fetch all form responses for a form template."""
+    
     responses = db.execute(
         select(DimUserFormResponse.UserFormResponse)
         .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
@@ -271,7 +293,7 @@ def get_student_form_response(db: Session, form_template_id: int, studentID:int)
     responses = db.execute(
         select(DimUserFormResponse.UserFormResponse)
         .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.StudentID == studentID)
+        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.SubjectStudentID == studentID)
     ).scalars().all()
     
     return responses
