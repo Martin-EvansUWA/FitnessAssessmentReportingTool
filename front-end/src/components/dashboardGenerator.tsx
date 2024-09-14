@@ -4,10 +4,11 @@ import LineChart from './charts/LineChart';
 import BubbleChart from './charts/BubbleChart';
 import ScatterChart from './charts/ScatterChart';
 import RadarChart from './charts/RadarChart';
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const StudentID = () => { "1" }
+const StudentID = 23374376
+const FormID = 1
 
 const DashboardGenerator: React.FC = () => {
   const [chartType, setChartType] = useState<string>('');
@@ -16,7 +17,7 @@ const DashboardGenerator: React.FC = () => {
 
   useEffect(() => {
     // Fetch all student data
-    axios.get(`${backEndUrl}/student_data/`)
+    axios.get(`${backEndUrl}/student_data/${FormID}`)
       .then(response => {
         setStudentData(response.data);
       })
@@ -25,7 +26,7 @@ const DashboardGenerator: React.FC = () => {
       });
 
     // Fetch specific student data
-    axios.get(`${backEndUrl}/specific_student_data/${StudentID}`)
+    axios.get(`${backEndUrl}/specific_student_data/${StudentID}/${FormID}`)
       .then(response => {
         setSpecificStudentData(response.data);
       })

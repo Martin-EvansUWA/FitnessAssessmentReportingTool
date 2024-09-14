@@ -110,7 +110,7 @@ def save_form_entry(
     form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
 ):
     try:
-        created_form_response = crud.create_dim_user_student_form_response(db, form_data)
+        created_form_response = crud.create_dim_user_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
         fact_user_form_obj = createFactUserFormSchema(
             form_data.dict(), userFormResponseID
@@ -125,23 +125,27 @@ def save_form_entry(
 
 
 # get all students data 
-@app.get("/student_data")
-def get_student_data(db: Session = Depends(get_db)):
-    students = crud.get_dim_user_form_responses(db)
+@app.get("/student_data/{FormID}")
+def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
+    students = crud.get_form_responses(db, form_template_id=FormID)
+    if not students:
+        raise HTTPException(status_code=404, detail="Form responses not found")
+    print(students)
     return students
 
 
 # get specific students data 
-@app.get("/specific_student_data/{StudentID}")
-def get_specific_student_data(StudentID = int, db: Session = Depends(get_db)):
-    student = crud.get_dim_user_form_response(db, student_id=StudentID)  # Example with student ID 1
+@app.get("/specific_student_data/{StudentID}/{FormID}")
+def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends(get_db)):
+    student = crud.get_student_form_response(db, form_template_id=FormID,  studentID=StudentID)  # Example with student ID 1
+    
     return student
 
 ## need to change for now its just here to see if connection works
-@app.get("/normative_results/{student_id}/{form_template_id}", response_model=dict)
+@app.get("/normative_results/{student_id}/{form_template_id}")
 async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
     # Fetch form responses for the student and form template
-    form_responses = get_form_responses(db, student_id, form_template_id)
+    form_responses = get_form_responses(db, form_template_id)
     
     if not form_responses:
         raise HTTPException(status_code=404, detail="No responses found for the specified form")

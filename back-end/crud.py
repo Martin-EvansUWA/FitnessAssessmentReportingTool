@@ -256,12 +256,22 @@ def determine_student_quartiles(student_response, quartile_data):
     return student_quartile_results
 
 
-def get_form_responses(db: Session, student_id: int, form_template_id: int):
+def get_form_responses(db: Session, form_template_id: int):
+    """Fetch all form responses for a form template."""
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.FormTemplateID == form_template_id)
+    ).scalars().all()
+    
+    return responses
+
+def get_student_form_response(db: Session, form_template_id: int, studentID:int):
     """Fetch all form responses for a specific student and form template."""
     responses = db.execute(
         select(DimUserFormResponse.UserFormResponse)
         .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.StudentID == student_id, FactUserForm.FormTemplateID == form_template_id)
+        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.StudentID == studentID)
     ).scalars().all()
-
+    
     return responses

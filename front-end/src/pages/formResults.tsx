@@ -4,7 +4,7 @@ import DashboardGenerator from '../components/dashboardGenerator';
 import MyResults from '../components/myResults';
 import Layout from '../components/layout';
 import { SidebarData } from '../interface/sidebarInterface';
-import { backEndUrl } from '../constants';
+import { backEndUrl } from "../global_helpers/constants";
 
 // Define generic types for fetched data
 interface Data {
@@ -30,8 +30,8 @@ const initialSidebarData: SidebarData = {
   ]
 };
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const StudentID = 1;
-const FormTemplateID =  "123" 
+const StudentID = 23374376;
+const FormID =  1;
 
 const FormResults: React.FC = () => {
   const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
@@ -42,8 +42,8 @@ const FormResults: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const studentResponse = await axios.get<Data>(`${backEndUrl}/specific_student_data/${StudentID}`);
-        const normativeResponse = await axios.get<Data>(`${backEndUrl}/normative_results/${StudentID}/${FormTemplateID}`);
+        const studentResponse = await axios.get<Data>(`${backEndUrl}/specific_student_data/${StudentID}/${FormID}`);
+        const normativeResponse = await axios.get<Data>(`${backEndUrl}/normative_results/${StudentID}/${FormID}`);
         setStudentData(studentResponse.data);
         setNormativeResults(normativeResponse.data);
         setMainContent(

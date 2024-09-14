@@ -27,13 +27,13 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
   const [maxValuesColor, setMaxValuesColor] = useState<string>('rgba(255, 99, 132, 1)');
 
   // Extract categories and exercises from data
-  const categories = data[0] ? Object.keys(data[0]).filter(key => typeof data[0][key] === 'object') : {};
+  const categories = data[0] ? Object.keys(data[0]).filter(key => typeof data[0][key] === 'object') : [];
 
   // Initialize max values object to store max values of each exercise
   const maxValues: Record<string, number> = {};
 
   // Loop through each category to compute max values
-  Object.keys(categories).forEach((category) => {
+  categories.forEach((category) => {
     Object.keys(data[0][category] || {}).forEach((exercise) => {
       maxValues[exercise] = Math.max(
         ...data.map((item) => item[category]?.[exercise] || 0)
@@ -53,7 +53,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
       ...(showStudentData
         ? [
             {
-              label: specificStudentData.Name || 'Specific Student',
+              label: specificStudentData['Student Details']?.Name || 'Specific Student',
               data: selectedExercises.map((exercise) => {
                 let value = 0;
                 selectedCategories.forEach((category) => {
@@ -108,7 +108,17 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
     setSelectedCategories((prevState) =>
       checked ? [...prevState, value] : prevState.filter((category) => category !== value)
     );
+  
+    if (checked) {
+      const newExercises = Array.from(new Set([...selectedExercises, ...Object.keys(data[0][value] || {})]));
+      setSelectedExercises(newExercises);
+    } else {
+      setSelectedExercises((prevExercises) =>
+        prevExercises.filter((exercise) => !Object.keys(data[0][value] || {}).includes(exercise))
+      );
+    }
   };
+  
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -139,7 +149,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
         {/* Category Selectors */}
         <div style={{ flex: '1', marginRight: '20px' }}>
           <h2>Select Categories:</h2>
-          {Object.keys(categories).map((category) => (
+          {categories.map((category) => (
             <div key={category}>
               <label>
                 <input
@@ -160,19 +170,21 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
           <div style={{ flex: '2' }}>
             <h3>Select Exercises:</h3>
             {selectedCategories.flatMap((category) =>
-              Object.keys(data[0][category] || {}).map((exercise) => (
-                <div key={exercise}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      value={exercise}
-                      checked={selectedExercises.includes(exercise)}
-                      onChange={handleCheckboxChange}
-                    />
-                    {exercise}
-                  </label>
-                </div>
-              ))
+              Object.keys(data[0][category] || {})
+                .filter((exercise) => Number.isInteger(data[0][category][exercise])) // Filter for integer values
+                .map((exercise) => (
+                  <div key={exercise}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value={exercise}
+                        checked={selectedExercises.includes(exercise)}
+                        onChange={handleCheckboxChange}
+                      />
+                      {exercise}
+                    </label>
+                  </div>
+                ))
             )}
           </div>
 
