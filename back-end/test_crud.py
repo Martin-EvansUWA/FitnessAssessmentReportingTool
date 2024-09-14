@@ -1,21 +1,24 @@
 from datetime import date, datetime
 
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
 import models
 from crud import (
     create_admin,
     create_dim_form_template,
+    create_dim_user_form_response,
     create_DimUser,
     create_fact_user_form,
-    create_dim_user_form_response,
     delete_admin,
     delete_DimUser,
     get_admin,
+    get_all_fact_user_forms,
+    get_dim_user_form_response,
     get_DimUser,
     get_fact_user_form,
-    get_dim_user_form_response,
-    get_all_fact_user_forms,
 )
-
 from schemas import (
     DimAdminCreate,
     DimFormTemplateCreate,
@@ -23,9 +26,6 @@ from schemas import (
     DimUserFormResponseCreate,
     FactUserFormCreate,
 )
-from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./back-end/test.db"
 
@@ -105,7 +105,6 @@ def test_create_form():
         FormTemplate=temp_layout,
     )
 
-    
     create_dim_form_template(db, temp_test)
 
 
@@ -124,6 +123,7 @@ def test_create_fact_user_form():
         CompleteAt="",
         IsComplete=False,
         UserFormResponseID=ret.UserFormResponseID,
+        FormTemplateID=1,
     )
 
     create_fact_user_form(db, test_fact_form)
@@ -139,7 +139,7 @@ def test_create_fact_user_form():
 
 
 def test_get_all_forms():
-    all_forms = get_all_fact_user_forms(db,0,100)
+    all_forms = get_all_fact_user_forms(db, 0, 100)
     for form in all_forms:
         assert form.StudentID != None
 
