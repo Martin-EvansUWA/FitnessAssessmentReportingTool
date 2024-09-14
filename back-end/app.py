@@ -144,7 +144,7 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
 ## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
 async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
-    # Fetch form responses for the cohort (all students) and form template
+    # ignor this it doesn't work 
     form_responses = get_form_responses(db, form_template_id)
     
     if not form_responses:
@@ -177,7 +177,7 @@ async def get_normative_results(student_id: int, form_template_id: int, db: Sess
         }
     }
 
-    print("//////////Normative Results:" + str(normative_results))  # Debugging print
+    #must return in this format so [{"catagory":{"exercise":"the string return"}, ...]
     return [
   {
     "Student Details": {
