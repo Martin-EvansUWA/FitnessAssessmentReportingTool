@@ -4,6 +4,9 @@ import models
 from models import FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
+from typing import List, Dict
+import json
+from statistics import mean
 
 # DimUser CRUD operations
 
@@ -151,10 +154,46 @@ def get_dim_user_form_response(db: Session, response_id: int):
         .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
         .first()
     )
+    
+def get_all_responses(db: Session):
+    return db.query(DimUserFormResponse).all()
 
 
-def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
+def aggregate_data_by_category(data: List[Dict]) -> Dict[str, Dict[str, float]]:
+    category_aggregates = {}
+    
+    for entry in data:
+        # Assuming `entry.UserFormResponse` is already a dictionary
+        form_data = entry.UserFormResponse
+        
+        for category, measurements in form_data.items():
+            
+            if category == "Student Details":
+                continue  # Skip "Student Details" category
+            
+            if category not in category_aggregates:
+                category_aggregates[category] = {}
+                
+            for measurement, value in measurements.items():
+                
+                try:
+                    numeric_value = float(value)
+                except ValueError:
+                    continue  # Skip values that can't be converted
+                
+                if measurement not in category_aggregates[category]:
+                    category_aggregates[category][measurement] = []
+                category_aggregates[category][measurement].append(value)
+    
+    for category, measurements in category_aggregates.items():
+        for measurement, values in measurements.items():
+            measurements[measurement] = mean(values)
+    
+    return category_aggregates
+
+
+
+
 
 
 def create_dim_user_form_response(

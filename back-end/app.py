@@ -19,7 +19,7 @@ from schemas import (
 )
 
 models.Base.metadata.create_all(bind=engine)
-
+#models.Base.metadata.drop_all(bind=engine)
 
 # Dependency
 def get_db():
@@ -110,7 +110,7 @@ def save_form_entry(
     form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
 ):
     try:
-        created_form_response = crud.create_dim_user_student_form_response(db, form_data)
+        created_form_response = crud.create_dim_user_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
         fact_user_form_obj = createFactUserFormSchema(
             form_data.dict(), userFormResponseID
@@ -159,3 +159,17 @@ async def get_normative_results(student_id: int, form_template_id: int, db: Sess
     return {
         "student_quartiles": student_quartiles
     }
+    
+@app.get("/aggregate_measurements")
+def aggregate_measurements(db: Session = Depends(get_db)):
+    # Fetch all user form responses
+    responses = crud.get_all_responses(db)
+
+    if not responses:
+        raise HTTPException(status_code=404, detail="No responses found")
+
+    # Aggregate data by category
+    aggregated_data = aggregate_data_by_category(responses)
+
+    return aggregated_data
+
