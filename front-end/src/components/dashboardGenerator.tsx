@@ -4,7 +4,7 @@ import LineChart from './charts/LineChart';
 import BubbleChart from './charts/BubbleChart';
 import ScatterChart from './charts/ScatterChart';
 import RadarChart from './charts/RadarChart';
-import { backEndUrl } from "../constants";
+import { backEndUrl } from "../global_helpers/constants";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
 const StudentID = () => { "1" }
