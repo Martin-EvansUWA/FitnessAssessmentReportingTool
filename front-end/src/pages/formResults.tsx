@@ -4,7 +4,7 @@ import DashboardGenerator from '../components/dashboardGenerator';
 import MyResults from '../components/myResults';
 import Layout from '../components/layout';
 import { SidebarData } from '../interface/sidebarInterface';
-import { backEndUrl } from '../constants';
+import { backEndUrl } from '../global_helpers/constants';
 
 // Define generic types for fetched data
 interface Data {
