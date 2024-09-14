@@ -66,7 +66,7 @@ def form(form_json):
 # Sending admin id, to receive the form id's and the form titles
 @app.get("/admin_forms/{id}")
 def retrieve_admin_templates(admin_id: int):
-    forms = get_forms(admin_id)
+    forms = crud.get_forms(admin_id)
 
     sidebar_info = {}
     for form in forms:
