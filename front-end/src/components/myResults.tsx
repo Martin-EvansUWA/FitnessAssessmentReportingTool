@@ -6,12 +6,8 @@ interface CategoryData {
 }
 
 interface MyResultsProps {
-  studentData: {
-    [key: string]: number | CategoryData;
-  };
-  normativeResults: {
-    [key: string]: string | CategoryData;
-  };
+  studentData: CategoryData[]; // Array of CategoryData objects
+  normativeResults: CategoryData[]; // Array of CategoryData objects
 }
 
 const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) => {
@@ -29,6 +25,10 @@ const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) 
     </div>
   );
 
+  if (!studentData.length || !normativeResults.length) {
+    return <div>No data available</div>;
+  }
+
   return (
     <div className="p-6">
       <h1 className="text-3xl font-bold mb-4">
@@ -37,27 +37,41 @@ const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) 
       </h1>
       <div className="mb-6">
         <ul className="list-none">
-          {Object.entries(studentData).map(([key, value]) => {
-            if (typeof value === 'number') {
-              return (
-                <li key={key} className="mb-1">
-                  <strong>{key}:</strong> {value} ({(normativeResults[key] as string) || 'N/A'})
-                </li>
-              );
-            }
-            return null;
-          })}
+          {studentData.map((data, index) => (
+            <div key={index}>
+              {Object.entries(data).map(([key, value]) => {
+                if (typeof value === 'number') {
+                  // Ensure normativeResults[index] exists and is of type CategoryData
+                  const normativeValue = normativeResults[index] && typeof normativeResults[index] === 'object' ? normativeResults[index][key] : 'N/A';
+                  return (
+                    <li key={key} className="mb-1">
+                      <strong>{key}:</strong> {value} ({normativeValue})
+                    </li>
+                  );
+                }
+                return null;
+              })}
+            </div>
+          ))}
         </ul>
       </div>
       <div>
-        {Object.keys(studentData).map((category) => {
-          if (typeof studentData[category] !== 'object') return null;
-          return renderCategory(
-            category,
-            studentData[category] as CategoryData,
-            normativeResults[category] as CategoryData
-          );
-        })}
+        {studentData.map((data, index) => (
+          <div key={index}>
+            {Object.keys(data).map((category) => {
+              // Ensure category data is of type CategoryData
+              const categoryData = data[category];
+              const categoryNormative = normativeResults[index] && typeof normativeResults[index] === 'object' ? normativeResults[index][category] : {};
+              
+              if (typeof categoryData !== 'object' || typeof categoryNormative !== 'object') return null;
+              return renderCategory(
+                category,
+                categoryData as CategoryData,
+                categoryNormative as CategoryData
+              );
+            })}
+          </div>
+        ))}
       </div>
     </div>
   );

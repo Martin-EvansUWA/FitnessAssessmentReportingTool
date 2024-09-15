@@ -104,19 +104,20 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
         position: 'bottom' as const,
         title: {
           display: true,
-          text: xCategory || 'X-Axis',
+          text: xExercise || 'X-Axis Exercise', // Change to xExercise
         },
         beginAtZero: showXAxisZero,
       },
       y: {
         title: {
           display: true,
-          text: yCategory || 'Y-Axis',
+          text: yExercise || 'Y-Axis Exercise', // Change to yExercise
         },
         beginAtZero: showYAxisZero,
       },
     },
   };
+  
 
   return (
     <div>

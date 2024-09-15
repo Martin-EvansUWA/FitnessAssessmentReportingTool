@@ -111,6 +111,7 @@ def save_form_entry(
 ):
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)
+        created_form_response = crud.create_dim_user_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
         fact_user_form_obj = createFactUserFormSchema(
             form_data.dict(), userFormResponseID
@@ -125,51 +126,70 @@ def save_form_entry(
 
 
 # get all students data 
-@app.get("/student_data")
-def get_student_data(db: Session = Depends(get_db)):
-    students = crud.get_dim_user_form_responses(db)
+@app.get("/student_data/{FormID}")
+def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
+    students = crud.get_form_responses(db, form_template_id=FormID)
+    if not students:
+        raise HTTPException(status_code=404, detail="Form responses not found")
+
     return students
 
 
 # get specific students data 
-@app.get("/specific_student_data/{StudentID}")
-def get_specific_student_data(StudentID = int, db: Session = Depends(get_db)):
-    student = crud.get_dim_user_form_response(db, student_id=StudentID)  # Example with student ID 1
+@app.get("/specific_student_data/{StudentID}/{FormID}")
+def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends(get_db)):
+    student = crud.get_student_form_response(db, form_template_id=FormID,  studentID=StudentID)  # Example with student ID 1
+    
     return student
 
-## need to change for now its just here to see if connection works
-@app.get("/normative_results/{student_id}/{form_template_id}", response_model=dict)
+## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
+@app.get("/normative_results/{student_id}/{form_template_id}")
 async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
-    # Fetch form responses for the student and form template
-    form_responses = get_form_responses(db, student_id, form_template_id)
+    # ignor this it doesn't work 
+    form_responses = get_form_responses(db, form_template_id)
     
     if not form_responses:
-        raise HTTPException(status_code=404, detail="No responses found for the specified form")
+        raise HTTPException(status_code=404, detail="No responses found for the specified form template")
 
-    # Calculate quartiles for all exercises
+    # Calculate quartiles for all exercises based on the cohort
     quartile_data = calculate_quartiles_for_exercises(form_responses)
+    
+    # Fetch specific student's form response
+    student_responses = get_student_form_response(db, form_template_id, student_id)
+    
+    if not student_responses:
+        raise HTTPException(status_code=404, detail="No responses found for the specified student and form template")
 
-    # Fetch specific student's form response (assuming latest response is used)
-    student_response = form_responses[-1]  # Modify this based on how you want to select student data
+    # Assuming the latest response is used for the student
+    student_response = student_responses[-1] if student_responses else None
+    
+    if student_response is None:
+        raise HTTPException(status_code=404, detail="No responses found for the specified student")
 
     # Determine which quartiles the student's responses fall into
     student_quartiles = determine_student_quartiles(student_response, quartile_data)
 
-    # Return only how the student's data compares to the quartiles
-    return {
-        "student_quartiles": student_quartiles
+    # Construct dynamic response
+    student_details = student_response.get('Student Details', {})
+    normative_results = {
+        "Student Details": {
+            key: student_quartiles.get(key, "not available in quartile data")
+            for key in student_details.keys()
+        }
     }
-    
-@app.get("/aggregate_measurements")
-def aggregate_measurements(db: Session = Depends(get_db)):
-    # Fetch all user form responses
-    responses = crud.get_all_responses(db)
 
-    if not responses:
-        raise HTTPException(status_code=404, detail="No responses found")
-
-    # Aggregate data by category
-    aggregated_data = aggregate_data_by_category(responses)
-
-    return aggregated_data
-
+    #must return in this format so [{"catagory":{"exercise":"the string return"}, ...]
+    return [
+  {
+    "Student Details": {
+      "Name": "low", 
+      "Age": "high", 
+      "Height": "midume", 
+      "Weight": "low", 
+      "idk": "high" 
+    },
+    "felx": {
+      "strech": "low" 
+    }
+  }
+]

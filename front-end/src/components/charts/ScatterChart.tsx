@@ -87,7 +87,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const chartData = {
     datasets: [
       {
-        label: `${xCategory || 'X'} vs ${yCategory || 'Y'}`,
+        label: `${xExercise || xCategory || 'X'} vs ${yExercise || yCategory || 'Y'}`,
         data: xAxisData.map((x, index) => ({
           x,
           y: yAxisData[index],
@@ -125,14 +125,14 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
         position: 'bottom' as const,
         title: {
           display: true,
-          text: xCategory || 'X-Axis',
+          text: xExercise || xCategory || 'X-Axis', // Use xExercise if available
         },
         min: startFromZero ? 0 : undefined, // Option to start x-axis from 0
       },
       y: {
         title: {
           display: true,
-          text: yCategory || 'Y-Axis',
+          text: yExercise || yCategory || 'Y-Axis', // Use yExercise if available
         },
         min: startFromZero ? 0 : undefined, // Option to start y-axis from 0
       },
