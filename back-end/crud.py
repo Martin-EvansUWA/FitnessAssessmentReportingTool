@@ -1,15 +1,17 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select
 import models
-from models import FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
-from typing import List, Dict
 import json
-from statistics import mean
+from sqlalchemy.orm import Session
+from sqlalchemy import select
 from typing import List, Dict, Any
-# DimUser CRUD operations
+from models import FactUserForm, DimUserFormResponse
+from models import DimUserFormResponse, FactUserForm
+from scipy.stats import percentileofscore
+from fastapi import Query
 
+
+# DimUser CRUD operations
 
 # Get Student via their StudentID
 def get_DimUser(db: Session, DimStudent_ID: int):
@@ -254,9 +256,83 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     return db_fact_user_form
 
 
+def get_form_responses(db: Session, form_template_id: int):
+    """Fetch all form responses for a form template."""
+    
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.FormTemplateID == form_template_id)
+    ).scalars().all()
+    
+    return [response for response in responses]
+
+def get_student_form_response(db: Session, form_template_id: int, studentID:int):
+    """Fetch all form responses for a specific student and form template."""
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.SubjectStudentID == studentID)
+    ).scalars().all()
+    
+    return [response for response in responses]
 
 
-# Function to calculate quartiles
+# Crud Aggregations
+
+def calculate_percentile_rank(values: List[float], value: float) -> float:
+    """Helper function to calculate percentile rank."""
+    return percentileofscore(values, value, kind='rank')
+
+
+def get_student_percentile(db: Session, form_template_id: int, student_id: int) -> Dict[str, Dict[str, float]]:
+    """Fetches student data and calculates percentile rank for all measurements within the cohort."""
+    
+    # Initialize dictionaries to store percentile ranks
+    student_percentiles = {}
+    
+    # Fetch the specific student's form responses
+    responses = get_student_form_response(db, form_template_id, student_id)
+    
+    # Collect all measurement values for percentile calculation
+    all_measurement_values = {}
+
+    # Collect values for all measurements from all students
+    all_responses = get_form_responses(db,form_template_id)
+
+    for all_form_data in all_responses:
+        
+        for category, measurements in all_form_data.items():
+            for measurement, value in measurements.items():
+                if measurement not in all_measurement_values:
+                    all_measurement_values[measurement] = []
+                all_measurement_values[measurement].append(value)
+
+    # Get the student's specific values for all measurements
+    student_measurements = {}
+
+    for student_form_data in responses:
+
+        for category, measurements in student_form_data.items():
+            for measurement, value in measurements.items():
+                student_measurements[measurement] = value
+
+    # Calculate percentile ranks for each measurement
+    for measurement, values in all_measurement_values.items():
+        student_value = student_measurements.get(measurement, None)
+        if student_value is not None:
+            percentile_rank = calculate_percentile_rank(values, student_value)
+            student_percentiles[measurement] = {
+                "student_value": student_value,
+                "percentile_rank": percentile_rank
+            }
+    
+    return {
+        "student_id": student_id,
+        "percentiles": student_percentiles
+    }
+
+    
 def calculate_quartiles_for_exercises(responses):
     """Calculate quartiles for each exercise from the form responses."""
     quartile_results = {}
@@ -312,27 +388,3 @@ def determine_student_quartiles(student_response, quartile_data):
             student_quartile_results[exercise] = "not an int"
     
     return student_quartile_results
-
-
-
-
-def get_form_responses(db: Session, form_template_id: int):
-    """Fetch all form responses for a form template."""
-    
-    responses = db.execute(
-        select(DimUserFormResponse.UserFormResponse)
-        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.FormTemplateID == form_template_id)
-    ).scalars().all()
-    
-    return responses
-
-def get_student_form_response(db: Session, form_template_id: int, studentID:int):
-    """Fetch all form responses for a specific student and form template."""
-    responses = db.execute(
-        select(DimUserFormResponse.UserFormResponse)
-        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.SubjectStudentID == studentID)
-    ).scalars().all()
-    
-    return responses

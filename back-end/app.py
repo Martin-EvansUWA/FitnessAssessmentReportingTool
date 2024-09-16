@@ -142,6 +142,12 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
     
     return student
 
+@app.get("/student_percentile/{student_id}/{form_template_id}")
+def student_percentile(form_template_id: int, student_id: int, db: Session = Depends(get_db)):
+    """Endpoint to get the percentile rank of a specific student for a given measurement."""
+    result = crud.get_student_percentile(db, form_template_id, student_id)
+    return result
+
 ## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
 async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
