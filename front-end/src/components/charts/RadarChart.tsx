@@ -16,7 +16,7 @@ interface RadarChartProps {
   specificStudentData: DataItem;
 }
 
-const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData }) => {
+const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data}) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [studentColor, setStudentColor] = useState<string>('rgba(75, 192, 192, 1)');

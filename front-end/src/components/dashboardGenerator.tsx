@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LineChart from './charts/LineChart';
+import BarChart from './charts/BarChart';
 import BubbleChart from './charts/BubbleChart';
 import ScatterChart from './charts/ScatterChart';
 import RadarChart from './charts/RadarChart';
@@ -39,13 +40,14 @@ const DashboardGenerator: React.FC = () => {
     switch (chartType) {
       case 'line':
         return <LineChart data={studentData} />;
-      
+      case 'Bar':
+        return <BarChart data={studentData} />;
       case 'bubble':
         return <BubbleChart data={studentData} />;
       case 'scatter':
         return <ScatterChart data={studentData} />;
       case 'radar':
-        return <RadarChart data={studentData} specificStudentData={specificStudentData} />;
+        return <RadarChart specificStudentData={specificStudentData} data={[]} />;
       default:
         return <p>Please select a chart type.</p>;
     }
@@ -66,6 +68,7 @@ const DashboardGenerator: React.FC = () => {
           >
             <option value="">Select</option>
             <option value="line">Line</option>
+            <option value="Bar">Bar</option>
             <option value="bubble">Bubble</option>
             <option value="scatter">Scatter</option>
             <option value="radar">Radar</option>
