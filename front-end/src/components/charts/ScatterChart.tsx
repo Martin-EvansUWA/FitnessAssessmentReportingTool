@@ -81,7 +81,9 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   const filteredData = xAxisData.map((x, index) => [x, yAxisData[index]]).filter(([x, y]) => typeof x === 'number' && typeof y === 'number') as [number, number][];
 
   // Perform regression if needed
-  const regressionData = showRegression ? regression.linear(filteredData).points : [];
+  const regressionResult = showRegression ? regression.linear(filteredData) : null;
+  const regressionEquation = regressionResult ? `y = ${regressionResult.equation[0].toFixed(2)}x + ${regressionResult.equation[1].toFixed(2)}` : '';
+  const rSquared = regressionResult ? `R² = ${regressionResult.r2.toFixed(2)}` : '';
 
   // Prepare scatter chart data
   const chartData = {
@@ -99,7 +101,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
       },
       {
         label: 'Line of Best Fit',
-        data: regressionData.map(([x, y]) => ({ x, y })),
+        data: regressionResult ? regressionResult.points.map(([x, y]) => ({ x, y })) : [],
         borderColor: lineColor,
         borderWidth: 2,
         showLine: true,
@@ -208,6 +210,15 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
           </div>
         </div>
       </div>
+
+      {showRegression && regressionResult && (
+        <div style={{ marginTop: '16px' }}>
+          <strong>Equation of the Line of Best Fit:</strong>
+          <p>{regressionEquation}</p>
+          <strong>R² Value:</strong>
+          <p>{rSquared}</p>
+        </div>
+      )}
 
       <Scatter data={chartData} options={options} />
     </div>

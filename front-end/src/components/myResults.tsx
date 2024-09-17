@@ -1,31 +1,30 @@
 import React from 'react';
 
-// Define the types for student data and normative results
+// Define the type for student data
 interface CategoryData {
   [test: string]: number | string;
 }
 
 interface MyResultsProps {
   studentData: CategoryData[]; // Array of CategoryData objects
-  normativeResults: CategoryData[]; // Array of CategoryData objects
 }
 
-const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) => {
+const MyResults: React.FC<MyResultsProps> = ({ studentData }) => {
   // Helper function to render categories
-  const renderCategory = (category: string, data: CategoryData, normative: CategoryData) => (
+  const renderCategory = (category: string, data: CategoryData) => (
     <div key={category} className="mt-6">
       <h3 className="text-xl font-semibold mb-2">{category}</h3>
       <div className="exercise-list">
         {Object.entries(data).map(([test, score]) => (
           <p key={test} className="mb-1">
-            <strong>{test}:</strong> {score} ({(normative[test] as string) || 'N/A'})
+            <strong>{test}:</strong> {score}
           </p>
         ))}
       </div>
     </div>
   );
 
-  if (!studentData.length || !normativeResults.length) {
+  if (!studentData.length) {
     return <div>No data available</div>;
   }
 
@@ -41,11 +40,9 @@ const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) 
             <div key={index}>
               {Object.entries(data).map(([key, value]) => {
                 if (typeof value === 'number') {
-                  // Ensure normativeResults[index] exists and is of type CategoryData
-                  const normativeValue = normativeResults[index] && typeof normativeResults[index] === 'object' ? normativeResults[index][key] : 'N/A';
                   return (
                     <li key={key} className="mb-1">
-                      <strong>{key}:</strong> {value} ({normativeValue})
+                      <strong>{key}:</strong> {value}
                     </li>
                   );
                 }
@@ -59,16 +56,10 @@ const MyResults: React.FC<MyResultsProps> = ({ studentData, normativeResults }) 
         {studentData.map((data, index) => (
           <div key={index}>
             {Object.keys(data).map((category) => {
-              // Ensure category data is of type CategoryData
               const categoryData = data[category];
-              const categoryNormative = normativeResults[index] && typeof normativeResults[index] === 'object' ? normativeResults[index][category] : {};
               
-              if (typeof categoryData !== 'object' || typeof categoryNormative !== 'object') return null;
-              return renderCategory(
-                category,
-                categoryData as CategoryData,
-                categoryNormative as CategoryData
-              );
+              if (typeof categoryData !== 'object') return null;
+              return renderCategory(category, categoryData as CategoryData);
             })}
           </div>
         ))}

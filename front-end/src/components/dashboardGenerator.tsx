@@ -39,6 +39,7 @@ const DashboardGenerator: React.FC = () => {
     switch (chartType) {
       case 'line':
         return <LineChart data={studentData} />;
+      
       case 'bubble':
         return <BubbleChart data={studentData} />;
       case 'scatter':
