@@ -143,9 +143,10 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
 
 ## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
-def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
+def get_max_values(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
     try:
         results = calculate_normative_results(db, form_template_id, student_id)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    

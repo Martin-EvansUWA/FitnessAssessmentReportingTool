@@ -285,21 +285,31 @@ from typing import Dict, Any, List
 
 def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, int]]:
     # Get the filtered exercises for the form template
-    filtered_exercises, _ = get_filtered_exercises_by_form_template_id(db, form_template_id)
+    filtered_exercises = get_filtered_exercises_by_form_template_id(db, form_template_id)
 
     # Prepare a dictionary to hold the maximum values
     max_values = {}
     
-    for category, exercises in filtered_exercises[0].items():
-        max_values[category] = {}
-        for exercise, max_value in exercises.items():
-            if isinstance(max_value, int):  # Ensure max_value is an integer
-                max_values[category][exercise] = max_value
+    # Iterate over each student response in filtered_exercises
+    for student_response in filtered_exercises:
+        for category, exercises in student_response.items():
+            # Initialize the category in max_values if not present
+            if category not in max_values:
+                max_values[category] = {}
+
+            for exercise, value in exercises.items():
+                if isinstance(value, int):  # Ensure the value is an integer
+                    # Update the maximum value for the exercise
+                    if exercise not in max_values[category]:
+                        max_values[category][exercise] = value
+                    else:
+                        max_values[category][exercise] = max(max_values[category][exercise], value)
 
     return max_values
 
 
-def calculate_normative_results(db: Session, form_template_id: int, studentID: int) -> List[Dict[str, Dict[str, float]]]:
+
+def calculate_normative_results(db: Session, form_template_id: int, studentID: int) -> List[Dict[str, Dict[str, int]]]:
     # Get the student's specific responses
     student_responses = get_student_form_response(db, form_template_id, studentID)
     if not student_responses:
@@ -326,7 +336,8 @@ def calculate_normative_results(db: Session, form_template_id: int, studentID: i
             student_value = student_response_data.get(category, {}).get(exercise, 0)
             if isinstance(student_value, int):  # Check if student_value is an integer
                 if max_value > 0:
-                    normative_results[category][exercise] = student_value / max_value
+                    # Calculate the normative result, multiply by 100, and convert to an integer
+                    normative_results[category][exercise] = int((student_value / max_value) * 100)
                 else:
                     normative_results[category][exercise] = None  # or some other value indicating invalid norm
 

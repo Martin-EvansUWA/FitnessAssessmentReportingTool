@@ -16,7 +16,7 @@ interface RadarChartProps {
   specificStudentData: DataItem;
 }
 
-const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data}) => {
+const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
   const [studentColor, setStudentColor] = useState<string>('rgba(75, 192, 192, 1)');
@@ -52,6 +52,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data}) =>
   // Radar chart options
   const options: ChartOptions<'radar'> = {
     responsive: true,
+    maintainAspectRatio: false, // Allow chart to adjust dynamically
     plugins: {
       legend: {
         position: 'top',
@@ -104,7 +105,6 @@ const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data}) =>
     });
   };
   
-
   const handleStudentColorChange = (event: ChangeEvent<HTMLInputElement>) => {
     setStudentColor(event.target.value);
   };
@@ -171,7 +171,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data}) =>
       </div>
 
       {/* Radar Chart */}
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: '20px', width: '100%', height: '80vh' /* Adjust height as needed */ }}>
         <Radar data={chartData} options={options} />
       </div>
     </div>
