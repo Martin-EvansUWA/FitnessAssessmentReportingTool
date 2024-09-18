@@ -127,7 +127,7 @@ def save_form_entry(
 # get all students data 
 @app.get("/student_data/{FormID}")
 def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
-    students = crud.get_form_responses(db, form_template_id=FormID)
+    students = crud.get_filtered_exercises_by_form_template_id(db, form_template_id=FormID)
     if not students:
         raise HTTPException(status_code=404, detail="Form responses not found")
 
@@ -143,52 +143,9 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
 
 ## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
-async def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
-    # ignor this it doesn't work 
-    form_responses = get_form_responses(db, form_template_id)
-    
-    if not form_responses:
-        raise HTTPException(status_code=404, detail="No responses found for the specified form template")
-
-    # Calculate quartiles for all exercises based on the cohort
-    quartile_data = calculate_quartiles_for_exercises(form_responses)
-    
-    # Fetch specific student's form response
-    student_responses = get_student_form_response(db, form_template_id, student_id)
-    
-    if not student_responses:
-        raise HTTPException(status_code=404, detail="No responses found for the specified student and form template")
-
-    # Assuming the latest response is used for the student
-    student_response = student_responses[-1] if student_responses else None
-    
-    if student_response is None:
-        raise HTTPException(status_code=404, detail="No responses found for the specified student")
-
-    # Determine which quartiles the student's responses fall into
-    student_quartiles = determine_student_quartiles(student_response, quartile_data)
-
-    # Construct dynamic response
-    student_details = student_response.get('Student Details', {})
-    normative_results = {
-        "Student Details": {
-            key: student_quartiles.get(key, "not available in quartile data")
-            for key in student_details.keys()
-        }
-    }
-
-    #must return in this format so [{"catagory":{"exercise":"the string return"}, ...]
-    return [
-  {
-    "Student Details": {
-      "Name": "low", 
-      "Age": "high", 
-      "Height": "midume", 
-      "Weight": "low", 
-      "idk": "high" 
-    },
-    "felx": {
-      "strech": "low" 
-    }
-  }
-]
+def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
+    try:
+        results = calculate_normative_results(db, form_template_id, student_id)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

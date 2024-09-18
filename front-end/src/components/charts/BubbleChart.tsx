@@ -6,7 +6,7 @@ ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend);
 
 // Define types
 interface DataItem {
-  [key: string]: any; // This allows any structure for the data
+  [key: string]: any; // Generalized data structure to accept any data
 }
 
 interface BubbleChartProps {
@@ -67,39 +67,28 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
   };
 
   // Prepare data for the chart
-  const xAxisData = data.map((item) => {
-    if (xCategory && xExercise) {
-      const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[xExercise as keyof typeof categoryData] || 0;
-    }
-    return item[xCategory as keyof DataItem] || 0;
-  });
+  const filteredData = data
+    .map(item => {
+      const xValue = xCategory && xExercise ? (item[xCategory] as Record<string, number>)[xExercise] : item[xCategory];
+      const yValue = yCategory && yExercise ? (item[yCategory] as Record<string, number>)[yExercise] : item[yCategory];
+      const sizeValue = sizeCategory && sizeExercise ? (item[sizeCategory] as Record<string, number>)[sizeExercise] : item[sizeCategory];
 
-  const yAxisData = data.map((item) => {
-    if (yCategory && yExercise) {
-      const categoryData = item[yCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[yExercise as keyof typeof categoryData] || 0;
-    }
-    return item[yCategory as keyof DataItem] || 0;
-  });
-
-  const sizeData = data.map((item) => {
-    if (sizeCategory && sizeExercise) {
-      const categoryData = item[sizeCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[sizeExercise as keyof typeof categoryData] || 0;
-    }
-    return item[sizeCategory as keyof DataItem] || 0;
-  });
+      if (xValue != null && yValue != null && sizeValue != null) {
+        return {
+          x: xValue,
+          y: yValue,
+          r: sizeValue || 5, // Default size if no data
+        };
+      }
+      return null;
+    })
+    .filter((item): item is { x: number; y: number; r: number } => item !== null);
 
   // Bubble chart data
   const chartData = {
     datasets: [{
       label: sizeExercise || sizeCategory || 'Data',
-      data: data.map((_, index) => ({
-        x: xAxisData[index],
-        y: yAxisData[index],
-        r: sizeData[index] || 5, // Default size if no data
-      })),
+      data: filteredData,
       backgroundColor: fillColor,
       borderColor: borderColor,
       borderWidth: 1,
@@ -135,7 +124,6 @@ const BubbleChart: React.FC<BubbleChartProps> = ({ data }) => {
       },
     },
   };
-  
 
   return (
     <div>

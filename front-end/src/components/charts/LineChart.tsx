@@ -57,26 +57,36 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
   };
 
   // Prepare data for the x-axis
-  const xAxisData = data.map((item) => {
-    if (xCategory && xExercise) {
-      const categoryData = item[xCategory] as Record<string, number>;
-      return { x: Number(categoryData[xExercise] || 0), original: item };
-    }
-    return { x: Number(item[xCategory] || 0), original: item };
-  }).sort((a, b) => a.x - b.x);
+  const xAxisData = data
+    .map((item) => {
+      if (xCategory && xExercise) {
+        const categoryData = item[xCategory] as Record<string, number>;
+        if (categoryData && xExercise in categoryData) {
+          return { x: Number(categoryData[xExercise]), original: item };
+        }
+      } else if (xCategory && xCategory in item) {
+        return { x: Number(item[xCategory]), original: item };
+      }
+      return null;
+    })
+    .filter(item => item !== null)
+    .sort((a, b) => (a as { x: number }).x - (b as { x: number }).x);
 
   // Prepare data for the y-axis
   const yAxisData = xAxisData.map((item) => {
     if (yCategory && yExercise) {
-      const categoryData = item.original[yCategory] as Record<string, number>;
-      return categoryData[yExercise] || 0;
+      const categoryData = (item as { original: DataItem }).original[yCategory] as Record<string, number>;
+      if (categoryData && yExercise in categoryData) {
+        return categoryData[yExercise];
+      }
+      return null;
     }
-    return item.original[yCategory] || 0;
-  });
+    return (item as { original: DataItem }).original[yCategory] || null;
+  }).filter(value => value !== null);
 
   // Chart configuration
   const chartData = {
-    labels: xAxisData.map(item => item.x),
+    labels: xAxisData.map(item => (item as { x: number }).x),
     datasets: [
       {
         label: yExercise || yCategory || 'Data',
@@ -117,7 +127,6 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
       },
     },
   };
-  
 
   return (
     <div>

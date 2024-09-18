@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 import models
-from models import FactUserForm, DimUserFormResponse
+from models import DimFormTemplate, FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
 from typing import List, Dict, Any
@@ -215,68 +215,6 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     return db_fact_user_form
 
 
-
-
-# Function to calculate quartiles
-def calculate_quartiles_for_exercises(responses):
-    """Calculate quartiles for each exercise from the form responses."""
-    quartile_results = {}
-    
-    # Accumulate all responses for each exercise
-    exercise_data = {}
-    
-    for response in responses:
-        for exercise, data_points in response.items():
-            if isinstance(data_points, int):  # Handle single integer response
-                data_points = [data_points]
-            
-            if isinstance(data_points, list) and all(isinstance(x, int) for x in data_points):
-                if exercise not in exercise_data:
-                    exercise_data[exercise] = []
-                exercise_data[exercise].extend(data_points)
-    
-    # Calculate quartiles for each exercise
-    for exercise, data_points in exercise_data.items():
-        if len(data_points) > 0:
-            q1 = np.percentile(data_points, 25)
-            q2 = np.percentile(data_points, 50)  # Median
-            q3 = np.percentile(data_points, 75)
-            
-            quartile_results[exercise] = {
-                "Q1": q1,
-                "Q2": q2,
-                "Q3": q3
-            }
-    
-    return quartile_results
-
-
-# Function to determine student quartiles
-def determine_student_quartiles(student_response, quartile_data):
-    """Determine where the student's results fall for each exercise."""
-    student_quartile_results = {}
-    
-    for exercise, result in student_response.items():
-        if isinstance(result, int):  # Ensure result is an integer
-            if exercise in quartile_data:
-                q1, q2, q3 = quartile_data[exercise]["Q1"], quartile_data[exercise]["Q2"], quartile_data[exercise]["Q3"]
-                
-                if result >= q3:
-                    student_quartile_results[exercise] = "upper quartile"
-                elif result >= q2:
-                    student_quartile_results[exercise] = "middle quartile"
-                else:
-                    student_quartile_results[exercise] = "lower quartile"
-            else:
-                student_quartile_results[exercise] = "not available in quartile data"
-        else:
-            student_quartile_results[exercise] = "not an int"
-    
-    return student_quartile_results
-
-
-
-
 def get_form_responses(db: Session, form_template_id: int):
     """Fetch all form responses for a form template."""
     
@@ -297,3 +235,99 @@ def get_student_form_response(db: Session, form_template_id: int, studentID:int)
     ).scalars().all()
     
     return responses
+
+
+def get_filtered_exercises_by_form_template_id(db:Session, form_template_id):
+    # Query the form template for the given ID
+    form_template = db.query(DimFormTemplate).filter_by(FormTemplateID=form_template_id).first()
+    
+    if not form_template:
+        return []
+
+    # Extract the JSON structure of the form template
+    template_structure = form_template.FormTemplate
+
+    # Query to get all user form responses associated with the specified form template ID
+    form_responses = db.query(DimUserFormResponse).all()
+
+    # List to store the filtered results
+    filtered_responses = []
+
+    # Iterate through each form response
+    for response in form_responses:
+        user_form_response = response.UserFormResponse
+        filtered_data = {}
+
+        # Track if the response has any matching categories/exercises
+        has_matching_entry = False
+
+        # Iterate over categories in the form template
+        for category, exercises in template_structure.items():
+            if category in user_form_response:
+                # Initialize category in the filtered data
+                filtered_data[category] = {}
+                
+                # Iterate over exercises in the category
+                for exercise in exercises:
+                    if exercise in user_form_response[category]:
+                        # Add exercise and its value to the filtered data
+                        filtered_data[category][exercise] = user_form_response[category][exercise]
+                        has_matching_entry = True
+
+        # Add the filtered response to the list only if it contains at least one matching entry
+        if has_matching_entry:
+            filtered_responses.append(filtered_data)
+
+    return filtered_responses
+
+
+from typing import Dict, Any, List
+
+def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, int]]:
+    # Get the filtered exercises for the form template
+    filtered_exercises, _ = get_filtered_exercises_by_form_template_id(db, form_template_id)
+
+    # Prepare a dictionary to hold the maximum values
+    max_values = {}
+    
+    for category, exercises in filtered_exercises[0].items():
+        max_values[category] = {}
+        for exercise, max_value in exercises.items():
+            if isinstance(max_value, int):  # Ensure max_value is an integer
+                max_values[category][exercise] = max_value
+
+    return max_values
+
+
+def calculate_normative_results(db: Session, form_template_id: int, studentID: int) -> List[Dict[str, Dict[str, float]]]:
+    # Get the student's specific responses
+    student_responses = get_student_form_response(db, form_template_id, studentID)
+    if not student_responses:
+        return [{}]  # Return an empty list with an empty dictionary if no responses found
+
+    # Get the maximum values for exercises
+    max_values = get_max_values(db, form_template_id)
+
+    # Flatten the list of student responses into a single dictionary
+    student_response_data = {}
+    for response in student_responses:
+        user_response = response
+        for category, exercises in user_response.items():
+            if category not in student_response_data:
+                student_response_data[category] = {}
+            student_response_data[category].update(exercises)
+
+    # Calculate normative results
+    normative_results = {}
+    for category, exercises in max_values.items():
+        if category not in normative_results:
+            normative_results[category] = {}
+        for exercise, max_value in exercises.items():
+            student_value = student_response_data.get(category, {}).get(exercise, 0)
+            if isinstance(student_value, int):  # Check if student_value is an integer
+                if max_value > 0:
+                    normative_results[category][exercise] = student_value / max_value
+                else:
+                    normative_results[category][exercise] = None  # or some other value indicating invalid norm
+
+    return [normative_results]

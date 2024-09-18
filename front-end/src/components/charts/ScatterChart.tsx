@@ -40,7 +40,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   // Handle category and exercise changes
   const handleXCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXCategory(event.target.value);
-    setXExercise('');
+    setXExercise(''); // Reset exercise selection when changing category
   };
 
   const handleXExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -49,7 +49,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
 
   const handleYCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYCategory(event.target.value);
-    setYExercise('');
+    setYExercise(''); // Reset exercise selection when changing category
   };
 
   const handleYExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -61,27 +61,21 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   };
 
   // Prepare data for the scatter plot
-  const xAxisData = data.map(item => {
-    if (xCategory && xExercise) {
-      const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[xExercise as keyof typeof categoryData] || 0;
-    }
-    return item[xCategory as keyof DataItem] || 0;
-  });
+  const filteredData = data
+    .map(item => {
+      // Check if item has the required data for the selected categories and exercises
+      const xValue = xCategory && xExercise ? (item[xCategory] as Record<string, number>)[xExercise] : item[xCategory];
+      const yValue = yCategory && yExercise ? (item[yCategory] as Record<string, number>)[yExercise] : item[yCategory];
 
-  const yAxisData = data.map(item => {
-    if (yCategory && yExercise) {
-      const categoryData = item[yCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[yExercise as keyof typeof categoryData] || 0;
-    }
-    return item[yCategory as keyof DataItem] || 0;
-  });
-
-  // Ensure xAxisData and yAxisData have the same length
-  const filteredData = xAxisData.map((x, index) => [x, yAxisData[index]]).filter(([x, y]) => typeof x === 'number' && typeof y === 'number') as [number, number][];
+      if (xValue != null && yValue != null) {
+        return { x: xValue, y: yValue };
+      }
+      return null;
+    })
+    .filter((item): item is { x: number; y: number } => item !== null);
 
   // Perform regression if needed
-  const regressionResult = showRegression ? regression.linear(filteredData) : null;
+  const regressionResult = showRegression ? regression.linear(filteredData.map(point => [point.x, point.y])) : null;
   const regressionEquation = regressionResult ? `y = ${regressionResult.equation[0].toFixed(2)}x + ${regressionResult.equation[1].toFixed(2)}` : '';
   const rSquared = regressionResult ? `R² = ${regressionResult.r2.toFixed(2)}` : '';
 
@@ -90,10 +84,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
     datasets: [
       {
         label: `${xExercise || xCategory || 'X'} vs ${yExercise || yCategory || 'Y'}`,
-        data: xAxisData.map((x, index) => ({
-          x,
-          y: yAxisData[index],
-        })),
+        data: filteredData,
         backgroundColor: pointColor,
         borderColor: pointColor,
         borderWidth: 1,

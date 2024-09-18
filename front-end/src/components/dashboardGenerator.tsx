@@ -27,7 +27,7 @@ const DashboardGenerator: React.FC = () => {
       });
 
     // Fetch specific student data
-    axios.get(`${backEndUrl}/specific_student_data/${StudentID}/${FormID}`)
+    axios.get(`${backEndUrl}/normative_results/${StudentID}/${FormID}`)
       .then(response => {
         setSpecificStudentData(response.data);
       })
