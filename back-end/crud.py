@@ -265,6 +265,15 @@ def get_form_responses(db: Session, form_template_id: int):
         .where(FactUserForm.FormTemplateID == form_template_id)
     ).scalars().all()
     
+    
+def get_all_form_responses(db: Session):
+    """Fetch all form responses."""
+    
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+    ).scalars().all()
+    
     return [response for response in responses]
 
 def get_student_form_response(db: Session, form_template_id: int, studentID:int):
