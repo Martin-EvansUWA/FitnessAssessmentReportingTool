@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 import models
-from models import DimFormTemplate, FactUserForm, DimUserFormResponse
+from models import DimFormTemplate, DimUser, FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
 from typing import List, Dict, Any
@@ -342,3 +342,14 @@ def calculate_normative_results(db: Session, form_template_id: int, studentID: i
                     normative_results[category][exercise] = None  # or some other value indicating invalid norm
 
     return [normative_results]
+
+
+def get_form_submissions(db: Session, form_template_id: int):
+    return (
+        db.query(FactUserForm, DimUser.FirstName, DimUser.LastName, DimUser.StudentID)  # Include StudentID here
+        .join(DimUser, FactUserForm.StudentID == DimUser.StudentID)
+        .filter(FactUserForm.FormTemplateID == form_template_id)
+        .order_by(DimUser.FirstName)  # Alphabetical sorting by first name
+        .all()
+    )
+

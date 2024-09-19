@@ -143,10 +143,53 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
 
 ## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
-def get_max_values(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
+def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
     try:
         results = calculate_normative_results(db, form_template_id, student_id)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+
+@app.get("/forms/{form_template_id}/submissions")
+def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
+    # Get form details
+    form_details = db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).first()
+
+    # Get form submissions
+    submissions = get_form_submissions(db, form_template_id)
+
+    # Return debugging information
+    return {
+        "form_details": {
+            "form_template_id": form_details.FormTemplateID,
+            "title": form_details.Title,
+            "description": form_details.Description,
+            "created_at": form_details.CreatedAt,
+        },
+        "submissions_count": len(submissions),  # Count of submissions
+        "submissions": [
+            {
+                "student_id": submission[3],  # Access StudentID from the tuple
+                "first_name": submission[1],    # Access FirstName from the tuple
+                "last_name": submission[2],     # Access LastName from the tuple
+                "submission_time": submission[0].CreatedAt,  # Access CreatedAt from FactUserForm
+            }
+            for submission in submissions
+        ],
+    }
+
+
+@app.delete("/forms/delete-submissions")
+def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db)):
+    if not student_ids:
+        return {"message": "No student IDs provided."}
+
+    try:
+        db.query(FactUserForm).filter(FactUserForm.StudentID.in_(student_ids)).delete(synchronize_session=False)
+        db.commit()
+        return {"message": "Selected submissions deleted successfully."}
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}, 400

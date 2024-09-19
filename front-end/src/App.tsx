@@ -6,6 +6,7 @@ import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
 import DashboardPage from "./pages/DashboardPage";
 import FormResults from "./pages/formResults";
+import FormHistory from "./pages/FormManager";
 
 function App() {
     return (
@@ -19,6 +20,7 @@ function App() {
                 <Route path="/form-results" element={<FormResults />} />
                 <Route path="/get-new-form" element={<GetNewFormPage />} />
                 <Route path="/data-entry" element={<DataEntryPage />} />
+                <Route path="/form-history" element={<FormHistory />} />
                 <Route path="/dashboardPage" element={<DashboardPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
