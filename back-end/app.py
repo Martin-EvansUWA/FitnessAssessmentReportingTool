@@ -4,6 +4,7 @@ from http.client import HTTPException
 from fastapi import Depends, FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 import crud
@@ -141,7 +142,6 @@ def get_specific_student_data(StudentID = int, FormID=int, db: Session = Depends
     
     return student
 
-## Dosn't work outputs something like this {'Student Details': {'Name': 'not available in quartile data', 'Age': 'not available in quartile data', 'Height': 'not available in quartile data', 'Weight': 'not available in quartile data', 'idk': 'not available in quartile data'}}
 @app.get("/normative_results/{student_id}/{form_template_id}")
 def get_normative_results(student_id: int, form_template_id: int, db: Session = Depends(get_db)):
     try:
@@ -180,7 +180,7 @@ def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
         ],
     }
 
-
+#dosn't work but I dont know exactly what going wrong 
 @app.delete("/forms/delete-submissions")
 def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db)):
     if not student_ids:
@@ -193,3 +193,16 @@ def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db
     except Exception as e:
         db.rollback()
         return {"error": str(e)}, 400
+    
+
+@app.get("/forms/{form_template_id}/export", response_class=FileResponse)
+def export_form_responses(form_template_id: int, db: Session = Depends(get_db)):
+    # Use the existing function to get responses
+    responses = get_form_responses(db, form_template_id)
+    # Logic to convert responses to CSV/XLSX format and return the file
+    export_file = create_export_file(responses)
+    return FileResponse(export_file, media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", filename="form_responses.xlsx")
+
+
+
+

@@ -5,6 +5,8 @@ from models import DimFormTemplate, DimUser, FactUserForm, DimUserFormResponse
 import schemas
 import numpy as np
 from typing import List, Dict, Any
+import pandas as pd
+from tempfile import NamedTemporaryFile
 # DimUser CRUD operations
 
 
@@ -353,3 +355,27 @@ def get_form_submissions(db: Session, form_template_id: int):
         .all()
     )
 
+def flatten_response(response):
+    """Flatten the nested response structure."""
+    flat_response = {}
+    
+    for key, value in response.items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                flat_response[f"{sub_key}"] = sub_value
+        else:
+            flat_response[key] = value
+            
+    return flat_response
+
+def create_export_file(responses):
+    # Flatten the responses
+    flattened_responses = [flatten_response(response) for response in responses]
+    
+    # Convert the flattened responses to a pandas DataFrame
+    df = pd.DataFrame(flattened_responses)
+
+    # Save the file temporarily and return the path
+    with NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+        df.to_excel(tmp.name, index=False)
+        return tmp.name

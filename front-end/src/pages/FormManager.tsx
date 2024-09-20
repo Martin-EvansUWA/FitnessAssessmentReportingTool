@@ -4,6 +4,7 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 import { backEndUrl } from '../global_helpers/constants';
+import * as XLSX from 'xlsx'; // Import xlsx for exporting to Excel
 
 // Define the interface for form submissions and form details
 interface FormSubmission {
@@ -21,8 +22,6 @@ interface FormDetails {
 }
 
 interface SpecificStudentData {
-    // Define the structure of the specific student data returned from the API
-    // For example:
     student_id: number;
     first_name: string;
     last_name: string;
@@ -112,6 +111,26 @@ const GetNewFormPage = () => {
         }
     };
 
+    const handleExport = async () => {
+        if (!formDetails) return;
+        
+        try {
+            const response = await axios.get(`${backEndUrl}/forms/${formDetails.form_template_id}/export`, {
+                responseType: 'blob' // Important for file downloads
+            });
+    
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', 'form_responses.xlsx');
+            document.body.appendChild(link);
+            link.click();
+        } catch (error) {
+            console.error('Error exporting form data:', error);
+        }
+    };
+    
+
     const dummySidebarData: SidebarData = {
         title: "Form Manager",
         footer: [
@@ -167,9 +186,14 @@ const GetNewFormPage = () => {
                                     <p><strong>Created At: </strong> {formDetails.created_at}</p>
                                     <p><strong>Description: </strong>{formDetails.description}</p>
                                 </div>
-                                <button onClick={() => setShowDeleteOptions(!showDeleteOptions)} className="bg-red-500 text-white px-4 py-2 rounded">
-                                    {showDeleteOptions ? 'Cancel' : 'Delete Response'}
-                                </button>
+                                <div>
+                                    <button onClick={handleExport} className="bg-green-500 text-white px-4 py-2 rounded mr-4">
+                                        Export to Excel
+                                    </button>
+                                    <button onClick={() => setShowDeleteOptions(!showDeleteOptions)} className="bg-red-500 text-white px-4 py-2 rounded">
+                                        {showDeleteOptions ? 'Cancel' : 'Delete Response'}
+                                    </button>
+                                </div>
                             </div>
                         )}
 
@@ -220,9 +244,9 @@ const GetNewFormPage = () => {
                     {showStudentPopup && (
                         <div className="popup">
                             <div className="popup-content">
-                                <h2 style={{ fontWeight: 'bold' , fontSize: '1.2em'}}>Student Details</h2> 
+                                <h2 style={{ fontWeight: 'bold', fontSize: '1.2em' }}>Student Details</h2>
                                 <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
-                                <br></br>
+                                <br />
                                 {studentDataError ? (
                                     <p>{studentDataError}</p>
                                 ) : (
@@ -235,17 +259,17 @@ const GetNewFormPage = () => {
                                                     <ul>
                                                         {Object.entries(studentDetails).map(([key, value]) => (
                                                             <li key={key}>
-                                                                <strong>{key}:</strong> {String(value)} {/* Convert value to string */}
+                                                                <strong>{key}:</strong> {String(value)}
                                                             </li>
                                                         ))}
                                                     </ul>
                                                 </div>
                                             );
-                                        }) as React.ReactNode // Type assertion here
+                                        }) as React.ReactNode
                                     )
                                 )}
-                                <br></br>
-                                <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"  onClick={() => setShowStudentPopup(false)}>Close</button>
+                                <br />
+                                <button className="mt-4 bg-blue-600 text-white px-4 py-2 rounded" onClick={() => setShowStudentPopup(false)}>Close</button>
                             </div>
                         </div>
                     )}
