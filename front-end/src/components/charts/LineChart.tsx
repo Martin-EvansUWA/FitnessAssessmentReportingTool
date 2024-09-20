@@ -4,13 +4,15 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Title, Toolt
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
-// Generalized DataItem interface to handle dynamic data structures
-interface DataItem {
-  [key: string]: any; // Allows flexibility for dynamic data structures
+// Define specific data interface for better type safety
+interface ExerciseData {
+  [category: string]: {
+    [exercise: string]: number; // Adjust type if needed
+  };
 }
 
 interface LineChartProps {
-  data: DataItem[];
+  data: ExerciseData[];
 }
 
 const LineChart: React.FC<LineChartProps> = ({ data }) => {
@@ -58,7 +60,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
 
   // Prepare data for the x-axis
   const xAxisData = data
-    .map((item) => {
+    .map(item => {
       if (xCategory && xExercise) {
         const categoryData = item[xCategory] as Record<string, number>;
         if (categoryData && xExercise in categoryData) {
@@ -73,15 +75,16 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
     .sort((a, b) => (a as { x: number }).x - (b as { x: number }).x);
 
   // Prepare data for the y-axis
-  const yAxisData = xAxisData.map((item) => {
+  const yAxisData = xAxisData.map(item => {
+    const original = (item as { original: ExerciseData }).original;
     if (yCategory && yExercise) {
-      const categoryData = (item as { original: DataItem }).original[yCategory] as Record<string, number>;
+      const categoryData = original[yCategory] as Record<string, number>;
       if (categoryData && yExercise in categoryData) {
         return categoryData[yExercise];
       }
       return null;
     }
-    return (item as { original: DataItem }).original[yCategory] || null;
+    return original[yCategory] || null;
   }).filter(value => value !== null);
 
   // Chart configuration
@@ -114,14 +117,14 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
         position: 'bottom' as const,
         title: {
           display: true,
-          text: xExercise || 'X-Axis Exercise', // Change to xExercise
+          text: xExercise || 'X-Axis Exercise',
         },
         beginAtZero: showXAxisZero,
       },
       y: {
         title: {
           display: true,
-          text: yExercise || 'Y-Axis Exercise', // Change to yExercise
+          text: yExercise || 'Y-Axis Exercise',
         },
         beginAtZero: showYAxisZero,
       },

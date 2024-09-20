@@ -7,12 +7,14 @@ import regression from 'regression';
 ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement, LineElement);
 
 // Define types
-interface DataItem {
-  [key: string]: any; // Generalized data structure to accept any data
+interface ExerciseData {
+  [category: string]: {
+    [exercise: string]: number; // Adjust type if needed
+  };
 }
 
 interface ScatterChartProps {
-  data: DataItem[];
+  data: ExerciseData[];
 }
 
 const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
@@ -63,9 +65,8 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
   // Prepare data for the scatter plot
   const filteredData = data
     .map(item => {
-      // Check if item has the required data for the selected categories and exercises
-      const xValue = xCategory && xExercise ? (item[xCategory] as Record<string, number>)[xExercise] : item[xCategory];
-      const yValue = yCategory && yExercise ? (item[yCategory] as Record<string, number>)[yExercise] : item[yCategory];
+      const xValue = xCategory && xExercise ? item[xCategory]?.[xExercise] : item[xCategory];
+      const yValue = yCategory && yExercise ? item[yCategory]?.[yExercise] : item[yCategory];
 
       if (xValue != null && yValue != null) {
         return { x: xValue, y: yValue };
@@ -118,16 +119,16 @@ const ScatterChart: React.FC<ScatterChartProps> = ({ data }) => {
         position: 'bottom' as const,
         title: {
           display: true,
-          text: xExercise || xCategory || 'X-Axis', // Use xExercise if available
+          text: xExercise || xCategory || 'X-Axis',
         },
-        min: startFromZero ? 0 : undefined, // Option to start x-axis from 0
+        min: startFromZero ? 0 : undefined,
       },
       y: {
         title: {
           display: true,
-          text: yExercise || yCategory || 'Y-Axis', // Use yExercise if available
+          text: yExercise || yCategory || 'Y-Axis',
         },
-        min: startFromZero ? 0 : undefined, // Option to start y-axis from 0
+        min: startFromZero ? 0 : undefined,
       },
     },
   };

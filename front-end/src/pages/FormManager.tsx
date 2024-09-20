@@ -4,7 +4,6 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 import { backEndUrl } from '../global_helpers/constants';
-import * as XLSX from 'xlsx'; // Import xlsx for exporting to Excel
 
 // Define the interface for form submissions and form details
 interface FormSubmission {
@@ -34,8 +33,8 @@ const GetNewFormPage = () => {
     const [specificStudentData, setSpecificStudentData] = useState<SpecificStudentData | null>(null);
     const [showStudentPopup, setShowStudentPopup] = useState(false);
     const [studentDataError, setStudentDataError] = useState<string | null>(null);
-    const [selectedSubmissions, setSelectedSubmissions] = useState<number[]>([]);
     const [showDeleteOptions, setShowDeleteOptions] = useState(false);
+    const [selectedSubmissions, setSelectedSubmissions] = useState<{ student_id: number; submission_time: string }[]>([]);
 
     const fetchFormData = async (formTemplateId: number) => {
         try {
@@ -88,22 +87,27 @@ const GetNewFormPage = () => {
         }
     };
 
-    const handleCheckboxChange = (studentId: number) => {
-        setSelectedSubmissions(prevSelected => 
-            prevSelected.includes(studentId)
-                ? prevSelected.filter(id => id !== studentId)
-                : [...prevSelected, studentId]
-        );
+    const handleCheckboxChange = (submission: FormSubmission) => {
+        const { student_id, submission_time } = submission;
+        setSelectedSubmissions(prevSelected => {
+            const isSelected = prevSelected.some(sub => sub.student_id === student_id && sub.submission_time === submission_time);
+            if (isSelected) {
+                return prevSelected.filter(sub => !(sub.student_id === student_id && sub.submission_time === submission_time));
+            } else {
+                return [...prevSelected, { student_id, submission_time }];
+            }
+        });
     };
+    
 
     const handleDeleteSelected = async () => {
         if (selectedSubmissions.length === 0 || !window.confirm('Are you sure you want to delete the selected responses?')) {
             return;
         }
-
+    
         try {
-            await axios.delete(`${backEndUrl}/forms/delete-submissions`, { data: { student_ids: selectedSubmissions } });
-            setFormSubmissions(prev => prev.filter(submission => !selectedSubmissions.includes(submission.student_id)));
+            await axios.delete(`${backEndUrl}/forms/delete-submissions`, { data: { submissions: selectedSubmissions } });
+            setFormSubmissions(prev => prev.filter(submission => !selectedSubmissions.some(selected => selected.student_id === submission.student_id && selected.submission_time === submission.submission_time)));
             setSelectedSubmissions([]);
             setShowDeleteOptions(false);
         } catch (error) {
@@ -211,13 +215,13 @@ const GetNewFormPage = () => {
                                 </thead>
                                 <tbody>
                                     {formSubmissions.map((submission) => (
-                                        <tr key={submission.student_id} onDoubleClick={() => handleRowDoubleClick(submission)}>
+                                        <tr key={`${submission.student_id}-${submission.submission_time}`} onDoubleClick={() => handleRowDoubleClick(submission)}>
                                             {showDeleteOptions && (
                                                 <td>
                                                     <input 
                                                         type="checkbox" 
-                                                        checked={selectedSubmissions.includes(submission.student_id)} 
-                                                        onChange={() => handleCheckboxChange(submission.student_id)} 
+                                                        checked={selectedSubmissions.some(sub => sub.student_id === submission.student_id && sub.submission_time === submission.submission_time)} 
+                                                        onChange={() => handleCheckboxChange(submission)} 
                                                     />
                                                 </td>
                                             )}
