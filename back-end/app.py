@@ -174,6 +174,7 @@ def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
                 "student_id": submission[3],  # Access StudentID from the tuple
                 "first_name": submission[1],    # Access FirstName from the tuple
                 "last_name": submission[2],     # Access LastName from the tuple
+                "subject_ID": submission[4],
                 "submission_time": submission[0].CreatedAt,  # Access CreatedAt from FactUserForm
             }
             for submission in submissions

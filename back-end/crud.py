@@ -348,7 +348,7 @@ def calculate_normative_results(db: Session, form_template_id: int, studentID: i
 
 def get_form_submissions(db: Session, form_template_id: int):
     return (
-        db.query(FactUserForm, DimUser.FirstName, DimUser.LastName, DimUser.StudentID)  # Include StudentID here
+        db.query(FactUserForm, DimUser.FirstName, DimUser.LastName, DimUser.StudentID, FactUserForm.SubjectStudentID)  # Include StudentID here
         .join(DimUser, FactUserForm.StudentID == DimUser.StudentID)
         .filter(FactUserForm.FormTemplateID == form_template_id)
         .order_by(DimUser.FirstName)  # Alphabetical sorting by first name

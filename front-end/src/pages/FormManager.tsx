@@ -10,6 +10,7 @@ interface FormSubmission {
     student_id: number;
     first_name: string;
     last_name: string;
+    subject_ID: number;
     submission_time: string;
 }
 
@@ -24,6 +25,7 @@ interface SpecificStudentData {
     student_id: number;
     first_name: string;
     last_name: string;
+    responce_id: number;
     responses: any; // Modify as per actual structure
 }
 
@@ -46,9 +48,9 @@ const GetNewFormPage = () => {
         }
     };
 
-    const fetchSpecificStudentData = async (studentId: number, formId: number) => {
+    const fetchSpecificStudentData = async (responce_id: number, formId: number) => {
         try {
-            const response = await axios.get(`${backEndUrl}/specific_student_data/${studentId}/${formId}`);
+            const response = await axios.get(`${backEndUrl}/specific_student_data/${responce_id}/${formId}`);
             if (response.data) {
                 setSpecificStudentData(response.data);
                 setStudentDataError(null);
@@ -67,7 +69,7 @@ const GetNewFormPage = () => {
 
     const handleRowDoubleClick = (submission: FormSubmission) => {
         if (formDetails) {
-            fetchSpecificStudentData(submission.student_id, formDetails.form_template_id);
+            fetchSpecificStudentData(submission.subject_ID, formDetails.form_template_id);
         }
     };
 
@@ -210,6 +212,7 @@ const GetNewFormPage = () => {
                                         {showDeleteOptions && <th>Select</th>}
                                         <th>Name</th>
                                         <th>Student ID</th>
+                                        <th>Subject ID</th>
                                         <th>Submission Time</th>
                                     </tr>
                                 </thead>
@@ -227,6 +230,7 @@ const GetNewFormPage = () => {
                                             )}
                                             <td>{`${submission.first_name} ${submission.last_name}`}</td>
                                             <td>{submission.student_id}</td>
+                                            <td>{submission.subject_ID}</td>
                                             <td>{submission.submission_time}</td>
                                         </tr>
                                     ))}
