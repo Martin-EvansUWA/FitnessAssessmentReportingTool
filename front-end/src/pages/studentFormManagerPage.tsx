@@ -179,7 +179,7 @@ const StudentFormManagerPage = () => {
         setSidebarData(buildSidebarData(formHistory));
     }, []);
 
-    const startingMainContent = (
+    const defaultMainContent = (
         <div>
             <h1 className="text-2xl font-bold mb-5">Form Manager</h1>
             <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
@@ -197,7 +197,14 @@ const StudentFormManagerPage = () => {
         <Layout
             sidebarContent={sidebarData}
             mainContent={
-                selectedForm ? <StudentFormManager /> : startingMainContent
+                selectedForm ? (
+                    <StudentFormManager
+                        formTitle={formDetails?.Title || ""}
+                        formDescription={formDetails?.Description || ""}
+                    />
+                ) : (
+                    defaultMainContent
+                )
             }
         ></Layout>
     );
