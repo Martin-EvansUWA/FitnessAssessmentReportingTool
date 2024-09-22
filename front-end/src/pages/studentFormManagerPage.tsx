@@ -63,6 +63,22 @@ const StudentFormManagerPage = () => {
     const getFormHistory = () => {
         // TODO: Send GET request to backend to get form history (detail of forms filled out by current student)
         // Some code here ...
+        // What I will need:
+        // 1) Send current user ID to backend
+        // 2) Backend queries the fact_user_form table to get all forms filled out by the user or assigned to the user
+        // 3) Backend returns:
+        //      - FactUserFormID
+        //      - UserFormResponseID
+        //      - FormTemplateID
+        //      - StudentID
+        //      - SubjectStudentID
+        //      - IsComplete
+        //      - CreatedAt
+        //      - CompletedAt
+        // 4) Frontend maps the response to the sidebar sections by assigning the FormTemplateID as the key and FormTemplateID+CreatedAt as the sectionName
+        // 5) Frontend also assigns a sectionOnClick function to each section that sets the selectedForm state to the FormTemplateID
+        // 6) When user clicks on a section, Frontend will send a GET request with the FormTemplateID to get the form details
+        // 7) Frontend will then render the form details in the main content
         return dummySidebarData; // TODO: Replace with actual data
     };
 
