@@ -12,6 +12,7 @@ function App() {
     return (
         <Router>
             <Routes>
+                {/* Add all the routes here */}
                 <Route path="/" element={<LandingPage />} />
                 <Route
                     path="/create-new-form-template"
