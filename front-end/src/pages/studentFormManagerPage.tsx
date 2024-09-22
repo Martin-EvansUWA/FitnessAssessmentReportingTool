@@ -27,7 +27,7 @@ import { SidebarData, SidebarSection } from "../interface/sidebarInterface";
 
 // Dummy data starts here ------------------------------------------------------
 
-const dummyBackendResponse1 = [
+const dummyFormHistory = [
     {
         FactUserFormID: 1,
         UserFormResponseID: 101,
@@ -63,7 +63,7 @@ const dummyBackendResponse1 = [
     },
 ];
 
-const dummyBackendResponse2: FormTemplateJSON[] = [
+const dummyFormDetails: FormTemplateJSON[] = [
     {
         FormTemplateID: 1,
         StaffID: 987654,
@@ -111,7 +111,7 @@ const dummyBackendResponse2: FormTemplateJSON[] = [
 // Dummy data ends here --------------------------------------------------------
 
 const StudentFormManagerPage = () => {
-    const [selectedForm, setSelectedForm] = useState<number | null>(null);
+    const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
     const [formDetails, setFormDetails] = useState<FormTemplateJSON | null>(
         null
     );
@@ -121,7 +121,7 @@ const StudentFormManagerPage = () => {
     const baseSidebar: SidebarData = {
         title: "My Forms",
         titleOnClick: () => {
-            setSelectedForm(null);
+            setSelectedFormId(null);
         },
         footer: [
             {
@@ -144,11 +144,11 @@ const StudentFormManagerPage = () => {
     const getFormHistory = () => {
         // TODO: Send GET request to backend to get form history (detail of forms filled out by current student)
         // Simulate backend response with dummy data - TODO: Replace with actual backend response
-        return dummyBackendResponse1.map((form) => ({
+        return dummyFormHistory.map((form) => ({
             [`${form.FormTemplateID} - ${form.CreatedAt}`]: {
                 sectionName: `${form.title} [${form.CreatedAt}]`,
                 sectionOnClick: () => {
-                    setSelectedForm(form.FormTemplateID);
+                    setSelectedFormId(form.FormTemplateID);
                     fetchFormDetails(form.FormTemplateID);
                 },
             },
@@ -157,14 +157,10 @@ const StudentFormManagerPage = () => {
 
     const fetchFormDetails = (formTemplateID: number) => {
         // Simulate GET request to get form details - TODO: Replace with actual backend response
-        const formDetail = dummyBackendResponse2.find(
+        const formDetail = dummyFormDetails.find(
             (form) => form.FormTemplateID === formTemplateID
         );
-        if (formDetail) {
-            setFormDetails(formDetail as FormTemplateJSON);
-        } else {
-            setFormDetails(null);
-        }
+        setFormDetails(formDetail || null);
     };
 
     const buildSidebarData = (formHistory: any) => {
@@ -193,20 +189,30 @@ const StudentFormManagerPage = () => {
         </div>
     );
 
+    const renderFormDetails = () => {
+        if (!formDetails) return null;
+        const formHistory = dummyFormHistory.find(
+            (form) => form.FormTemplateID === selectedFormId
+        );
+        return (
+            <StudentFormManager
+                formTitle={formDetails.Title}
+                formDescription={formDetails.Description}
+                formStartDate={formHistory?.CreatedAt || ""}
+                formCompletionDate={formHistory?.CompletedAt || ""}
+                formCreatedBy={formHistory?.StudentID.toString() || ""}
+                formCreatedFor={formHistory?.SubjectStudentID.toString() || ""}
+            />
+        );
+    };
+
     return (
         <Layout
             sidebarContent={sidebarData}
             mainContent={
-                selectedForm ? (
-                    <StudentFormManager
-                        formTitle={formDetails?.Title || ""}
-                        formDescription={formDetails?.Description || ""}
-                    />
-                ) : (
-                    defaultMainContent
-                )
+                selectedFormId ? renderFormDetails() : defaultMainContent
             }
-        ></Layout>
+        />
     );
 };
 
