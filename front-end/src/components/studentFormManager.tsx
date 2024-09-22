@@ -1,3 +1,10 @@
+import {
+    faChartSimple,
+    faEdit,
+    faTrash,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+
 const StudentFormManager = ({
     formTitle,
     formDescription,
@@ -23,16 +30,6 @@ const StudentFormManager = ({
                         <p className="font-bold">Description:</p>
                         <p>{formDescription}</p>
                     </div>
-                    <div className="my-5 flex flex-col md:flex-row space-x-10">
-                        <p>
-                            <span className="font-bold">Started Date:</span>{" "}
-                            {formStartDate}
-                        </p>
-                        <p>
-                            <span className="font-bold">Completed Date:</span>{" "}
-                            {formCompletionDate}
-                        </p>
-                    </div>
                     <div className="my-5 flex flex-col">
                         <p>
                             <span className="font-bold">Recorded By:</span>{" "}
@@ -43,9 +40,47 @@ const StudentFormManager = ({
                             {formCreatedFor}
                         </p>
                     </div>
+                    <div className="my-5 flex flex-col">
+                        <p>
+                            <span className="font-bold">Started:</span>{" "}
+                            {formStartDate}
+                        </p>
+                        <p>
+                            <span className="font-bold">
+                                Completed/Updated:
+                            </span>{" "}
+                            {formCompletionDate}
+                        </p>
+                    </div>
                 </div>
             </div>
-            <div className="flex justify-end p-5">hello</div>
+            <div className="flex flex-row justify-between">
+                <button className="flex flex-col">
+                    <FontAwesomeIcon
+                        icon={faEdit}
+                        className="text-2xl md:text-4xl"
+                    />
+                    <span className="invisible md:visible font-bold">Edit</span>
+                </button>
+                <button className="flex flex-col items-center">
+                    <FontAwesomeIcon
+                        icon={faChartSimple}
+                        className="text-2xl md:text-4xl"
+                    />
+                    <span className="invisible md:visible font-bold">
+                        Dashboard
+                    </span>
+                </button>
+                <button className="flex flex-col items-center">
+                    <FontAwesomeIcon
+                        icon={faTrash}
+                        className="text-2xl md:text-4xl"
+                    />
+                    <span className="invisible md:visible font-bold">
+                        Delete
+                    </span>
+                </button>
+            </div>
         </div>
     );
 };
