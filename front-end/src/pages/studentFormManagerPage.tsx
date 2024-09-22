@@ -1,22 +1,9 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/layout";
 import StudentFormManager from "../components/studentFormManager";
 import { SidebarData, SidebarSection } from "../interface/sidebarInterface";
-
-const baseSidebar: SidebarData = {
-    title: "My Forms",
-    footer: [
-        {
-            text: "Add a new form",
-            fontAwesomeIcon: faPlus,
-            onClick: () => {
-                console.log("Footer button clicked");
-            },
-        },
-    ],
-    sections: [] as SidebarSection[],
-};
 
 const dummySidebarData: SidebarSection[] = [
     {
@@ -46,6 +33,28 @@ const dummySidebarData: SidebarSection[] = [
 ];
 
 const StudentFormManagerPage = () => {
+    const [selectedForm, setSelectedForm] = useState<string | null>(null);
+
+    const navigate = useNavigate();
+
+    const baseSidebar: SidebarData = {
+        title: "My Forms",
+        titleOnClick: () => {
+            setSelectedForm(null);
+        },
+        footer: [
+            {
+                text: "Add a new form",
+                fontAwesomeIcon: faPlus,
+                onClick: () => {
+                    // Navigate to get new form page
+                    navigate("/get-new-form");
+                },
+            },
+        ],
+        sections: [] as SidebarSection[],
+    };
+
     const [sidebarData, setSidebarData] = useState<SidebarData>({
         ...baseSidebar,
         sections: [] as SidebarSection[],
@@ -69,10 +78,26 @@ const StudentFormManagerPage = () => {
         setSidebarData(buildSidebarData(formHistory));
     }, []);
 
+    const startingMainContent = (
+        <div>
+            <h1 className="text-2xl font-bold mb-5">Form Manager</h1>
+            <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+            <p className="font-bold my-5">
+                Select a form from the sidebar to view or edit it.
+            </p>
+            <p className="font-bold my-5">
+                Otherwise, if you want to fill out a new form, click "Add a new
+                form".
+            </p>
+        </div>
+    );
+
     return (
         <Layout
             sidebarContent={sidebarData}
-            mainContent={<StudentFormManager />}
+            mainContent={
+                selectedForm ? <StudentFormManager /> : startingMainContent
+            }
         ></Layout>
     );
 };
