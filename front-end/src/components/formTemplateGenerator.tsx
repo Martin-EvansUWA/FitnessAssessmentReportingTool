@@ -285,22 +285,6 @@ const FormTemplateGenerator = () => {
                                             )
                                         )}
                                         <li className="ml-2 md:ml-14">
-                                            <input
-                                                type="text"
-                                                placeholder="New Measurement"
-                                                value={
-                                                    newMeasurements[category]
-                                                        ?.name || ""
-                                                }
-                                                onChange={(e) =>
-                                                    handleMeasurementChange(
-                                                        category,
-                                                        "name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="border-solid border border-uwa-blue mr-2 my-1"
-                                            />
                                             <select
                                                 aria-label="Measurement Type"
                                                 value={
@@ -342,6 +326,29 @@ const FormTemplateGenerator = () => {
                                                     Boolean
                                                 </option>
                                             </select>
+                                            <input
+                                                type="text"
+                                                placeholder="New Measurement"
+                                                value={
+                                                    newMeasurements[category]
+                                                        ?.name || ""
+                                                }
+                                                onChange={(e) =>
+                                                    handleMeasurementChange(
+                                                        category,
+                                                        "name",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        addNewMeasurement(
+                                                            category
+                                                        );
+                                                    }
+                                                }}
+                                                className="border-solid border border-uwa-blue mr-2 my-1"
+                                            />
                                             <button
                                                 onClick={() =>
                                                     addNewMeasurement(category)
@@ -368,6 +375,13 @@ const FormTemplateGenerator = () => {
                                                     e.target.value
                                                 )
                                             }
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    addNewCategory(
+                                                        newCategoryName
+                                                    );
+                                                }
+                                            }}
                                             className="border-solid border border-uwa-blue mr-2"
                                         />
                                         <button
