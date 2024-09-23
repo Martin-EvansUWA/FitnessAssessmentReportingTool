@@ -28,10 +28,10 @@ def decode_token(token):
     return 0
 
 def encode_password(password: str):
-    # ideally, this is encoded on the front end but will make do atm
+    # Hash Password function, used in order to check user
     return "encoded"
 
-
+# Get current user
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     user = decode_token(token)
     if not user:
@@ -42,7 +42,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         )
     return user
 
-
+# Get current active user. 
 async def get_current_active_user(
     current_user: Annotated[DimUser, Depends(get_current_user)],
 ):

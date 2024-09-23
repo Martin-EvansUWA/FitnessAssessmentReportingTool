@@ -3,6 +3,7 @@ import json
 from schemas import DimFormTemplateCreate, FactUserFormCreate
 
 
+# Create new schema from raw data
 def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
     form_schema = DimFormTemplateCreate(
         Title=form_data["Title"],
@@ -13,7 +14,7 @@ def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
     )
     return form_schema
 
-
+# Create a form response from raw data
 def createFactUserFormSchema(
     form_data: dict, userFormResponseID: int
 ) -> FactUserFormCreate:
