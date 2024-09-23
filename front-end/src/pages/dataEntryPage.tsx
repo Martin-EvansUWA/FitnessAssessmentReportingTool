@@ -162,7 +162,7 @@ const DataEntryPage = () => {
                     pauseOnHover: true,
                     draggable: true,
                     progress: undefined,
-                    theme: "light",
+                    theme: "colored",
                     transition: Bounce,
                 });
             })
@@ -177,7 +177,7 @@ const DataEntryPage = () => {
                     pauseOnHover: true,
                     draggable: true,
                     progress: undefined,
-                    theme: "light",
+                    theme: "colored",
                     transition: Bounce,
                 });
             });
@@ -297,9 +297,8 @@ const DataEntryPage = () => {
                 pauseOnFocusLoss
                 draggable
                 pauseOnHover
-                theme="light"
+                theme="colored"
                 transition={Bounce}
-                style={{ backgroundColor: "uwa-blue" }}
             />
         </>
     );
