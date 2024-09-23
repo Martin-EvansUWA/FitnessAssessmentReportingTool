@@ -1,7 +1,7 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
 import {
     FormTemplate,
@@ -30,8 +30,11 @@ const FormTemplateGenerator = () => {
     const [responseData, setResponseData] =
         useState<FormTemplateCreateResponse | null>(null); // State to store response data
 
+    const bottomRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         console.log("Template updated:", template);
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [template]);
 
     const addNewCategory = useCallback((categoryName: string) => {
@@ -382,6 +385,7 @@ const FormTemplateGenerator = () => {
                     </>
                 )}
             </div>
+            <div ref={bottomRef} />
             <div className="flex justify-end p-5">
                 {responseData
                     ? returnToFormManagerButton
