@@ -2,6 +2,8 @@ import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
 import { backEndUrl } from "../global_helpers/constants";
@@ -151,11 +153,33 @@ const DataEntryPage = () => {
             })
             .then((response) => {
                 console.log("Success:", response.data);
-                setSaveSuccess(true); // TODO: Create a success message for the user to see
+                setSaveSuccess(true);
+                toast.success("Progress Saved Successfully!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             })
             .catch((error) => {
                 console.error("Error:", error);
                 setSaveSuccess(false);
+                toast.error("Failed To Save Progress!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "light",
+                    transition: Bounce,
+                });
             });
     };
 
@@ -252,16 +276,32 @@ const DataEntryPage = () => {
     );
 
     return (
-        <Layout
-            sidebarContent={sidebarContent}
-            mainContent={
-                selectedSection !== null
-                    ? selectedSectionComponent
-                    : introComponent
-            }
-            selectedSectionProp={selectedSection}
-            setSelectedSectionProp={setSelectedSection}
-        />
+        <>
+            <Layout
+                sidebarContent={sidebarContent}
+                mainContent={
+                    selectedSection !== null
+                        ? selectedSectionComponent
+                        : introComponent
+                }
+                selectedSectionProp={selectedSection}
+                setSelectedSectionProp={setSelectedSection}
+            />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="light"
+                transition={Bounce}
+                style={{ backgroundColor: "uwa-blue" }}
+            />
+        </>
     );
 };
 
