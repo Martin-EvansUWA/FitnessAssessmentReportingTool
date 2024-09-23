@@ -1,6 +1,7 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AddNewForm from "../components/addNewForm";
 import Layout from "../components/layout";
 import StudentFormManager from "../components/studentFormManager";
 import { FormTemplateJSON } from "../interface/formInterface";
@@ -112,6 +113,8 @@ const dummyFormDetails: FormTemplateJSON[] = [
 
 const StudentFormManagerPage = () => {
     const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
+    const [addNewFormSelected, setAddNewFormSelected] =
+        useState<boolean>(false);
     const [formDetails, setFormDetails] = useState<FormTemplateJSON | null>(
         null
     );
@@ -128,8 +131,7 @@ const StudentFormManagerPage = () => {
                 text: "Add a new form",
                 fontAwesomeIcon: faPlus,
                 onClick: () => {
-                    // Navigate to get new form page
-                    navigate("/get-new-form");
+                    setAddNewFormSelected(true);
                 },
             },
         ],
@@ -148,6 +150,7 @@ const StudentFormManagerPage = () => {
             [`${form.FormTemplateID} - ${form.CreatedAt}`]: {
                 sectionName: `${form.title} [${form.CreatedAt}]`,
                 sectionOnClick: () => {
+                    setAddNewFormSelected(false);
                     setSelectedFormId(form.FormTemplateID);
                     fetchFormDetails(form.FormTemplateID);
                 },
@@ -210,7 +213,13 @@ const StudentFormManagerPage = () => {
         <Layout
             sidebarContent={sidebarData}
             mainContent={
-                selectedFormId ? renderFormDetails() : defaultMainContent
+                addNewFormSelected ? (
+                    <AddNewForm />
+                ) : selectedFormId ? (
+                    renderFormDetails()
+                ) : (
+                    defaultMainContent
+                )
             }
         />
     );

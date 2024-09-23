@@ -4,7 +4,6 @@ import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DashboardPage from "./pages/dashboardPage";
 import DataEntryPage from "./pages/dataEntryPage";
 import FormResults from "./pages/formResults";
-import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
 import StudentFormManagerPage from "./pages/studentFormManagerPage";
 
@@ -23,7 +22,6 @@ function App() {
                     path="/student-form-manager"
                     element={<StudentFormManagerPage />}
                 />
-                <Route path="/get-new-form" element={<GetNewFormPage />} />
                 <Route path="/data-entry" element={<DataEntryPage />} />
                 <Route path="/dashboardPage" element={<DashboardPage />} />
                 <Route path="*" element={<LandingPage />} />
