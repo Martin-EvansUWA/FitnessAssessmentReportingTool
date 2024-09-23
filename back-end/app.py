@@ -1,10 +1,15 @@
 import json
 from http.client import HTTPException
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+
+from fastapi.security import OAuth2PasswordBearer
+from typing_extensions import Annotated
+
+from auth import decode_token, get_current_active_user, hash_password
 
 import crud
 import models
@@ -14,8 +19,10 @@ from schemas import (
     DataEntryPageSubmissionData,
     DimFormTemplateCreate,
     DimUserFormResponseCreate,
+    DimUser,
 )
 
+from fastapi.security import OAuth2PasswordRequestForm
 models.Base.metadata.create_all(bind=engine)
 
 
@@ -31,6 +38,8 @@ def get_db():
 # app implementation
 app = FastAPI()
 
+
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],  # Add your frontend origin here
@@ -39,10 +48,32 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.post("/token")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+    user = crud.get_DimUser.get(form_data.username)
+    if not user:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+    hashed_password = hash_password(form_data.password)
+    if not hashed_password == user.hashed_password:
+        raise HTTPException(status_code=400, detail="Incorrect username or password")
+
+    return {"access_token": user.username, "token_type": "bearer"}
+
+@app.get("/current_user")
+async def current_user(
+    current_user: Annotated[DimUser, Depends(get_current_active_user)],
+):
+    return current_user
+
 
 @app.get("/")
 def index():
     return "temp"
+
+
+@app.get("/items/")
+async def read_items(token: Annotated[str, Depends(oauth2_scheme)]):
+    return {"token": token}
 
 
 @app.get("/student")
@@ -66,7 +97,7 @@ def form(form_json):
 # Sending admin id, to receive the form id's and the form titles
 @app.get("/admin_forms/{id}")
 def retrieve_admin_templates(admin_id: int):
-    forms = get_forms(admin_id)
+    forms = {}
 
     sidebar_info = {}
     for form in forms:

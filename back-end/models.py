@@ -13,6 +13,7 @@ class DimUser(Base):
     LastName = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    disabled=Column(Boolean)
 
     def __repr__(self):
         return (

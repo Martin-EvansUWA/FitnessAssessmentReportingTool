@@ -15,6 +15,7 @@ def get_DimUser(db: Session, DimStudent_ID: int):
     )
 
 
+
 def get_DimUser_by_email(db: Session, email: str):
     return db.query(models.DimUser).filter(models.DimUser.email == email).first()
 
