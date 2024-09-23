@@ -21,7 +21,6 @@ const DataEntryPage = () => {
             [name: string]: { sectionName: string; sectionOnClick: () => void };
         }[]
     >([]);
-    const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
     const [subjectStudentNumber, setSubjectStudentNumber] =
         useState<string>("");
     const [createdAtDateTime, setCreatedAtDateTime] = useState<string>("");
@@ -145,7 +144,7 @@ const DataEntryPage = () => {
             formData
         );
         // Send form response data to backend
-        axios
+        return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {
                     "Content-Type": "application/json",
@@ -153,7 +152,6 @@ const DataEntryPage = () => {
             })
             .then((response) => {
                 console.log("Success:", response.data);
-                setSaveSuccess(true);
                 toast.success("Progress Saved Successfully!", {
                     position: "top-right",
                     autoClose: 5000,
@@ -165,10 +163,10 @@ const DataEntryPage = () => {
                     theme: "colored",
                     transition: Bounce,
                 });
+                return true;
             })
             .catch((error) => {
                 console.error("Error:", error);
-                setSaveSuccess(false);
                 toast.error("Failed To Save Progress!", {
                     position: "top-right",
                     autoClose: 5000,
@@ -180,12 +178,15 @@ const DataEntryPage = () => {
                     theme: "colored",
                     transition: Bounce,
                 });
+                return false;
             });
     };
 
-    const handleSaveAndExit = () => {
-        handleSave(); // Save the form data
-        navigate("/"); // Navigate to the home page after saving
+    const handleSaveAndExit = async () => {
+        const saveSuccessful = await handleSave(); // Save the form data and wait for the result
+        if (saveSuccessful) {
+            navigate("/"); // Navigate to the home page if save was successful
+        }
     };
 
     const handleSubjectStudentIdChange = useCallback(
