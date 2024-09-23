@@ -104,7 +104,7 @@ def retrieve_student_form_sidebar_info(student_id: int):
     return response
 
 # [Student] Retrieve form template by form id
-@app.get("/retrieve_form_template")
+@app.get("/retrieve_form_template/{form_id}")
 def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
     try:
         form_template = crud.get_dim_form_template(db, form_id)
