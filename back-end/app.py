@@ -93,7 +93,7 @@ async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]
     return user
 
 
-@app.post("/student_login")
+@app.post("/login_user")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = authenticate_student(get_db(), form_data.username, form_data.password)
     if not user:
