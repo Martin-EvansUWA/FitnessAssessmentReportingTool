@@ -3,6 +3,7 @@ import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DashboardPage from "./pages/dashboardPage";
 import DataEntryPage from "./pages/dataEntryPage";
+import FormHistory from "./pages/FormManager";
 import FormResults from "./pages/formResults";
 import LandingPage from "./pages/landingPage";
 import StudentFormManagerPage from "./pages/studentFormManagerPage";
@@ -23,6 +24,7 @@ function App() {
                     element={<StudentFormManagerPage />}
                 />
                 <Route path="/data-entry" element={<DataEntryPage />} />
+                <Route path="/form-history" element={<FormHistory />} />
                 <Route path="/dashboardPage" element={<DashboardPage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
