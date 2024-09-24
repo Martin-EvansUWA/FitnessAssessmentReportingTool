@@ -126,18 +126,20 @@ def get_student_form(student_id: int, subject_id: int, db: Session = Depends(get
 
 
 # [Student] Get form description
-@app.get("/get_student_form_description")
-def get_student_form(
-    form_template_id: int,
-    student_id: int,
-    subject_id: int,
+@app.get("/get_student_form_description/{fact_user_form_id}")
+def get_student_form_description(
+    fact_user_form_id: int,
     db: Session = Depends(get_db),
 ):
-    form_info = {}
+    form_template_id = crud.get_form_template_id_from_fact_user_form(
+        db, fact_user_form_id
+    )  # Get FormTemplateID from FactUserForm table using FactUserFormID
     form_template = crud.get_dim_form_template(db, form_template_id=form_template_id)
-    form_info.update({"title": form_template.Title})
-    form_info.update({"subjectID": student_id})
-    form_info.update({"studentID": subject_id})
+    form_info = {
+        "FormTemplateID": form_template.FormTemplateID,
+        "Title": form_template.Title,
+        "Description": form_template.Description,
+    }
     return form_info
 
 

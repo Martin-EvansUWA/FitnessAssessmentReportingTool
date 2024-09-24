@@ -7,7 +7,7 @@ import AddNewForm from "../components/addNewForm";
 import Layout from "../components/layout";
 import StudentFormManager from "../components/studentFormManager";
 import { backEndUrl } from "../global_helpers/constants";
-import { FormTemplateJSON } from "../interface/formInterface";
+import { formTemplateTitleAndDescription } from "../interface/formInterface";
 import {
     formHistorySidebarInfo,
     SidebarData,
@@ -30,7 +30,7 @@ import {
 // 4) Frontend maps the response to the sidebar sections by assigning the FormTemplateID as the key and FormTemplateID+CreatedAt as the sectionName
 // 5) Frontend also assigns a sectionOnClick function to each section that sets the selectedForm state to the FormTemplateID
 // 6) When user clicks on a section, Frontend will send a GET request with the FormTemplateID to get the form details
-//     - Form details will include: Title, Description, staffID
+//     - Form details will include: Title, Description
 // 7) Frontend will then render the form details in the main content
 
 const StudentFormManagerPage = () => {
@@ -40,9 +40,8 @@ const StudentFormManagerPage = () => {
     >([]);
     const [addNewFormSelected, setAddNewFormSelected] =
         useState<boolean>(false);
-    const [formDetails, setFormDetails] = useState<FormTemplateJSON | null>(
-        null
-    );
+    const [formDetails, setFormDetails] =
+        useState<formTemplateTitleAndDescription | null>(null);
 
     const navigate = useNavigate();
 
@@ -78,12 +77,12 @@ const StudentFormManagerPage = () => {
             console.log("Fetched form history:", response.data);
 
             return response.data.map((form: formHistorySidebarInfo) => ({
-                [`${form.FormTemplateID} - ${form.CreatedAt}`]: {
+                [form.FactUserFormID]: {
                     sectionName: `${form.title} [${form.CreatedAt}]`,
                     sectionOnClick: () => {
                         setAddNewFormSelected(false);
-                        setSelectedFormId(form.FormTemplateID);
-                        fetchFormDetails(form.FormTemplateID);
+                        setSelectedFormId(form.FactUserFormID);
+                        fetchFormDetails(form.FactUserFormID);
                     },
                 },
             }));
@@ -104,9 +103,9 @@ const StudentFormManagerPage = () => {
         }
     };
 
-    const fetchFormDetails = (formTemplateID: number) => {
+    const fetchFormDetails = (factUserFormID: number) => {
         axios
-            .get(`${backEndUrl}/retrieve_form_template/${formTemplateID}`)
+            .get(`${backEndUrl}/get_student_form_description/${factUserFormID}`)
             .then((response) => {
                 console.log("Success:", response.data);
                 setFormDetails(response.data || null);
@@ -162,7 +161,7 @@ const StudentFormManagerPage = () => {
     const renderFormDetails = () => {
         if (!formDetails) return null;
         const formHistory = fetchedFormHistory.find(
-            (form) => form.FormTemplateID === selectedFormId
+            (form) => form.FactUserFormID === selectedFormId
         );
         return (
             <StudentFormManager
