@@ -4,19 +4,15 @@ import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, Title, Toolt
 
 ChartJS.register(LineElement, CategoryScale, LinearScale, Title, Tooltip, Legend);
 
-// Define types
-interface DataItem {
-  Name: string;
-  Age: number;
-  Height: number;
-  Mass: number;
-  Flexibility: { [key: string]: number };
-  "Muscular Strength": { [key: string]: number };
-  "Cardiovascular Endurance": { [key: string]: number };
+// Define specific data interface for better type safety
+interface ExerciseData {
+  [category: string]: {
+    [exercise: string]: number; // Adjust type if needed
+  };
 }
 
 interface LineChartProps {
-  data: DataItem[];
+  data: ExerciseData[];
 }
 
 const LineChart: React.FC<LineChartProps> = ({ data }) => {
@@ -24,65 +20,82 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
   const [xExercise, setXExercise] = useState<string>('');
   const [yCategory, setYCategory] = useState<string>('');
   const [yExercise, setYExercise] = useState<string>('');
-  const [lineColor, setLineColor] = useState<string>('rgba(75, 192, 192, 1)'); // Default line color
-  const [showXAxisZero, setShowXAxisZero] = useState<boolean>(true); // Option to set x-axis to zero
-  const [showYAxisZero, setShowYAxisZero] = useState<boolean>(true); // Option to set y-axis to zero
+  const [lineColor, setLineColor] = useState<string>('rgba(75, 192, 192, 1)');
+  const [showXAxisZero, setShowXAxisZero] = useState<boolean>(true);
+  const [showYAxisZero, setShowYAxisZero] = useState<boolean>(true);
 
-  // Extract categories and exercises
-  const categories = {
-    Flexibility: Object.keys(data[0].Flexibility || {}),
-    'Muscular Strength': Object.keys(data[0]['Muscular Strength'] || {}),
-    'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
-  };
+  // Dynamically extract categories and exercises
+  const categories: Record<string, string[]> = {};
 
-  // Handle category change for x-axis
+  data.forEach(item => {
+    Object.keys(item).forEach(key => {
+      if (typeof item[key] === 'object' && item[key] !== null) {
+        // Collect subcategories (exercises)
+        categories[key] = Object.keys(item[key]);
+      } else if (typeof item[key] === 'number') {
+        // Single value categories
+        if (!categories[key]) categories[key] = [];
+      }
+    });
+  });
+
+  // Handle category and exercise selections
   const handleXCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXCategory(event.target.value);
-    setXExercise(''); // Reset exercise when category changes
+    setXExercise(''); // Reset the exercise when changing category
   };
 
-  // Handle exercise change for x-axis
   const handleXExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setXExercise(event.target.value);
   };
 
-  // Handle category change for y-axis
   const handleYCategoryChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYCategory(event.target.value);
-    setYExercise(''); // Reset exercise when category changes
+    setYExercise(''); // Reset the exercise when changing category
   };
 
-  // Handle exercise change for y-axis
   const handleYExerciseChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setYExercise(event.target.value);
   };
 
-  // Prepare x-axis data
-  const xAxisData = data.map((item) => {
-    if (xCategory && xExercise) {
-      const categoryData = item[xCategory as keyof DataItem] as Record<string, number>;
-      return { x: Number(categoryData[xExercise as keyof typeof categoryData] || 0), original: item };
-    }
-    return { x: Number(item[xCategory as keyof DataItem] || 0), original: item };
-  }).sort((a, b) => a.x - b.x);
+  // Prepare data for the x-axis
+  const xAxisData = data
+    .map(item => {
+      if (xCategory && xExercise) {
+        const categoryData = item[xCategory] as Record<string, number>;
+        if (categoryData && xExercise in categoryData) {
+          return { x: Number(categoryData[xExercise]), original: item };
+        }
+      } else if (xCategory && xCategory in item) {
+        return { x: Number(item[xCategory]), original: item };
+      }
+      return null;
+    })
+    .filter(item => item !== null)
+    .sort((a, b) => (a as { x: number }).x - (b as { x: number }).x);
 
-  // Prepare y-axis data
-  const yAxisData = xAxisData.map((item) => {
+  // Prepare data for the y-axis
+  const yAxisData = xAxisData.map(item => {
+    const original = (item as { original: ExerciseData }).original;
     if (yCategory && yExercise) {
-      const categoryData = item.original[yCategory as keyof DataItem] as Record<string, number>;
-      return categoryData[yExercise as keyof typeof categoryData] || 0;
+      const categoryData = original[yCategory] as Record<string, number>;
+      if (categoryData && yExercise in categoryData) {
+        return categoryData[yExercise];
+      }
+      return null;
     }
-    return item.original[yCategory as keyof DataItem] || 0;
-  });
+    return original[yCategory] || null;
+  }).filter(value => value !== null);
 
+  // Chart configuration
   const chartData = {
-    labels: xAxisData.map(item => item.x),
+    labels: xAxisData.map(item => (item as { x: number }).x),
     datasets: [
       {
         label: yExercise || yCategory || 'Data',
         data: yAxisData,
         borderColor: lineColor,
-        backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
+        backgroundColor: 'rgba(0, 0, 0, 0)',
         fill: false,
       }
     ]
@@ -104,14 +117,14 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
         position: 'bottom' as const,
         title: {
           display: true,
-          text: xCategory || 'X-Axis',
+          text: xExercise || 'X-Axis Exercise',
         },
         beginAtZero: showXAxisZero,
       },
       y: {
         title: {
           display: true,
-          text: yCategory || 'Y-Axis',
+          text: yExercise || 'Y-Axis Exercise',
         },
         beginAtZero: showYAxisZero,
       },
@@ -136,7 +149,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
                 <label>X-Axis Exercise:</label>
                 <select value={xExercise} onChange={handleXExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[xCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[xCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -158,7 +171,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
                 <label>Y-Axis Exercise:</label>
                 <select value={yExercise} onChange={handleYExerciseChange}>
                   <option value="">Select Exercise</option>
-                  {(categories[yCategory as keyof typeof categories] || []).map((exercise: string) => (
+                  {(categories[yCategory] || []).map(exercise => (
                     <option key={exercise} value={exercise}>{exercise}</option>
                   ))}
                 </select>
@@ -190,7 +203,7 @@ const LineChart: React.FC<LineChartProps> = ({ data }) => {
           />
         </div>
       </div>
-        <br></br>
+      <br />
       <Line data={chartData} options={options} />
     </div>
   );

@@ -8,16 +8,17 @@ import models
 from crud import (
     create_admin,
     create_dim_form_template,
-    create_dim_user_form_response,
     create_DimUser,
     create_fact_user_form,
+    create_dim_user_form_response,
     delete_admin,
     delete_DimUser,
     get_admin,
     get_all_fact_user_forms,
-    get_dim_user_form_response,
     get_DimUser,
     get_fact_user_form,
+    get_dim_user_form_response,
+    get_all_fact_user_forms,
 )
 from schemas import (
     DimAdminCreate,
@@ -74,8 +75,6 @@ def test_user_creation():
 
 
 # Create Admin Creation
-
-
 def test_admin_creation():
     temp_admin = DimAdminCreate(
         email="admin1234@outlook.com",
@@ -107,10 +106,7 @@ def test_create_form():
 
     create_dim_form_template(db, temp_test)
 
-
 # Test User Form Data Creation
-
-
 def test_create_fact_user_form():
     test_input = DimUserFormResponseCreate(UserFormResponse={"bench": 130})
 
@@ -118,12 +114,12 @@ def test_create_fact_user_form():
 
     test_fact_form = FactUserFormCreate(
         StudentID=23621647,
+        FormTemplateID=1,
         SubjectStudentID=17651211,
         CreatedAt=date.today().strftime("%d/%m/%Y"),
         CompleteAt="",
         IsComplete=False,
         UserFormResponseID=ret.UserFormResponseID,
-        FormTemplateID=1,
     )
 
     create_fact_user_form(db, test_fact_form)
