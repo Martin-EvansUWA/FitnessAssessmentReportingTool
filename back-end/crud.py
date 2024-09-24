@@ -144,22 +144,22 @@ def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
 
 
 # DimUserFormResponse CRUD operations
-def get_fact_user_form_response(db: Session, response_id: int):
+def get_dim_user_form_response(db: Session, response_id: int):
     return (
-        db.query(models.FactUserFormResponse)
-        .filter(models.FactUserFormResponse.UserFormResponseID == response_id)
+        db.query(models.DimUserFormResponse)
+        .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
         .first()
     )
 
 
-def get_fact_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.FactUserFormResponse).offset(skip).limit(limit).all()
+def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
 
 
-def create_fact_user_form_response(
+def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
 ):
-    db_dim_user_form_response = models.FactUserFormResponse(
+    db_dim_user_form_response = models.DimUserFormResponse(
         UserFormResponse=dim_user_form_response.UserFormResponse,
     )
     db.add(db_dim_user_form_response)
@@ -184,7 +184,7 @@ def get_fact_user_form(
     )
 
 
-def get_multiple_fact_user_forms(
+def get_fact_multiple_user_forms(
     db: Session,
     student_id: int,
 ):

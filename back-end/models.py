@@ -43,7 +43,7 @@ class DimFormTemplate(Base):
     CreatedAt = Column(String)
 
 
-class FactUserFormResponse(Base):
+class DimUserFormResponse(Base):
     __tablename__ = "dim_user_form_response"
 
     UserFormResponseID = Column(Integer, primary_key=True)
@@ -54,7 +54,7 @@ class FactUserForm(Base):
     __tablename__ = "fact_user_form"
     FactUserFormID = Column(Integer, primary_key=True, index=True, autoincrement=True)
     UserFormResponseID = Column(
-        Integer, ForeignKey(FactUserFormResponse.UserFormResponseID), index=True
+        Integer, ForeignKey(DimUserFormResponse.UserFormResponseID), index=True
     )
     FormTemplateID = Column(
         Integer,

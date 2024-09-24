@@ -143,7 +143,7 @@ def save_form_entry(
         fact_user_form_obj = createFactUserFormSchema(
             form_data.dict(), userFormResponseID
         )
-        create_fact_user_form_response = crud.create_fact_user_form(
+        create_dim_user_form_response = crud.create_fact_user_form(
             db, fact_user_form_obj
         )
     except ValueError as e:
