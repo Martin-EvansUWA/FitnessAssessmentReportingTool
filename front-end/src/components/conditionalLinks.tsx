@@ -10,8 +10,8 @@ const ConditionalLinks = ({ className }: { className: string }) => {
                 <div className="flex space-x-10 justify-center">
                     <Link to="/">Home</Link>
                     <Link to="/dashboardPage">Dashboard [student]</Link>
-                    <Link to="/create-new-form-template">
-                        [Admin Workflow] Create New Form Template
+                    <Link to="/form-history">
+                        [Admin Workflow] Form mangaer, link to add form works 
                     </Link>
                     <Link to="/get-new-form">
                         [Student Workflow] Get New Form Template

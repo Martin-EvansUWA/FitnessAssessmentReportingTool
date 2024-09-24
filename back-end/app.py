@@ -4,20 +4,16 @@ from http.client import HTTPException
 from fastapi import Depends, FastAPI
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.templating import Jinja2Templates
-from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-
-
 
 import crud
 import models
+from crud import *
 from database import SessionLocal, engine
+from models import *
 from process import createFactUserFormSchema, createFormTemplateSchema
-from schemas import (
-    DataEntryPageSubmissionData,
-    DimFormTemplateCreate,
-)
+from schemas import DataEntryPageSubmissionData, DimFormTemplateCreate
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -44,12 +40,11 @@ app.add_middleware(
 )
 
 
-
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int):
     response = {}
-    forms = crud.get_formtemplates_by_admin(get_db(),admin_id)
+    forms = crud.get_formtemplates_by_admin(get_db(), admin_id)
 
     sidebar_info = {}
     for form in forms:
@@ -59,11 +54,14 @@ def retrieve_admin_templates(admin_id: int):
 
     return response
 
+
 # [Admin] Retrieve admin form template, to display on admin dashboard
 @app.get("/retrieve_admin_form_template/{form_id}")
 def retrive_admin_form_template(form_template_id: int):
     response = {}
-    form_template = crud.get_dim_form_template(get_db(), form_template_id=form_template_id)
+    form_template = crud.get_dim_form_template(
+        get_db(), form_template_id=form_template_id
+    )
     response.update({form_template_id: form_template})
     return response
 
@@ -84,7 +82,6 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     return response
 
 
-
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info")
 def retrieve_student_form_sidebar_info(student_id: int):
@@ -94,13 +91,14 @@ def retrieve_student_form_sidebar_info(student_id: int):
     sidebar_info = {}
     for form in forms:
         form_info = {}
-        form_template = crud.get_dim_form_template(get_db(),form.FormTemplateID)
+        form_template = crud.get_dim_form_template(get_db(), form.FormTemplateID)
         form_info["subjectID"] = form.SubjectStudentID
         form_info["studentID"] = form.StudentID
         form_info["description"] = form_template.Description
         sidebar_info.update({form_template.Title: form_info})
     response["sidebar_info"] = sidebar_info
     return response
+
 
 # [Student] Retrieve form template by form id
 @app.get("/retrieve_form_template/{form_id}")
@@ -115,21 +113,26 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 
     return jsonable_encoder(form_template)
 
+
 # [Student] Get previous student forms
 @app.get("/get_student_form")
 def get_student_form(student_id: int, subject_id: int):
     form = crud.get_fact_user_form(get_db(), student_id, subject_id)
     return form
 
+
 # [Student] Get form description
 @app.get("/get_student_form_description")
 def get_student_form(form_template_id: int, student_id: int, subject_id: int):
     form_info = {}
-    form_template = crud.get_dim_form_template(get_db(), form_template_id=form_template_id)
+    form_template = crud.get_dim_form_template(
+        get_db(), form_template_id=form_template_id
+    )
     form_info.update({"title": form_template.Title})
     form_info.update({"subjectID": student_id})
     form_info.update({"studentID": subject_id})
     return form_info
+
 
 # [Student] Save student form data
 @app.post("/save_form_entry")
@@ -149,3 +152,102 @@ def save_form_entry(
         raise HTTPException(status_code=400, detail="Form entry failed to save")
 
     return {"status": 200, "message": "Form entry saved successfully"}
+
+
+# get all students data
+@app.get("/student_data/{FormID}")
+def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
+    students = crud.get_filtered_exercises_by_form_template_id(
+        db, form_template_id=FormID
+    )
+    if not students:
+        raise HTTPException(status_code=404, detail="Form responses not found")
+
+    return students
+
+
+# get specific students data
+@app.get("/specific_student_data/{StudentID}/{FormID}")
+def get_specific_student_data(StudentID=int, FormID=int, db: Session = Depends(get_db)):
+    student = crud.get_student_form_response(
+        db, form_template_id=FormID, studentID=StudentID
+    )  # Example with student ID 1
+
+    return student
+
+
+@app.get("/normative_results/{student_id}/{form_template_id}")
+def get_normative_results(
+    student_id: int, form_template_id: int, db: Session = Depends(get_db)
+):
+    try:
+        results = calculate_normative_results(db, form_template_id, student_id)
+        return results
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/forms/{form_template_id}/submissions")
+def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
+    # Get form details
+    form_details = (
+        db.query(DimFormTemplate)
+        .filter(DimFormTemplate.FormTemplateID == form_template_id)
+        .first()
+    )
+
+    # Get form submissions
+    submissions = get_form_submissions(db, form_template_id)
+
+    # Return debugging information
+    return {
+        "form_details": {
+            "form_template_id": form_details.FormTemplateID,
+            "title": form_details.Title,
+            "description": form_details.Description,
+            "created_at": form_details.CreatedAt,
+        },
+        "submissions_count": len(submissions),  # Count of submissions
+        "submissions": [
+            {
+                "student_id": submission[3],  # Access StudentID from the tuple
+                "first_name": submission[1],  # Access FirstName from the tuple
+                "last_name": submission[2],  # Access LastName from the tuple
+                "subject_ID": submission[4],
+                "submission_time": submission[
+                    0
+                ].CreatedAt,  # Access CreatedAt from FactUserForm
+            }
+            for submission in submissions
+        ],
+    }
+
+
+# dosn't work but I dont know exactly what going wrong
+@app.delete("/forms/delete-submissions")
+def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db)):
+    if not student_ids:
+        return {"message": "No student IDs provided."}
+
+    try:
+        db.query(FactUserForm).filter(FactUserForm.StudentID.in_(student_ids)).delete(
+            synchronize_session=False
+        )
+        db.commit()
+        return {"message": "Selected submissions deleted successfully."}
+    except Exception as e:
+        db.rollback()
+        return {"error": str(e)}, 400
+
+
+@app.get("/forms/{form_template_id}/export", response_class=FileResponse)
+def export_form_responses(form_template_id: int, db: Session = Depends(get_db)):
+    # Use the existing function to get responses
+    responses = get_form_responses(db, form_template_id)
+    # Logic to convert responses to CSV/XLSX format and return the file
+    export_file = create_export_file(responses)
+    return FileResponse(
+        export_file,
+        media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        filename="form_responses.xlsx",
+    )

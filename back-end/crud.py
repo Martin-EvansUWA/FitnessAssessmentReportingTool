@@ -1,8 +1,12 @@
 from sqlalchemy.orm import Session
-
+from sqlalchemy import select
 import models
+from models import DimFormTemplate, DimUser, FactUserForm, DimUserFormResponse
 import schemas
-
+import numpy as np
+from typing import List, Dict, Any
+import pandas as pd
+from tempfile import NamedTemporaryFile
 # DimUser CRUD operations
 
 
@@ -212,3 +216,167 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     db.commit()
     db.refresh(db_fact_user_form)
     return db_fact_user_form
+
+
+def get_form_responses(db: Session, form_template_id: int):
+    """Fetch all form responses for a form template."""
+    
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.FormTemplateID == form_template_id)
+    ).scalars().all()
+    
+    return responses
+
+def get_student_form_response(db: Session, form_template_id: int, studentID:int):
+    """Fetch all form responses for a specific student and form template."""
+    responses = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
+        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.SubjectStudentID == studentID)
+    ).scalars().all()
+    
+    return responses
+
+
+def get_filtered_exercises_by_form_template_id(db:Session, form_template_id):
+    # Query the form template for the given ID
+    form_template = db.query(DimFormTemplate).filter_by(FormTemplateID=form_template_id).first()
+    
+    if not form_template:
+        return []
+
+    # Extract the JSON structure of the form template
+    template_structure = form_template.FormTemplate
+
+    # Query to get all user form responses associated with the specified form template ID
+    form_responses = db.query(DimUserFormResponse).all()
+
+    # List to store the filtered results
+    filtered_responses = []
+
+    # Iterate through each form response
+    for response in form_responses:
+        user_form_response = response.UserFormResponse
+        filtered_data = {}
+
+        # Track if the response has any matching categories/exercises
+        has_matching_entry = False
+
+        # Iterate over categories in the form template
+        for category, exercises in template_structure.items():
+            if category in user_form_response:
+                # Initialize category in the filtered data
+                filtered_data[category] = {}
+                
+                # Iterate over exercises in the category
+                for exercise in exercises:
+                    if exercise in user_form_response[category]:
+                        # Add exercise and its value to the filtered data
+                        filtered_data[category][exercise] = user_form_response[category][exercise]
+                        has_matching_entry = True
+
+        # Add the filtered response to the list only if it contains at least one matching entry
+        if has_matching_entry:
+            filtered_responses.append(filtered_data)
+
+    return filtered_responses
+
+
+from typing import Dict, Any, List
+
+def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, int]]:
+    # Get the filtered exercises for the form template
+    filtered_exercises = get_filtered_exercises_by_form_template_id(db, form_template_id)
+
+    # Prepare a dictionary to hold the maximum values
+    max_values = {}
+    
+    # Iterate over each student response in filtered_exercises
+    for student_response in filtered_exercises:
+        for category, exercises in student_response.items():
+            # Initialize the category in max_values if not present
+            if category not in max_values:
+                max_values[category] = {}
+
+            for exercise, value in exercises.items():
+                if isinstance(value, int):  # Ensure the value is an integer
+                    # Update the maximum value for the exercise
+                    if exercise not in max_values[category]:
+                        max_values[category][exercise] = value
+                    else:
+                        max_values[category][exercise] = max(max_values[category][exercise], value)
+
+    return max_values
+
+
+
+def calculate_normative_results(db: Session, form_template_id: int, studentID: int) -> List[Dict[str, Dict[str, int]]]:
+    # Get the student's specific responses
+    student_responses = get_student_form_response(db, form_template_id, studentID)
+    if not student_responses:
+        return [{}]  # Return an empty list with an empty dictionary if no responses found
+
+    # Get the maximum values for exercises
+    max_values = get_max_values(db, form_template_id)
+
+    # Flatten the list of student responses into a single dictionary
+    student_response_data = {}
+    for response in student_responses:
+        user_response = response
+        for category, exercises in user_response.items():
+            if category not in student_response_data:
+                student_response_data[category] = {}
+            student_response_data[category].update(exercises)
+
+    # Calculate normative results
+    normative_results = {}
+    for category, exercises in max_values.items():
+        if category not in normative_results:
+            normative_results[category] = {}
+        for exercise, max_value in exercises.items():
+            student_value = student_response_data.get(category, {}).get(exercise, 0)
+            if isinstance(student_value, int):  # Check if student_value is an integer
+                if max_value > 0:
+                    # Calculate the normative result, multiply by 100, and convert to an integer
+                    normative_results[category][exercise] = int((student_value / max_value) * 100)
+                else:
+                    normative_results[category][exercise] = None  # or some other value indicating invalid norm
+
+    return [normative_results]
+
+
+def get_form_submissions(db: Session, form_template_id: int):
+    return (
+        db.query(FactUserForm, DimUser.FirstName, DimUser.LastName, DimUser.StudentID, FactUserForm.SubjectStudentID)  # Include StudentID here
+        .join(DimUser, FactUserForm.StudentID == DimUser.StudentID)
+        .filter(FactUserForm.FormTemplateID == form_template_id)
+        .order_by(DimUser.FirstName)  # Alphabetical sorting by first name
+        .all()
+    )
+
+def flatten_response(response):
+    """Flatten the nested response structure."""
+    flat_response = {}
+    
+    for key, value in response.items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                flat_response[f"{sub_key}"] = sub_value
+        else:
+            flat_response[key] = value
+            
+    return flat_response
+
+def create_export_file(responses):
+    # Flatten the responses
+    flattened_responses = [flatten_response(response) for response in responses]
+    
+    # Convert the flattened responses to a pandas DataFrame
+    df = pd.DataFrame(flattened_responses)
+
+    # Save the file temporarily and return the path
+    with NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
+        df.to_excel(tmp.name, index=False)
+        return tmp.name
