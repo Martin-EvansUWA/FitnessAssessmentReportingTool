@@ -29,7 +29,7 @@ class DimAdmin(Base):
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(Boolean)
+    hashed_password = Column(String)
 
 # Form template model
 class DimFormTemplate(Base):
