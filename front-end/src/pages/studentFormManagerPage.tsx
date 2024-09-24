@@ -14,7 +14,7 @@ import {
     SidebarSection,
 } from "../interface/sidebarInterface";
 
-// What I will need:
+// Process for fetching form history:
 // 1) Send current user ID to backend
 // 2) Backend queries the fact_user_form table to get all forms filled out by the user or assigned to the user
 // 3) Backend returns:
@@ -32,55 +32,6 @@ import {
 // 6) When user clicks on a section, Frontend will send a GET request with the FormTemplateID to get the form details
 //     - Form details will include: Title, Description, staffID
 // 7) Frontend will then render the form details in the main content
-
-// Dummy data starts here ------------------------------------------------------
-
-const dummyFormDetails: FormTemplateJSON[] = [
-    {
-        FormTemplateID: 1,
-        StaffID: 987654,
-        Title: "SSEH2201 - Sem 1 2024",
-        Description: "This is a description for SSEH2201 - Sem 1 2024",
-        CreatedAt: "2023-01-01T10:00:00Z",
-        FormTemplate: {
-            "1": {
-                "Question 1": "What is your name?",
-                "Question 2": "What is your student ID?",
-                "Question 3": "What is your email?",
-            },
-        },
-    },
-    {
-        FormTemplateID: 2,
-        StaffID: 987654,
-        Title: "SSEH3301 - Sem 2 2023",
-        Description: "This is a description for SSEH3301 - Sem 2 2023",
-        CreatedAt: "2023-02-01T10:00:00Z",
-        FormTemplate: {
-            "1": {
-                "Question 1": "What is your name?",
-                "Question 2": "What is your student ID?",
-                "Question 3": "What is your email?",
-            },
-        },
-    },
-    {
-        FormTemplateID: 3,
-        StaffID: 987654,
-        Title: "SSEH3302 - Sem 1 2023",
-        Description: "This is a description for SSEH3302 - Sem 1 2023",
-        CreatedAt: "2023-03-01T10:00:00Z",
-        FormTemplate: {
-            "1": {
-                "Question 1": "What is your name?",
-                "Question 2": "What is your student ID?",
-                "Question 3": "What is your email?",
-            },
-        },
-    },
-];
-
-// Dummy data ends here --------------------------------------------------------
 
 const StudentFormManagerPage = () => {
     const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
@@ -154,11 +105,26 @@ const StudentFormManagerPage = () => {
     };
 
     const fetchFormDetails = (formTemplateID: number) => {
-        // Simulate GET request to get form details - TODO: Replace with actual backend response
-        const formDetail = dummyFormDetails.find(
-            (form) => form.FormTemplateID === formTemplateID
-        );
-        setFormDetails(formDetail || null);
+        axios
+            .get(`${backEndUrl}/retrieve_form_template/${formTemplateID}`)
+            .then((response) => {
+                console.log("Success:", response.data);
+                setFormDetails(response.data || null);
+            })
+            .catch((error) => {
+                console.error("Error:", error);
+                toast.error("Failed to fetch selected form details!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
+            });
     };
 
     const buildSidebarData = (formHistory: any) => {
