@@ -46,7 +46,7 @@ app.add_middleware(
 
 
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
-@app.get("/retrieve_admin_sidebar_info")
+@app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int):
     response = {}
     forms = crud.get_formtemplates_by_admin(get_db(),admin_id)
