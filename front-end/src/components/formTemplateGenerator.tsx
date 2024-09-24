@@ -1,7 +1,7 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
 import {
     FormTemplate,
@@ -30,8 +30,11 @@ const FormTemplateGenerator = () => {
     const [responseData, setResponseData] =
         useState<FormTemplateCreateResponse | null>(null); // State to store response data
 
+    const bottomRef = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
         console.log("Template updated:", template);
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
     }, [template]);
 
     const addNewCategory = useCallback((categoryName: string) => {
@@ -282,22 +285,6 @@ const FormTemplateGenerator = () => {
                                             )
                                         )}
                                         <li className="ml-2 md:ml-14">
-                                            <input
-                                                type="text"
-                                                placeholder="New Measurement"
-                                                value={
-                                                    newMeasurements[category]
-                                                        ?.name || ""
-                                                }
-                                                onChange={(e) =>
-                                                    handleMeasurementChange(
-                                                        category,
-                                                        "name",
-                                                        e.target.value
-                                                    )
-                                                }
-                                                className="border-solid border border-uwa-blue mr-2 my-1"
-                                            />
                                             <select
                                                 aria-label="Measurement Type"
                                                 value={
@@ -339,6 +326,29 @@ const FormTemplateGenerator = () => {
                                                     Boolean
                                                 </option>
                                             </select>
+                                            <input
+                                                type="text"
+                                                placeholder="New Measurement"
+                                                value={
+                                                    newMeasurements[category]
+                                                        ?.name || ""
+                                                }
+                                                onChange={(e) =>
+                                                    handleMeasurementChange(
+                                                        category,
+                                                        "name",
+                                                        e.target.value
+                                                    )
+                                                }
+                                                onKeyDown={(e) => {
+                                                    if (e.key === "Enter") {
+                                                        addNewMeasurement(
+                                                            category
+                                                        );
+                                                    }
+                                                }}
+                                                className="border-solid border border-uwa-blue mr-2 my-1"
+                                            />
                                             <button
                                                 onClick={() =>
                                                     addNewMeasurement(category)
@@ -365,6 +375,13 @@ const FormTemplateGenerator = () => {
                                                     e.target.value
                                                 )
                                             }
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    addNewCategory(
+                                                        newCategoryName
+                                                    );
+                                                }
+                                            }}
                                             className="border-solid border border-uwa-blue mr-2"
                                         />
                                         <button
@@ -382,6 +399,7 @@ const FormTemplateGenerator = () => {
                     </>
                 )}
             </div>
+            <div ref={bottomRef} />
             <div className="flex justify-end p-5">
                 {responseData
                     ? returnToFormManagerButton
