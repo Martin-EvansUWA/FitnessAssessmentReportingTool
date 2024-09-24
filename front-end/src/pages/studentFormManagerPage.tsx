@@ -149,11 +149,8 @@ const StudentFormManagerPage = () => {
                 history or fill out a new form.
             </p>
             <p className="my-5">
-                Select a form from the sidebar to view or edit it.
-            </p>
-            <p className="my-5">
-                Otherwise, if you want to fill out a new form, click "Add a new
-                form".
+                Select a form from the sidebar to view or edit it. Otherwise, if
+                you want to fill out a new form, click "Add a new form".
             </p>
         </div>
     );
