@@ -1,16 +1,27 @@
 import json
 from http.client import HTTPException
 
+
+# Website Imports
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from fastapi.security import OAuth2PasswordBearer
+# Login and Encryption Imports
+import jwt
+from datetime import datetime, timedelta, timezone
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing_extensions import Annotated
+from jwt.exceptions import InvalidTokenError
+from passlib.context import CryptContext
+from pydantic import BaseModel
 
+# Auth Imports
 from auth import decode_token, hash_password
 
+
+# Database Imports  ``
 import crud
 import models
 from database import SessionLocal, engine
@@ -22,7 +33,7 @@ from schemas import (
     DimUser,
 )
 
-from fastapi.security import OAuth2PasswordRequestForm
+
 models.Base.metadata.create_all(bind=engine)
 
 
