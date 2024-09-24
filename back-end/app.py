@@ -83,20 +83,26 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 
 
 # [Student] Get sidebar info of student forms
-@app.get("/retrieve_student_form_sidebar_info")
+@app.get("/retrieve_student_form_sidebar_info/{student_id}")
 def retrieve_student_form_sidebar_info(student_id: int):
-    response = {}
-    forms = crud.get_multiple_fact_user_forms(get_db(), student_id)
+    response = []
+    forms = crud.get_fact_multiple_user_forms(get_db(), student_id)
 
-    sidebar_info = {}
     for form in forms:
-        form_info = {}
         form_template = crud.get_dim_form_template(get_db(), form.FormTemplateID)
-        form_info["subjectID"] = form.SubjectStudentID
-        form_info["studentID"] = form.StudentID
-        form_info["description"] = form_template.Description
-        sidebar_info.update({form_template.Title: form_info})
-    response["sidebar_info"] = sidebar_info
+        form_info = {
+            "FactUserFormID": form.FactUserFormID,
+            "UserFormResponseID": form.UserFormResponseID,
+            "FormTemplateID": form.FormTemplateID,
+            "title": form_template.Title,
+            "StudentID": form.StudentID,
+            "SubjectStudentID": form.SubjectStudentID,
+            "IsComplete": form.IsComplete,
+            "CreatedAt": form.CreatedAt,
+            "CompletedAt": form.CompleteAt,
+        }
+        response.append(form_info)
+
     return response
 
 
