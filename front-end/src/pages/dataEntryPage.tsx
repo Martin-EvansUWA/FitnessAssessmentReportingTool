@@ -2,6 +2,8 @@ import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
 import { backEndUrl } from "../global_helpers/constants";
@@ -19,7 +21,6 @@ const DataEntryPage = () => {
             [name: string]: { sectionName: string; sectionOnClick: () => void };
         }[]
     >([]);
-    const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
     const [subjectStudentNumber, setSubjectStudentNumber] =
         useState<string>("");
     const [createdAtDateTime, setCreatedAtDateTime] = useState<string>("");
@@ -143,7 +144,7 @@ const DataEntryPage = () => {
             formData
         );
         // Send form response data to backend
-        axios
+        return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {
                     "Content-Type": "application/json",
@@ -151,17 +152,41 @@ const DataEntryPage = () => {
             })
             .then((response) => {
                 console.log("Success:", response.data);
-                setSaveSuccess(true); // TODO: Create a success message for the user to see
+                toast.success("Progress Saved Successfully!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
+                return true;
             })
             .catch((error) => {
                 console.error("Error:", error);
-                setSaveSuccess(false);
+                toast.error("Failed To Save Progress!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
+                return false;
             });
     };
 
-    const handleSaveAndExit = () => {
-        handleSave(); // Save the form data
-        navigate("/"); // Navigate to the home page after saving
+    const handleSaveAndExit = async () => {
+        const saveSuccessful = await handleSave(); // Save the form data and wait for the result
+        if (saveSuccessful) {
+            navigate("/"); // Navigate to the home page if save was successful
+        }
     };
 
     const handleSubjectStudentIdChange = useCallback(
@@ -252,16 +277,31 @@ const DataEntryPage = () => {
     );
 
     return (
-        <Layout
-            sidebarContent={sidebarContent}
-            mainContent={
-                selectedSection !== null
-                    ? selectedSectionComponent
-                    : introComponent
-            }
-            selectedSectionProp={selectedSection}
-            setSelectedSectionProp={setSelectedSection}
-        />
+        <>
+            <Layout
+                sidebarContent={sidebarContent}
+                mainContent={
+                    selectedSection !== null
+                        ? selectedSectionComponent
+                        : introComponent
+                }
+                selectedSectionProp={selectedSection}
+                setSelectedSectionProp={setSelectedSection}
+            />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+                transition={Bounce}
+            />
+        </>
     );
 };
 
