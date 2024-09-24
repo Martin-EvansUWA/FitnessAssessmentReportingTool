@@ -53,7 +53,7 @@ const Sidebar = ({
                     <h2 className="text-white font-bold">{content.title}</h2>
                 )}
                 <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
-                <div className="overflow-y-auto max-h-[42rem]">
+                <div>
                     {content.sections.map((section, index) => (
                         <ul key={index}>
                             {Object.entries(section).map(([key, value]) => (
