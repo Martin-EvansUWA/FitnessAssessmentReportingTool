@@ -1,12 +1,12 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
+import DashboardPage from "./pages/dashboardPage";
 import DataEntryPage from "./pages/dataEntryPage";
+import FormHistory from "./pages/FormManager";
+import FormResults from "./pages/formResults";
 import GetNewFormPage from "./pages/getNewFormPage";
 import LandingPage from "./pages/landingPage";
-import DashboardPage from "./pages/DashboardPage";
-import FormResults from "./pages/formResults";
-import FormHistory from "./pages/FormManager";
 
 function App() {
     return (
