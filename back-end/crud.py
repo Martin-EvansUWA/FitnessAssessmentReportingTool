@@ -95,7 +95,7 @@ def delete_admin(db: Session, Staff_ID: int):
 
 
 # DimFormTemplate CRUD operations
-def get_dim_form_template(db: Session, form_template_id: int) -> models.DimFormTemplate:
+def get_dim_form_template(db: Session, form_template_id: int):
     return (
         db.query(models.DimFormTemplate)
         .filter(models.DimFormTemplate.FormTemplateID == form_template_id)
@@ -115,7 +115,6 @@ def create_dim_form_template(
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
-        CreatedAt=dim_form_template.CreatedAt,
     )
     db.add(db_dim_form_template)
     db.commit()
@@ -123,7 +122,7 @@ def create_dim_form_template(
     return db_dim_form_template
 
 
-def get_forms_by_admin(db: Session, admin_id: int):
+def get_form_templates_by_admin(db: Session, admin_id: int):
     return (
         db.query(models.DimFormTemplate)
         .filter(models.DimFormTemplate.AdminId == admin_id)
@@ -132,17 +131,20 @@ def get_forms_by_admin(db: Session, admin_id: int):
 
 
 def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
-    db_student_form = models.FactUserForm(
-        FormTemplateId=student_form.FormTemplateId,
-        UserId=student_form.UserId,
-        SubjectUserId=student_form.SubjectUserId,
-        IsComplete=student_form.IsComplete,
-        CreatedAt=student_form.CreatedAt,
-        CompleteAt=student_form.CompleteAt,
-    )
-    db.add(db_student_form)
-    db.commit()
-    db.refresh(db_student_form)
+    try:
+        db_student_form = models.FactUserForm(
+            FormTemplateId=student_form.FormTemplateId,
+            UserId=student_form.UserId,
+            SubjectUserId=student_form.SubjectUserId,
+            IsComplete=student_form.IsComplete,
+            CreatedAt=student_form.CreatedAt,
+            CompleteAt=student_form.CompleteAt,
+        )
+        db.add(db_student_form)
+        db.commit()
+        db.refresh(db_student_form)
+    except:
+        return ValueError
     return db_student_form
 
 
@@ -190,7 +192,6 @@ def get_fact_user_form(
 def get_fact_multiple_user_forms(
     db: Session,
     student_id: int,
-    subject_user_id: int,
 ):
     return db.query(models.FactUserForm).filter(
         models.FactUserForm.StudentID == student_id,
