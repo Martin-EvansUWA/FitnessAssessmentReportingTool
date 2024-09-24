@@ -177,6 +177,7 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     return response
 
 
+""" STUDENT FUNCTIONS"""
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info")
 def retrieve_student_form_sidebar_info(student_id: int):
@@ -193,9 +194,6 @@ def retrieve_student_form_sidebar_info(student_id: int):
         sidebar_info.update({form_template.Title: form_info})
     response["sidebar_info"] = sidebar_info
     return response
-
-
-""" STUDENT FUNCTIONS"""
 
 
 # [Student] Retrieve form template by form id
