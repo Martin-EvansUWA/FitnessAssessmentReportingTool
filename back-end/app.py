@@ -19,7 +19,16 @@ from passlib.context import CryptContext
 from pydantic import BaseModel
 
 # Auth Imports
-from auth import decode_token, hash_password
+from auth import (
+    Token,
+    TokenData,
+    get_password_hash,
+    authenticate_student,
+    create_access_token,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    SECRET_KEY,
+    ALGORITHM
+)
 
 
 # Database Imports  ``
@@ -50,10 +59,8 @@ def get_db():
 
 
 # app implementation
-
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
 
 
 app.add_middleware(
@@ -64,32 +71,43 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    # Decode token, and get the user from the token
-    user = decode_token(token)
 
-    # create model to provide data integrity
-    print(f"Token: {token}")
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid authentication credentials",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        student_id: str = payload.get("sub")
+        if student_id is None:
+            raise credentials_exception
+        token_data = TokenData(id=student_id)
+    except InvalidTokenError:
+        raise credentials_exception
+    user = crud.get_DimUser(get_db(), DimStudent_ID=token_data.id)
+    if user is None:
+        raise credentials_exception
     return user
+
 
 @app.post("/token")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    print(f"{form_data.username}")
-    user = crud.get_DimUser(get_db(),form_data.username)
+    print(get_password_hash("hash"))
+    user = authenticate_student(get_db(), form_data.username, form_data.password)
     if not user:
-        raise HTTPException(status_code=400, detail="No such user...")
-    hashed_password = hash_password(form_data.password)
-    print(f"Hashed {hash_password}, user {user.hashed_password}")
-    if not hashed_password == user.hashed_password:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.StudentID}, expires_delta=access_token_expires
+    )
+    return Token(access_token=access_token, token_type="bearer")
 
-    return {"access_token": user.FirstName, "token_type": "bearer"}
 
 @app.get("/current_user")
 async def current_user(
