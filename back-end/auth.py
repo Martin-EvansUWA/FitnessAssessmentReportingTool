@@ -4,8 +4,8 @@ from pydantic import BaseModel
 
 
 import crud
-
 import jwt
+
 from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 

@@ -10,8 +10,9 @@ def createNewUser(form_data: dict):
     new_user = DimUserCreate(
         StudentID=form_data["StudentID"],
         email=form_data["email"],
+        FirstName=form_data["FirstName"],
         LastName=form_data["LastName"],
-        password=form_data["password"]
+        password=hash_password(form_data["password"])
     )
     return new_user
 

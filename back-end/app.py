@@ -120,7 +120,7 @@ async def current_user(
 
 @app.post("/register_student")
 async def register_student(form_data: DimUserCreate, db: Session = Depends(get_db)):
-    new_user = createNewUser(form_data=form_data)
+    new_user = createNewUser(form_data=form_data.dict())
     ret = crud.create_DimUser(db, new_user)
     if ret is None:
         raise HTTPException(
@@ -133,8 +133,6 @@ async def register_student(form_data: DimUserCreate, db: Session = Depends(get_d
 
 
 """ ADMIN FUNCTIONS """
-
-
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int):
