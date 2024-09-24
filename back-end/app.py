@@ -71,6 +71,8 @@ app.add_middleware(
 )
 
 
+
+""" AUTHENTICATION FUNCTIONS"""
 async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -114,6 +116,9 @@ async def current_user(
     return current_user.FirstName
 
 
+
+
+""" ADMIN FUNCTIONS """
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int):
@@ -174,6 +179,7 @@ def retrieve_student_form_sidebar_info(student_id: int):
     return response
 
 
+""" STUDENT FUNCTIONS"""
 # [Student] Retrieve form template by form id
 @app.get("/retrieve_form_template/{form_id}")
 def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
@@ -228,6 +234,7 @@ def save_form_entry(
     return {"status": 200, "message": "Form entry saved successfully"}
 
 
+""" DATA VISUALISATION FUNCTION"""
 # get all students data
 @app.get("/student_data/{FormID}")
 def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
