@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordBearer
 from typing_extensions import Annotated
 
-from auth import decode_token, get_current_active_user, hash_password
+from auth import decode_token, hash_password
 
 import crud
 import models
@@ -37,6 +37,7 @@ def get_db():
 
 # app implementation
 app = FastAPI()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 
 
@@ -48,22 +49,38 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    # Decode token, and get the user from the token
+    user = decode_token(token)
+
+    # create model to provide data integrity
+    print(f"Token: {token}")
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return user
+
 @app.post("/token")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
-    user = crud.get_DimUser.get(form_data.username)
+    print(f"{form_data.username}")
+    user = crud.get_DimUser(get_db(),form_data.username)
     if not user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(status_code=400, detail="No such user...")
     hashed_password = hash_password(form_data.password)
+    print(f"Hashed {hash_password}, user {user.hashed_password}")
     if not hashed_password == user.hashed_password:
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
-    return {"access_token": user.username, "token_type": "bearer"}
+    return {"access_token": user.FirstName, "token_type": "bearer"}
 
 @app.get("/current_user")
 async def current_user(
-    current_user: Annotated[DimUser, Depends(get_current_active_user)],
+    current_user: Annotated[DimUser, Depends(get_current_user)],
 ):
-    return current_user
+    return current_user.FirstName
 
 
 @app.get("/")

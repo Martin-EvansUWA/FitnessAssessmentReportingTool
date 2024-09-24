@@ -72,12 +72,10 @@ class DimUserBase(BaseModel):
     email: str
     FirstName: str
     LastName: str
-    disabled: bool
 
 
 class DimUserCreate(DimUserBase):
     password: str
-    disabled = False
 
 
 class DimUser(DimUserBase):

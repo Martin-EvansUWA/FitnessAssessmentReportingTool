@@ -13,13 +13,12 @@ class DimUser(Base):
     LastName = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
-    disabled=Column(Boolean)
 
     def __repr__(self):
         return (
             f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
             f"LastName='{self.LastName}', StudentId={self.StudentID}, "
-            f"email='{self.email}')"
+            f"email='{self.email}'), disabled={self.disabled}"
         )
 
 # Admin model
@@ -30,7 +29,7 @@ class DimAdmin(Base):
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
     email = Column(String, unique=True, index=True)
-    hashed_password = Column(String)
+    hashed_password = Column(Boolean)
 
 # Form template model
 class DimFormTemplate(Base):
