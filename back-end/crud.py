@@ -7,6 +7,7 @@ import numpy as np
 from typing import List, Dict, Any
 import pandas as pd
 from tempfile import NamedTemporaryFile
+from auth import hash_password
 # DimUser CRUD operations
 
 
@@ -29,12 +30,10 @@ def get_DimUsers(db: Session, skip: int = 0, limit: int = 100):
 
 # Creatre a new user
 def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
-    fake_hashed_password = (
-        DimUser.password + "notreallyhashed"
-    )  # Replace with actual hashing
+    hashed_password = hash_password(DimUser.password)
     db_DimUser = models.DimUser(
         email=DimUser.email,
-        hashed_password=fake_hashed_password,
+        hashed_password=hashed_password,
         FirstName=DimUser.FirstName,  # Default or handle according to your logic
         LastName=DimUser.LastName,  # Default or handle according to your logic
         StudentID=DimUser.StudentID,

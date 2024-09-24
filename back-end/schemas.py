@@ -116,3 +116,5 @@ class DataEntryPageSubmissionData(BaseModel):
 
     class Config:
         orm_mode = True
+
+

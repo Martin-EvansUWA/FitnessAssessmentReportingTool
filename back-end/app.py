@@ -27,7 +27,7 @@ from auth import (
     create_access_token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
     SECRET_KEY,
-    ALGORITHM
+    ALGORITHM,
 )
 
 
@@ -37,10 +37,11 @@ import models
 from crud import *
 from database import SessionLocal, engine
 from models import *
-from process import createFactUserFormSchema, createFormTemplateSchema
+from process import createFactUserFormSchema, createFormTemplateSchema, createNewUser
 from schemas import (
     DataEntryPageSubmissionData,
     DimFormTemplateCreate,
+    DimUserCreate,
     DimUserFormResponseCreate,
     DimUser,
 )
@@ -71,8 +72,9 @@ app.add_middleware(
 )
 
 
-
 """ AUTHENTICATION FUNCTIONS"""
+
+
 async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -116,9 +118,23 @@ async def current_user(
     return current_user.FirstName
 
 
+@app.post("/register_student")
+async def register_student(form_data: DimUserCreate, db: Session = Depends(get_db)):
+    new_user = createNewUser(form_data=form_data)
+    ret = crud.create_DimUser(db, new_user)
+    if ret is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    else:
+        return 200
 
 
 """ ADMIN FUNCTIONS """
+
+
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int):
@@ -180,6 +196,8 @@ def retrieve_student_form_sidebar_info(student_id: int):
 
 
 """ STUDENT FUNCTIONS"""
+
+
 # [Student] Retrieve form template by form id
 @app.get("/retrieve_form_template/{form_id}")
 def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
@@ -235,6 +253,8 @@ def save_form_entry(
 
 
 """ DATA VISUALISATION FUNCTION"""
+
+
 # get all students data
 @app.get("/student_data/{FormID}")
 def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
