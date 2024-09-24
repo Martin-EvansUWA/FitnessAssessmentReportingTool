@@ -84,7 +84,9 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 @app.get("/retrieve_student_form_sidebar_info/{student_id}")
 def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(get_db)):
     response = []
-    forms = crud.get_fact_multiple_user_forms(db, student_id)
+    forms = crud.get_fact_multiple_user_forms(
+        db, student_id
+    )  # Student ID could be both StudentID or SubjectStudentID
 
     for form in forms:
         form_template = crud.get_dim_form_template(db, form.FormTemplateID)

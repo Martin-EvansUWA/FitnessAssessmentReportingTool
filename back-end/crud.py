@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 import numpy as np
 import pandas as pd
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
 import models
@@ -196,8 +196,12 @@ def get_fact_multiple_user_forms(
     db: Session,
     student_id: int,
 ):
+    # Both StudentID and SubjectStudentID are used to get all forms associated with a student
     return db.query(models.FactUserForm).filter(
-        models.FactUserForm.StudentID == student_id,
+        or_(
+            models.FactUserForm.StudentID == student_id,
+            models.FactUserForm.SubjectStudentID == student_id,
+        )
     )
 
 
