@@ -17,7 +17,7 @@ interface HistogramProps {
 const Histogram: React.FC<HistogramProps> = ({ data }) => {
   const [xCategory, setXCategory] = useState<string>('');
   const [xExercise, setXExercise] = useState<string>('');
-  const [binSize, setBinSize] = useState<number>(10); // Default bin size
+  const [binSize, setBinSize] = useState<number>(1); // Default bin size
 
   // Dynamically extract categories and exercises
   const categories: Record<string, string[]> = {};
