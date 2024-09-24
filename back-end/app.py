@@ -15,14 +15,11 @@ from datetime import datetime, timedelta, timezone
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from typing_extensions import Annotated
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
-from pydantic import BaseModel
-
+from sqlalchemy.exc import IntegrityError
 # Auth Imports
 from auth import (
     Token,
     TokenData,
-    get_password_hash,
     authenticate_student,
     create_access_token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
@@ -121,16 +118,21 @@ async def current_user(
 @app.post("/register_student")
 async def register_student(form_data: DimUserCreate, db: Session = Depends(get_db)):
     new_user = createNewUser(form_data=form_data.dict())
-    ret = crud.create_DimUser(db, new_user)
-    if ret is None:
+    try:
+        ret = crud.create_DimUser(db, new_user)
+        if ret is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        else:
+            return 200
+    except IntegrityError:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    else:
-        return 200
-
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User already exists",
+            )
 
 """ ADMIN FUNCTIONS """
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
