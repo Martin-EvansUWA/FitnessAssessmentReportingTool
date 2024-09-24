@@ -60,7 +60,7 @@ def retrieve_admin_templates(admin_id: int):
     return response
 
 # [Admin] Retrieve admin form template, to display on admin dashboard
-@app.get("/retrieve_admin_form_template")
+@app.get("/retrieve_admin_form_template{form_id}")
 def retrive_admin_form_template(form_template_id: int):
     response = {}
     form_template = crud.get_dim_form_template(get_db(), form_template_id=form_template_id)
