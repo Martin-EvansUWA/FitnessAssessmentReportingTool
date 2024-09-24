@@ -11,7 +11,8 @@ import schemas
 from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
 # DimUser CRUD operations
-
+from typing import Dict, Any, List
+from difflib import SequenceMatcher
 
 # Get Student via their StudentID
 def get_DimUser(db: Session, DimStudent_ID: int):
@@ -303,27 +304,33 @@ def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
 
         # Iterate over categories in the form template
         for category, exercises in template_structure.items():
-            if category in user_form_response:
-                # Initialize category in the filtered data
-                filtered_data[category] = {}
+            # Look for a matching category in the user response, considering 85% similarity and case-insensitivity
+            for user_category in user_form_response.keys():
+                similarity_score = similar(category.lower(), user_category.lower())
+                if similarity_score >= 0.80:
+                    # Always rename to form template category name (ensures case correction)
+                    filtered_data[category] = {}
 
-                # Iterate over exercises in the category
-                for exercise in exercises:
-                    if exercise in user_form_response[category]:
-                        # Add exercise and its value to the filtered data
-                        filtered_data[category][exercise] = user_form_response[
-                            category
-                        ][exercise]
-                        has_matching_entry = True
+                    # Iterate over exercises in the matched category
+                    for exercise in exercises:
+                        # Check for case-insensitive match and 85% similarity for exercises
+                        for user_exercise, user_value in user_form_response[user_category].items():
+                            exercise_similarity = similar(exercise.lower(), user_exercise.lower())
+                            if exercise_similarity >= 0.85:
+                                # Always rename to form template exercise name (ensures case correction)
+                                filtered_data[category][exercise] = user_value
+                                has_matching_entry = True
 
         # Add the filtered response to the list only if it contains at least one matching entry
         if has_matching_entry:
             filtered_responses.append(filtered_data)
-
+    print(filtered_responses)
     return filtered_responses
 
 
-from typing import Any, Dict, List
+
+def similar(a, b):
+    return SequenceMatcher(None, a, b).ratio()
 
 
 def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, int]]:
