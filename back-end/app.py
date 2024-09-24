@@ -60,8 +60,7 @@ def get_db():
 
 # app implementation
 app = FastAPI()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
-
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="student_login")
 
 app.add_middleware(
     CORSMiddleware,
@@ -72,7 +71,7 @@ app.add_middleware(
 )
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -92,7 +91,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     return user
 
 
-@app.post("/token")
+@app.post("/student_login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     user = authenticate_student(get_db(), form_data.username, form_data.password)
     if not user:
@@ -108,9 +107,9 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     return Token(access_token=access_token, token_type="bearer")
 
 
-@app.get("/current_user")
+@app.get("/current_student_user")
 async def current_user(
-    current_user: Annotated[DimUser, Depends(get_current_user)],
+    current_user: Annotated[DimUser, Depends(get_current_student_user)],
 ):
     return current_user.FirstName
 
