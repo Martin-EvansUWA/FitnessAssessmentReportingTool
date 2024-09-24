@@ -1,11 +1,18 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Bounce, toast, ToastContainer } from "react-toastify";
 import AddNewForm from "../components/addNewForm";
 import Layout from "../components/layout";
 import StudentFormManager from "../components/studentFormManager";
+import { backEndUrl } from "../global_helpers/constants";
 import { FormTemplateJSON } from "../interface/formInterface";
-import { SidebarData, SidebarSection } from "../interface/sidebarInterface";
+import {
+    formHistorySidebarInfo,
+    SidebarData,
+    SidebarSection,
+} from "../interface/sidebarInterface";
 
 // What I will need:
 // 1) Send current user ID to backend
@@ -27,42 +34,6 @@ import { SidebarData, SidebarSection } from "../interface/sidebarInterface";
 // 7) Frontend will then render the form details in the main content
 
 // Dummy data starts here ------------------------------------------------------
-
-const dummyFormHistory = [
-    {
-        FactUserFormID: 1,
-        UserFormResponseID: 101,
-        FormTemplateID: 1,
-        title: "SSEH2201 - Sem 1 2024",
-        StudentID: 123456,
-        SubjectStudentID: 654321,
-        IsComplete: true,
-        CreatedAt: "2023-01-15T10:00:00Z",
-        CompletedAt: "2023-01-20T10:00:00Z",
-    },
-    {
-        FactUserFormID: 2,
-        UserFormResponseID: 102,
-        FormTemplateID: 2,
-        title: "SSEH3301 - Sem 2 2023",
-        StudentID: 123456,
-        SubjectStudentID: 654322,
-        IsComplete: false,
-        CreatedAt: "2023-02-15T10:00:00Z",
-        CompletedAt: null,
-    },
-    {
-        FactUserFormID: 3,
-        UserFormResponseID: 103,
-        FormTemplateID: 3,
-        title: "SSEH3302 - Sem 1 2023",
-        StudentID: 123456,
-        SubjectStudentID: 654323,
-        IsComplete: true,
-        CreatedAt: "2023-03-15T10:00:00Z",
-        CompletedAt: "2023-03-20T10:00:00Z",
-    },
-];
 
 const dummyFormDetails: FormTemplateJSON[] = [
     {
@@ -113,6 +84,9 @@ const dummyFormDetails: FormTemplateJSON[] = [
 
 const StudentFormManagerPage = () => {
     const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
+    const [fetchedFormHistory, setFetchedFormHistory] = useState<
+        formHistorySidebarInfo[]
+    >([]);
     const [addNewFormSelected, setAddNewFormSelected] =
         useState<boolean>(false);
     const [formDetails, setFormDetails] = useState<FormTemplateJSON | null>(
@@ -143,19 +117,40 @@ const StudentFormManagerPage = () => {
         sections: [] as SidebarSection[],
     });
 
-    const getFormHistory = () => {
-        // TODO: Send GET request to backend to get form history (detail of forms filled out by current student)
-        // Simulate backend response with dummy data - TODO: Replace with actual backend response
-        return dummyFormHistory.map((form) => ({
-            [`${form.FormTemplateID} - ${form.CreatedAt}`]: {
-                sectionName: `${form.title} [${form.CreatedAt}]`,
-                sectionOnClick: () => {
-                    setAddNewFormSelected(false);
-                    setSelectedFormId(form.FormTemplateID);
-                    fetchFormDetails(form.FormTemplateID);
+    const getFormHistory = async () => {
+        try {
+            // TODO: Replace 12345678 with actual student ID once authentication is implemented
+            const response = await axios.get(
+                `${backEndUrl}/retrieve_student_form_sidebar_info/${12345678}`
+            );
+            setFetchedFormHistory(response.data);
+            console.log("Fetched form history:", response.data);
+
+            return response.data.map((form: formHistorySidebarInfo) => ({
+                [`${form.FormTemplateID} - ${form.CreatedAt}`]: {
+                    sectionName: `${form.title} [${form.CreatedAt}]`,
+                    sectionOnClick: () => {
+                        setAddNewFormSelected(false);
+                        setSelectedFormId(form.FormTemplateID);
+                        fetchFormDetails(form.FormTemplateID);
+                    },
                 },
-            },
-        }));
+            }));
+        } catch (error) {
+            console.error("Error fetching form history:", error);
+            toast.error("Failed to fetch your form history!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Bounce,
+            });
+            return [];
+        }
     };
 
     const fetchFormDetails = (formTemplateID: number) => {
@@ -174,10 +169,12 @@ const StudentFormManagerPage = () => {
     };
 
     useEffect(() => {
-        const formHistory = getFormHistory();
-        setSidebarData(buildSidebarData(formHistory));
+        const fetchData = async () => {
+            const formHistory = await getFormHistory();
+            setSidebarData(buildSidebarData(formHistory));
+        };
+        fetchData();
     }, []);
-
     const defaultMainContent = (
         <div>
             <h1 className="text-2xl font-bold mb-5">Form Manager</h1>
@@ -198,7 +195,7 @@ const StudentFormManagerPage = () => {
 
     const renderFormDetails = () => {
         if (!formDetails) return null;
-        const formHistory = dummyFormHistory.find(
+        const formHistory = fetchedFormHistory.find(
             (form) => form.FormTemplateID === selectedFormId
         );
         return (
@@ -214,18 +211,33 @@ const StudentFormManagerPage = () => {
     };
 
     return (
-        <Layout
-            sidebarContent={sidebarData}
-            mainContent={
-                addNewFormSelected ? (
-                    <AddNewForm />
-                ) : selectedFormId ? (
-                    renderFormDetails()
-                ) : (
-                    defaultMainContent
-                )
-            }
-        />
+        <>
+            <Layout
+                sidebarContent={sidebarData}
+                mainContent={
+                    addNewFormSelected ? (
+                        <AddNewForm />
+                    ) : selectedFormId ? (
+                        renderFormDetails()
+                    ) : (
+                        defaultMainContent
+                    )
+                }
+            />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+                transition={Bounce}
+            />
+        </>
     );
 };
 
