@@ -1,6 +1,7 @@
+from sqlalchemy.orm import Session
+
 import models
 import schemas
-from sqlalchemy.orm import Session
 
 # DimUser CRUD operations
 
@@ -93,7 +94,7 @@ def delete_admin(db: Session, Staff_ID: int):
 def get_dim_form_template(db: Session, form_template_id: int):
     return (
         db.query(models.DimFormTemplate)
-        .filter(models.DimFormTemplate.FormTemplateId == form_template_id)
+        .filter(models.DimFormTemplate.FormTemplateID == form_template_id)
         .first()
     )
 
