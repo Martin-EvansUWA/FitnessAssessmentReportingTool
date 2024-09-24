@@ -3,103 +3,56 @@ import { Radar } from 'react-chartjs-2';
 import { Chart as ChartJS, RadialLinearScale, Title, Tooltip, Legend } from 'chart.js';
 import { ChartData, ChartOptions } from 'chart.js';
 
-// Registering necessary components
+// Register necessary components
 ChartJS.register(RadialLinearScale, Title, Tooltip, Legend);
 
-// Define types
-interface Student {
-  Name: string;
-  Flexibility: Record<string, number>;
-  'Muscular Strength': Record<string, number>;
-  'Cardiovascular Endurance': Record<string, number>;
+// Define types for dynamic data
+interface DataItem {
+  [key: string]: any;
 }
 
 interface RadarChartProps {
-  data: Student[];
-  specificStudentData: Student;
+  data: DataItem[];
+  specificStudentData: DataItem;
 }
 
-const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) => {
+const RadarChart: React.FC<RadarChartProps> = ({ specificStudentData , data }) => {
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedExercises, setSelectedExercises] = useState<string[]>([]);
-  const [showStudentData, setShowStudentData] = useState<boolean>(true);
-  const [showMaxValues, setShowMaxValues] = useState<boolean>(true);
-  
-  // State for colors
   const [studentColor, setStudentColor] = useState<string>('rgba(75, 192, 192, 1)');
-  const [maxValuesColor, setMaxValuesColor] = useState<string>('rgba(255, 99, 132, 1)');
 
-  // Extract categories and exercises from data
-  const categories: { [key: string]: string[] } = {
-    Flexibility: Object.keys(data[0].Flexibility || {}),
-    'Muscular Strength': Object.keys(data[0]['Muscular Strength'] || {}),
-    'Cardiovascular Endurance': Object.keys(data[0]['Cardiovascular Endurance'] || {}),
-  };
-
-  // Initialize max values object to store max values of each exercise
-  const maxValues: Record<string, number> = {};
-
-  // Loop through each category to compute max values
-  Object.keys(categories).forEach((category) => {
-    categories[category].forEach((exercise) => {
-      maxValues[exercise] = Math.max(
-        ...data.map((student) => {
-          const categoryData = student[category as keyof Student];
-          if (categoryData && typeof categoryData === 'object') {
-            return (categoryData as Record<string, number>)[exercise] || 0;
-          }
-          return 0;
-        })
-      );
-    });
-  });
-
-  // Find the maximum value from the data to dynamically adjust the scale
-  const overallMaxValue = Math.max(
-    ...selectedExercises.map((exercise) => maxValues[exercise] || 0)
-  );
+  // Extract categories from data
+  const categories = specificStudentData[0] ? Object.keys(specificStudentData[0]).filter(key => typeof specificStudentData[0][key] === 'object') : [];
 
   // Prepare chart data
   const chartData: ChartData<'radar'> = {
     labels: selectedExercises,
     datasets: [
-      ...(showStudentData
-        ? [
-            {
-              label: specificStudentData.Name,
-              data: selectedExercises.map((exercise) => {
-                let value = 0;
-                for (const category of selectedCategories) {
-                  const categoryData = specificStudentData[category as keyof Student];
-                  if (categoryData && typeof categoryData === 'object') {
-                    value = value || (categoryData as Record<string, number>)[exercise];
-                  }
-                }
-                return value || 0;
-              }),
-              backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
-              borderColor: studentColor, // Use selected color
-              borderWidth: 2, // Adjust the border width if needed
-            },
-          ]
-        : []),
-      ...(showMaxValues
-        ? [
-            {
-              label: 'Max Values',
-              data: selectedExercises.map((exercise) => maxValues[exercise] || 0),
-              backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
-              borderColor: maxValuesColor, // Use selected color
-              borderWidth: 2, // Adjust the border width if needed
-            },
-          ]
-        : []),
+      {
+        label: specificStudentData[0]?.['Student Details']?.Name || 'Specific Student',
+        data: selectedExercises.map((exercise) => {
+          for (const category of selectedCategories) {
+            const categoryData = specificStudentData[0][category];
+            if (categoryData && typeof categoryData === 'object') {
+              const value = categoryData[exercise];
+              if (typeof value === 'number') {
+                return value;
+              }
+            }
+          }
+          return 0; // Default to 0 if not found or not a number
+        }),
+        backgroundColor: 'rgba(0, 0, 0, 0)', // No fill
+        borderColor: studentColor, // Use selected color
+        borderWidth: 2, // Adjust the border width if needed
+      },
     ],
   };
 
   // Radar chart options
   const options: ChartOptions<'radar'> = {
     responsive: true,
+    maintainAspectRatio: false, // Allow chart to adjust dynamically
     plugins: {
       legend: {
         position: 'top',
@@ -110,10 +63,9 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
       r: {
         angleLines: { display: false },
         suggestedMin: 0,
-        // Dynamically set the maximum value
-        suggestedMax: Math.ceil(overallMaxValue * 1.2), // Add a buffer (20% more than the max value)
+        suggestedMax: 100, // Fixed maximum value
         ticks: {
-          stepSize: Math.ceil(overallMaxValue / 5), // Adjust step size based on data
+          stepSize: 10, // Adjust step size if needed
         },
       },
     },
@@ -125,29 +77,36 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
     setSelectedCategories((prevState) =>
       checked ? [...prevState, value] : prevState.filter((category) => category !== value)
     );
+
+    if (checked) {
+      const newExercises = Array.from(new Set([...selectedExercises, ...Object.keys(specificStudentData[0][value] || {})]));
+      setSelectedExercises(newExercises);
+    } else {
+      setSelectedExercises((prevExercises) =>
+        prevExercises.filter((exercise) => !Object.keys(specificStudentData[0][value] || {}).includes(exercise))
+      );
+    }
   };
 
   const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
-    setSelectedExercises((prevState) =>
-      checked ? [...prevState, value] : prevState.filter((exercise) => exercise !== value)
-    );
+    setSelectedExercises((prevState) => {
+      const newSelectedExercises = checked
+        ? [...prevState, value]
+        : prevState.filter((exercise) => exercise !== value);
+  
+      // Filter out exercises that have non-integer values
+      return newSelectedExercises.filter((exercise) => {
+        return selectedCategories.some((category) => {
+          const categoryData = specificStudentData[0][category];
+          return typeof categoryData === 'object' && typeof categoryData[exercise] === 'number' && Number.isInteger(categoryData[exercise]);
+        });
+      });
+    });
   };
-
-  const handleShowStudentDataChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setShowStudentData(event.target.checked);
-  };
-
-  const handleShowMaxValuesChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setShowMaxValues(event.target.checked);
-  };
-
+  
   const handleStudentColorChange = (event: ChangeEvent<HTMLInputElement>) => {
     setStudentColor(event.target.value);
-  };
-
-  const handleMaxValuesColorChange = (event: ChangeEvent<HTMLInputElement>) => {
-    setMaxValuesColor(event.target.value);
   };
 
   return (
@@ -156,7 +115,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
         {/* Category Selectors */}
         <div style={{ flex: '1', marginRight: '20px' }}>
           <h2>Select Categories:</h2>
-          {Object.keys(categories).map((category) => (
+          {categories.map((category) => (
             <div key={category}>
               <label>
                 <input
@@ -177,62 +136,33 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
           <div style={{ flex: '2' }}>
             <h3>Select Exercises:</h3>
             {selectedCategories.flatMap((category) =>
-              categories[category].map((exercise) => (
-                <div key={exercise}>
-                  <label>
-                    <input
-                      type="checkbox"
-                      value={exercise}
-                      checked={selectedExercises.includes(exercise)}
-                      onChange={handleCheckboxChange}
-                    />
-                    {exercise}
-                  </label>
-                </div>
-              ))
+              Object.keys(specificStudentData[0][category] || {})
+                .filter((exercise) => typeof specificStudentData[0][category][exercise] === 'number') // Filter for numeric values
+                .map((exercise) => (
+                  <div key={exercise}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        value={exercise}
+                        checked={selectedExercises.includes(exercise)}
+                        onChange={handleCheckboxChange}
+                      />
+                      {exercise}
+                    </label>
+                  </div>
+                ))
             )}
           </div>
 
-          {/* Options and Color Pickers */}
+          {/* Color Picker */}
           <div style={{ flex: '1', marginLeft: '20px', display: 'flex', flexDirection: 'column' }}>
-            {/* Show Options */}
-            <div style={{ marginTop: '10px' }}>
-              <label>
-                Show Student Data: 
-                <input
-                  type="checkbox"
-                  checked={showStudentData}
-                  onChange={handleShowStudentDataChange}
-                />
-              </label>
-              <br></br>
-              <label style={{ marginTop: '10px' }}>
-                Show Max Values: 
-                <input
-                  type="checkbox"
-                  checked={showMaxValues}
-                  onChange={handleShowMaxValuesChange}
-                />
-              </label>
-            </div>
-
-            {/* Color Pickers */}
             <div style={{ marginTop: '20px' }}>
               <label>
-                Student Data Line Color: 
+                Student Data Line Color:
                 <input
                   type="color"
                   value={studentColor}
                   onChange={handleStudentColorChange}
-                />
-              </label>
-              <br></br>
-              <label style={{ marginTop: '10px' }}>
-                Max Values Line Color: 
-                <input
-                  type="color"
-                  value={maxValuesColor}
-                  onChange={handleMaxValuesColorChange}
                 />
               </label>
             </div>
@@ -241,7 +171,7 @@ const RadarChart: React.FC<RadarChartProps> = ({ data, specificStudentData }) =>
       </div>
 
       {/* Radar Chart */}
-      <div style={{ marginTop: '20px' }}>
+      <div style={{ marginTop: '20px', width: '100%', height: '80vh' /* Adjust height as needed */ }}>
         <Radar data={chartData} options={options} />
       </div>
     </div>
