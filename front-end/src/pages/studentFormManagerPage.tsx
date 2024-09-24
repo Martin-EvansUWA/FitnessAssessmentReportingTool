@@ -182,10 +182,14 @@ const StudentFormManagerPage = () => {
         <div>
             <h1 className="text-2xl font-bold mb-5">Form Manager</h1>
             <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
-            <p className="font-bold my-5">
+            <p className="my-5">
+                Welcome to your Form Manager! Here you can view your form
+                history or fill out a new form.
+            </p>
+            <p className="my-5">
                 Select a form from the sidebar to view or edit it.
             </p>
-            <p className="font-bold my-5">
+            <p className="my-5">
                 Otherwise, if you want to fill out a new form, click "Add a new
                 form".
             </p>
