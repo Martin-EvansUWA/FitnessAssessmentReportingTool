@@ -3,7 +3,7 @@ from http.client import HTTPException
 
 
 # Website Imports
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -58,7 +58,7 @@ def get_db():
 
 # app implementation
 app = FastAPI()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="student_login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_user")
 
 app.add_middleware(
     CORSMiddleware,
@@ -70,8 +70,6 @@ app.add_middleware(
 
 
 """ AUTHENTICATION FUNCTIONS"""
-
-
 async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -93,7 +91,7 @@ async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]
 
 
 @app.post("/login_user")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response):
     user = authenticate_student(get_db(), form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -105,8 +103,14 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()]):
     access_token = create_access_token(
         data={"sub": user.StudentID}, expires_delta=access_token_expires
     )
-    return Token(access_token=access_token, token_type="bearer")
+    ret_token = Token(access_token=access_token, token_type="bearer")
+    response.set_cookie(key="access_token", value=ret_token)
+    return ret_token
 
+@app.get("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return 200
 
 @app.get("/current_student_user")
 async def current_user(
