@@ -75,7 +75,7 @@ const FormResults: React.FC = () => {
     }, []);
 
     const handleMyResultsClick = useCallback(() => {
-        if (studentData.length > 0) {
+        if (Object.keys(studentData).length > 0) {
             setMainContent(<MyResults studentData={studentData} />);
         } else {
             setMainContent(
