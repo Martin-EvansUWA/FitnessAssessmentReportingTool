@@ -13,8 +13,8 @@ const ConditionalLinks = ({ className }: { className: string }) => {
                     <Link to="/form-history">
                         [Admin Workflow] Form mangaer, link to add form works 
                     </Link>
-                    <Link to="/get-new-form">
-                        [Student Workflow] Get New Form Template
+                    <Link to="/student-form-manager">
+                        [Student Workflow] Student Form Manager Page
                     </Link>
                 </div>
             )}

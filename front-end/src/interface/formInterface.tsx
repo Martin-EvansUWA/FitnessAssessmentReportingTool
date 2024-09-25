@@ -24,3 +24,9 @@ export interface FormTemplateJSON {
     Description: string;
     CreatedAt: string;
 }
+
+export interface formTemplateTitleAndDescription {
+    FormTemplateID: number;
+    Title: string;
+    Description: string;
+}

@@ -19,3 +19,15 @@ export interface SidebarData {
     footer: SideBarFooterButton[];
     sections: SidebarSection[];
 }
+
+export interface formHistorySidebarInfo {
+    FactUserFormID: number;
+    UserFormResponseID: number;
+    FormTemplateID: number;
+    title: string;
+    StudentID: number;
+    SubjectStudentID: number;
+    IsComplete: boolean;
+    CreatedAt: string;
+    CompletedAt: string;
+}

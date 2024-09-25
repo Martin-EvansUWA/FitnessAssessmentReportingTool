@@ -1,12 +1,15 @@
-from sqlalchemy.orm import Session
-from sqlalchemy import select
-import models
-from models import DimFormTemplate, DimUser, FactUserForm, DimUserFormResponse
-import schemas
-import numpy as np
-from typing import List, Dict, Any
-import pandas as pd
 from tempfile import NamedTemporaryFile
+from typing import Any, Dict, List
+
+import numpy as np
+import pandas as pd
+from sqlalchemy import or_, select
+from sqlalchemy.orm import Session
+
+import models
+import schemas
+from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
+
 # DimUser CRUD operations
 from typing import Dict, Any, List
 from difflib import SequenceMatcher
@@ -194,8 +197,12 @@ def get_fact_multiple_user_forms(
     db: Session,
     student_id: int,
 ):
+    # Both StudentID and SubjectStudentID are used to get all forms associated with a student
     return db.query(models.FactUserForm).filter(
-        models.FactUserForm.StudentID == student_id,
+        or_(
+            models.FactUserForm.StudentID == student_id,
+            models.FactUserForm.SubjectStudentID == student_id,
+        )
     )
 
 
@@ -219,32 +226,62 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     return db_fact_user_form
 
 
+def get_form_template_id_from_fact_user_form(db: Session, fact_user_form_id: int):
+    return (
+        db.query(models.FactUserForm.FormTemplateID)
+        .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )[0]
+
+
 def get_form_responses(db: Session, form_template_id: int):
     """Fetch all form responses for a form template."""
-    
-    responses = db.execute(
-        select(DimUserFormResponse.UserFormResponse)
-        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.FormTemplateID == form_template_id)
-    ).scalars().all()
-    
+
+    responses = (
+        db.execute(
+            select(DimUserFormResponse.UserFormResponse)
+            .join(
+                FactUserForm,
+                FactUserForm.UserFormResponseID
+                == DimUserFormResponse.UserFormResponseID,
+            )
+            .where(FactUserForm.FormTemplateID == form_template_id)
+        )
+        .scalars()
+        .all()
+    )
+
     return responses
 
-def get_student_form_response(db: Session, form_template_id: int, studentID:int):
+
+def get_student_form_response(db: Session, form_template_id: int, studentID: int):
     """Fetch all form responses for a specific student and form template."""
-    responses = db.execute(
-        select(DimUserFormResponse.UserFormResponse)
-        .join(FactUserForm, FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID)
-        .where(FactUserForm.FormTemplateID == form_template_id, FactUserForm.SubjectStudentID == studentID)
-    ).scalars().all()
-    
+    responses = (
+        db.execute(
+            select(DimUserFormResponse.UserFormResponse)
+            .join(
+                FactUserForm,
+                FactUserForm.UserFormResponseID
+                == DimUserFormResponse.UserFormResponseID,
+            )
+            .where(
+                FactUserForm.FormTemplateID == form_template_id,
+                FactUserForm.SubjectStudentID == studentID,
+            )
+        )
+        .scalars()
+        .all()
+    )
+
     return responses
 
 
 def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
     # Query the form template for the given ID
-    form_template = db.query(DimFormTemplate).filter_by(FormTemplateID=form_template_id).first()
-    
+    form_template = (
+        db.query(DimFormTemplate).filter_by(FormTemplateID=form_template_id).first()
+    )
+
     if not form_template:
         return []
 
@@ -298,11 +335,13 @@ def similar(a, b):
 
 def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, int]]:
     # Get the filtered exercises for the form template
-    filtered_exercises = get_filtered_exercises_by_form_template_id(db, form_template_id)
+    filtered_exercises = get_filtered_exercises_by_form_template_id(
+        db, form_template_id
+    )
 
     # Prepare a dictionary to hold the maximum values
     max_values = {}
-    
+
     # Iterate over each student response in filtered_exercises
     for student_response in filtered_exercises:
         for category, exercises in student_response.items():
@@ -316,17 +355,22 @@ def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, in
                     if exercise not in max_values[category]:
                         max_values[category][exercise] = value
                     else:
-                        max_values[category][exercise] = max(max_values[category][exercise], value)
+                        max_values[category][exercise] = max(
+                            max_values[category][exercise], value
+                        )
 
     return max_values
 
 
-
-def calculate_normative_results(db: Session, form_template_id: int, studentID: int) -> List[Dict[str, Dict[str, int]]]:
+def calculate_normative_results(
+    db: Session, form_template_id: int, studentID: int
+) -> List[Dict[str, Dict[str, int]]]:
     # Get the student's specific responses
     student_responses = get_student_form_response(db, form_template_id, studentID)
     if not student_responses:
-        return [{}]  # Return an empty list with an empty dictionary if no responses found
+        return [
+            {}
+        ]  # Return an empty list with an empty dictionary if no responses found
 
     # Get the maximum values for exercises
     max_values = get_max_values(db, form_template_id)
@@ -350,39 +394,51 @@ def calculate_normative_results(db: Session, form_template_id: int, studentID: i
             if isinstance(student_value, int):  # Check if student_value is an integer
                 if max_value > 0:
                     # Calculate the normative result, multiply by 100, and convert to an integer
-                    normative_results[category][exercise] = int((student_value / max_value) * 100)
+                    normative_results[category][exercise] = int(
+                        (student_value / max_value) * 100
+                    )
                 else:
-                    normative_results[category][exercise] = None  # or some other value indicating invalid norm
+                    normative_results[category][
+                        exercise
+                    ] = None  # or some other value indicating invalid norm
 
     return [normative_results]
 
 
 def get_form_submissions(db: Session, form_template_id: int):
     return (
-        db.query(FactUserForm, DimUser.FirstName, DimUser.LastName, DimUser.StudentID, FactUserForm.SubjectStudentID)  # Include StudentID here
+        db.query(
+            FactUserForm,
+            DimUser.FirstName,
+            DimUser.LastName,
+            DimUser.StudentID,
+            FactUserForm.SubjectStudentID,
+        )  # Include StudentID here
         .join(DimUser, FactUserForm.StudentID == DimUser.StudentID)
         .filter(FactUserForm.FormTemplateID == form_template_id)
         .order_by(DimUser.FirstName)  # Alphabetical sorting by first name
         .all()
     )
 
+
 def flatten_response(response):
     """Flatten the nested response structure."""
     flat_response = {}
-    
+
     for key, value in response.items():
         if isinstance(value, dict):
             for sub_key, sub_value in value.items():
                 flat_response[f"{sub_key}"] = sub_value
         else:
             flat_response[key] = value
-            
+
     return flat_response
+
 
 def create_export_file(responses):
     # Flatten the responses
     flattened_responses = [flatten_response(response) for response in responses]
-    
+
     # Convert the flattened responses to a pandas DataFrame
     df = pd.DataFrame(flattened_responses)
 

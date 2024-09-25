@@ -11,7 +11,7 @@ const Sidebar = ({
     content: SidebarData;
     className?: string;
     selectedSectionProp?: number | null; // Optional prop for external control
-    setSelectedSectionProp?: (index: number) => void; // Optional callback when a section is selected
+    setSelectedSectionProp?: (index: number | null) => void; // Optional callback when a section is selected
 }) => {
     const [internalSelectedSection, setInternalSelectedSection] = useState<
         number | null
@@ -23,7 +23,7 @@ const Sidebar = ({
             ? selectedSectionProp
             : internalSelectedSection;
 
-    const toggleSelectedSection = (index: number) => {
+    const toggleSelectedSection = (index: number | null) => {
         setInternalSelectedSection(index); // Update internal state
         if (setSelectedSectionProp) {
             setSelectedSectionProp(index); // Update external state if callback is provided
@@ -44,7 +44,10 @@ const Sidebar = ({
             <div className="flex-grow">
                 {content.titleOnClick ? (
                     <button
-                        onClick={content.titleOnClick}
+                        onClick={() => {
+                            content.titleOnClick && content.titleOnClick();
+                            toggleSelectedSection(null);
+                        }}
                         className="text-white font-bold"
                     >
                         {content.title}
@@ -53,7 +56,7 @@ const Sidebar = ({
                     <h2 className="text-white font-bold">{content.title}</h2>
                 )}
                 <hr className="w-28 border-t-2 border-uwa-yellow my-2" />
-                <div className="overflow-y-auto max-h-[42rem]">
+                <div>
                     {content.sections.map((section, index) => (
                         <ul key={index}>
                             {Object.entries(section).map(([key, value]) => (
@@ -89,7 +92,10 @@ const Sidebar = ({
                 {content.footer.map((footerButton, index) => (
                     <button
                         key={index}
-                        onClick={footerButton.onClick}
+                        onClick={() => {
+                            footerButton.onClick();
+                            toggleSelectedSection(null);
+                        }}
                         className="flex items-center text-white"
                     >
                         <FontAwesomeIcon icon={footerButton.fontAwesomeIcon} />
