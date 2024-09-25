@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { useLocation } from 'react-router-dom'; // Import useLocation to get the state
 import DashboardGenerator from '../components/dashboardGenerator';
 import MyResults from '../components/myResults';
 import Layout from '../components/layout';
@@ -30,33 +31,39 @@ const initialSidebarData: SidebarData = {
   ]
 };
 
-// Placeholder student and form IDs
-const StudentID = 64332;
-const FormID = 5;
+// Placeholder student ID
+const StudentID = 123456789;
 
 const FormResults: React.FC = () => {
+  const location = useLocation(); // Get the state from the navigate
+  const { formID } = location.state || {}; // Get formID from state, fallback to undefined
+
   const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
   const [sidebarData, setSidebarData] = useState<SidebarData>(initialSidebarData);
   const [studentData, setStudentData] = useState<CategoryData[]>([]); // Updated type
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const studentResponse = await axios.get<CategoryData[]>(`${backEndUrl}/specific_student_data/${StudentID}/${FormID}`);
-        setStudentData(studentResponse.data);
-        setMainContent(
-          studentResponse.data.length > 0
-            ? <MyResults studentData={studentResponse.data} />
-            : <div>No data available</div>
-        );
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setMainContent(<div>Error loading data</div>);
-      }
-    };
+    if (formID) {
+      const fetchData = async () => {
+        try {
+          const studentResponse = await axios.get<CategoryData[]>(`${backEndUrl}/specific_student_data/${StudentID}/${formID}`);
+          setStudentData(studentResponse.data);
+          setMainContent(
+            studentResponse.data.length > 0
+              ? <MyResults studentData={studentResponse.data} />
+              : <div>No data available</div>
+          );
+        } catch (error) {
+          console.error('Error fetching data:', error);
+          setMainContent(<div>Error loading data</div>);
+        }
+      };
 
-    fetchData();
-  }, []);
+      fetchData();
+    } else {
+      setMainContent(<div>No form ID provided</div>);
+    }
+  }, [formID]); // Fetch new data when formID changes
 
   // Handler for "Data Visualization" click
   const handleDataVisualizationClick = () => {
