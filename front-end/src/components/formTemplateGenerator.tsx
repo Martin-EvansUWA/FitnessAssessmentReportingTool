@@ -31,6 +31,7 @@ const FormTemplateGenerator = () => {
         useState<FormTemplateCreateResponse | null>(null); // State to store response data
 
     const bottomRef = useRef<HTMLDivElement>(null);
+    const [formIdToClone, setFormIdToClone] = useState<string>("");
 
     useEffect(() => {
         console.log("Template updated:", template);
@@ -150,23 +151,60 @@ const FormTemplateGenerator = () => {
         </>
     );
 
+    const cloneFormTemplate = () => {
+        axios
+            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`) // Use formIdToClone
+            .then((response) => {
+                const fetchedTemplate = response.data.FormTemplate;
+                setTemplate(fetchedTemplate);
+            })
+            .catch((error) => {
+                console.error("Error fetching template:", error);
+            });
+    };
+    
+        const cloneFormTemplateButton = (
+            <button
+                onClick={() => cloneFormTemplate()}
+                className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00] ml-4"
+            >
+                Clone Form
+            </button>
+        );
+
     const formMetaData = (
         <>
             <div className="flex">
                 <div className="flex flex-col w-full md:w-[30rem] space-y-3">
-                    <div className="flex flex-row justify-between">
-                        <label className="font-bold" htmlFor="formTitle">
-                            Form Title:
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Title"
-                            className="border-2 border-gray-300 rounded-md h-7"
-                            onChange={(e) =>
-                                setFormTemplateName(e.target.value)
-                            }
-                        />
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <label className="font-bold" htmlFor="formTitle">
+                                Form Title:
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Title"
+                                className="border-2 border-gray-300 rounded-md h-7"
+                                onChange={(e) => setFormTemplateName(e.target.value)}
+                            />
+                        </div>
+                        <div className="flex items-center space-x-2"> {/* Use space-x-2 for consistent spacing */}
+                            <input
+                                type="text"
+                                placeholder="Form ID"
+                                value={formIdToClone}
+                                onChange={(e) => setFormIdToClone(e.target.value)}
+                                className="border-2 border-gray-300 rounded-md h-7 w-32" // Set a width to prevent wrapping
+                            />
+                            <button
+                                onClick={cloneFormTemplate}
+                                className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                            >
+                                Clone
+                            </button>
+                        </div>
                     </div>
+
                     <div className="flex flex-col w-full">
                         <label className="font-bold" htmlFor="formDescription">
                             Form Description:
@@ -205,6 +243,8 @@ const FormTemplateGenerator = () => {
     );
 
     const categories = useMemo(() => Object.keys(template), [template]);
+    
+
 
     return (
         <div className="flex flex-col min-h-full">
@@ -401,9 +441,13 @@ const FormTemplateGenerator = () => {
             </div>
             <div ref={bottomRef} />
             <div className="flex justify-end p-5">
-                {responseData
-                    ? returnToFormManagerButton
-                    : saveFormTemplateButton}
+                    {responseData ? (
+                    returnToFormManagerButton
+                ) : (
+                    <>
+                        {saveFormTemplateButton}
+                    </>
+                )}
             </div>
         </div>
     );
