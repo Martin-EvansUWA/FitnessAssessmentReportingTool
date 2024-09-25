@@ -1,103 +1,116 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // Import useLocation to get the state
-import DashboardGenerator from '../components/dashboardGenerator';
-import MyResults from '../components/myResults';
-import Layout from '../components/layout';
-import { SidebarData } from '../interface/sidebarInterface';
+import { faHome } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import DashboardGenerator from "../components/dashboardGenerator";
+import Layout from "../components/layout";
+import MyResults from "../components/myResults";
 import { backEndUrl } from "../global_helpers/constants";
+import { SidebarData } from "../interface/sidebarInterface";
 
 // Define generic types for fetched data
 interface CategoryData {
-  [test: string]: number | string;
+    [test: string]: number | string;
 }
 
-const initialSidebarData: SidebarData = {
-  title: 'SSEH2201 - 2024 Sem1',
-  footer: [],
-  sections: [
-    {
-      'My Results': {
-        sectionName: 'My Results',
-        sectionOnClick: () => {} // Placeholder; will be set in the component
-      }
-    },
-    {
-      'Data Visualization': {
-        sectionName: 'Data Visualization',
-        sectionOnClick: () => {} // Placeholder; will be set in the component
-      }
-    }
-  ]
-};
-
-// Placeholder student ID
-const StudentID = 123456789;
-
 const FormResults: React.FC = () => {
-  const location = useLocation(); // Get the state from the navigate
-  const { formID } = location.state || {}; // Get formID from state, fallback to undefined
+    const location = useLocation();
+    const { factUserFormID, formTitle } = location.state || {};
 
-  const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
-  const [sidebarData, setSidebarData] = useState<SidebarData>(initialSidebarData);
-  const [studentData, setStudentData] = useState<CategoryData[]>([]); // Updated type
+    const [state, setState] = useState({
+        mainContent: <div>Loading...</div>,
+        studentData: [] as CategoryData[],
+    });
 
-  useEffect(() => {
-    if (formID) {
-      const fetchData = async () => {
-        try {
-          const studentResponse = await axios.get<CategoryData[]>(`${backEndUrl}/specific_student_data/${StudentID}/${formID}`);
-          setStudentData(studentResponse.data);
-          setMainContent(
-            studentResponse.data.length > 0
-              ? <MyResults studentData={studentResponse.data} />
-              : <div>No data available</div>
-          );
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          setMainContent(<div>Error loading data</div>);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (factUserFormID) {
+            const fetchData = async () => {
+                try {
+                    const studentResponse = await axios.get<CategoryData[]>(
+                        `${backEndUrl}/get_specific_student_data_fact_user_form_id/${factUserFormID}`
+                    );
+                    console.log(
+                        "Successfully fetched data:",
+                        studentResponse.data
+                    );
+                    setState({
+                        mainContent:
+                            studentResponse.data.length > 0 ? (
+                                <MyResults studentData={studentResponse.data} />
+                            ) : (
+                                <div>No data available</div>
+                            ),
+                        studentData: studentResponse.data,
+                    });
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                    setState({
+                        mainContent: <div>Error loading data</div>,
+                        studentData: [],
+                    });
+                }
+            };
+
+            fetchData();
+        } else {
+            setState({
+                mainContent: <div>No FactUserFormID provided</div>,
+                studentData: [],
+            });
         }
-      };
+    }, [factUserFormID]);
 
-      fetchData();
-    } else {
-      setMainContent(<div>No form ID provided</div>);
-    }
-  }, [formID]); // Fetch new data when formID changes
+    const handleDataVisualizationClick = useCallback(() => {
+        setState((prevState) => ({
+            ...prevState,
+            mainContent: <DashboardGenerator />,
+        }));
+    }, []);
 
-  // Handler for "Data Visualization" click
-  const handleDataVisualizationClick = () => {
-    setMainContent(<DashboardGenerator />);
-  };
-
-  // Handler for "My Results" click
-  const handleMyResultsClick = () => {
-    if (studentData.length > 0) {
-      setMainContent(<MyResults studentData={studentData} />);
-    }
-  };
-
-  // Set the onClick handlers for sidebar sections
-  const sidebarContent: SidebarData = {
-    ...sidebarData,
-    sections: sidebarData.sections.map((section) => {
-      const sectionName = Object.keys(section)[0];
-      return {
-        [sectionName]: {
-          ...section[sectionName],
-          sectionOnClick: sectionName === 'Data Visualization'
-            ? handleDataVisualizationClick
-            : sectionName === 'My Results'
-            ? handleMyResultsClick
-            : (section[sectionName as keyof typeof section] as { sectionOnClick: () => void }).sectionOnClick
+    const handleMyResultsClick = useCallback(() => {
+        if (state.studentData.length > 0) {
+            setState((prevState) => ({
+                ...prevState,
+                mainContent: <MyResults studentData={state.studentData} />,
+            }));
         }
-      };
-    })
-  };
+    }, [state.studentData]);
 
-  return (
-    <Layout sidebarContent={sidebarContent} mainContent={mainContent} />
-  );
+    const sidebarContent: SidebarData = {
+        title: formTitle || "Form Results",
+        sections: [
+            {
+                "My Results": {
+                    sectionName: "My Results",
+                    sectionOnClick: handleMyResultsClick,
+                },
+            },
+            {
+                "Data Visualization": {
+                    sectionName: "Data Visualization",
+                    sectionOnClick: handleDataVisualizationClick,
+                },
+            },
+        ],
+        footer: [
+            {
+                text: "Return to Form Manager",
+                fontAwesomeIcon: faHome,
+                onClick: () => {
+                    navigate("/student-form-manager");
+                },
+            },
+        ],
+    };
+
+    return (
+        <Layout
+            sidebarContent={sidebarContent}
+            mainContent={state.mainContent}
+        />
+    );
 };
 
 export default FormResults;

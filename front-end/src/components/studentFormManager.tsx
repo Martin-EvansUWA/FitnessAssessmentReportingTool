@@ -4,7 +4,7 @@ import {
     faTrash,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 const StudentFormManager = ({
     formTitle,
@@ -13,7 +13,7 @@ const StudentFormManager = ({
     formCompletionDate,
     formCreatedBy,
     formCreatedFor,
-    formID
+    factUserFormID,
 }: {
     formTitle: string;
     formDescription: string;
@@ -21,13 +21,12 @@ const StudentFormManager = ({
     formCompletionDate: string;
     formCreatedBy: string;
     formCreatedFor: string;
-    formID: number
+    factUserFormID: number | null;
 }) => {
-
-    const navigate = useNavigate(); 
+    const navigate = useNavigate();
 
     const goToFormResults = () => {
-        navigate('/form-results', { state: { formID } });
+        navigate("/form-results", { state: { factUserFormID, formTitle } });
     };
 
     return (
@@ -72,7 +71,10 @@ const StudentFormManager = ({
                     />
                     <span className="invisible md:visible font-bold">Edit</span>
                 </button>
-                <button className="flex flex-col items-center" onClick={goToFormResults}>
+                <button
+                    className="flex flex-col items-center"
+                    onClick={goToFormResults}
+                >
                     <FontAwesomeIcon
                         icon={faChartSimple}
                         className="text-2xl md:text-4xl"

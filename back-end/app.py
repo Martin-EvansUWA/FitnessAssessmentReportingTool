@@ -187,6 +187,18 @@ def get_specific_student_data(StudentID=int, FormID=int, db: Session = Depends(g
     return student
 
 
+# get specific students data from factUserFormID
+@app.get("/get_specific_student_data_fact_user_form_id/{fact_user_form_id}")
+def get_specific_student_data_fact_user_form_id(
+    fact_user_form_id=int, db: Session = Depends(get_db)
+):
+    student = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id=fact_user_form_id
+    )
+
+    return student
+
+
 @app.get("/normative_results/{student_id}/{form_template_id}")
 def get_normative_results(
     student_id: int, form_template_id: int, db: Session = Depends(get_db)
