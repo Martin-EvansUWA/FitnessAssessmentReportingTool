@@ -168,6 +168,7 @@ const StudentFormManagerPage = () => {
                 formCompletionDate={formHistory?.CompletedAt || ""}
                 formCreatedBy={formHistory?.StudentID.toString() || ""}
                 formCreatedFor={formHistory?.SubjectStudentID.toString() || ""}
+                factUserFormID={formHistory?.FactUserFormID || null}
             />
         );
     };
