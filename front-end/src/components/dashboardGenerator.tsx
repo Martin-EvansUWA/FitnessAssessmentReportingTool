@@ -1,79 +1,87 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import LineChart from './charts/LineChart';
-import BarChart from './charts/BarChart';
-import ScatterChart from './charts/ScatterChart';
-import RadarChart from './charts/RadarChart';
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
+import BarChart from "./charts/BarChart";
+import LineChart from "./charts/LineChart";
+import RadarChart from "./charts/RadarChart";
+import ScatterChart from "./charts/ScatterChart";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const StudentID = 64332
-const FormID = 5
+const StudentID = 64332;
+const FormID = 5;
 
 const DashboardGenerator: React.FC = () => {
-  const [chartType, setChartType] = useState<string>('');
-  const [studentData, setStudentData] = useState<any[]>([]);
-  const [specificStudentData, setSpecificStudentData] = useState<any>({});
+    const [chartType, setChartType] = useState<string>("");
+    const [studentData, setStudentData] = useState<any[]>([]);
+    const [specificStudentData, setSpecificStudentData] = useState<any>({});
 
-  useEffect(() => {
-    // Fetch all student data
-    axios.get(`${backEndUrl}/student_data/${FormID}`)
-      .then(response => {
-        setStudentData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching student data:', error);
-      });
+    useEffect(() => {
+        // Fetch all student data
+        axios
+            .get(`${backEndUrl}/student_data/${FormID}`)
+            .then((response) => {
+                setStudentData(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching student data:", error);
+            });
 
-    // Fetch specific student data
-    axios.get(`${backEndUrl}/normative_results/${StudentID}/${FormID}`)
-      .then(response => {
-        setSpecificStudentData(response.data);
-      })
-      .catch(error => {
-        console.error('Error fetching specific student data:', error);
-      });
-  }, []);
+        // Fetch specific student data
+        axios
+            .get(`${backEndUrl}/normative_results/${StudentID}/${FormID}`)
+            .then((response) => {
+                setSpecificStudentData(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching specific student data:", error);
+            });
+    }, []);
 
-  const renderChart = () => {
-    switch (chartType) {
-      case 'line':
-        return <LineChart data={studentData} />;
-      case 'Bar':
-        return <BarChart data={studentData} />;
-      case 'scatter':
-        return <ScatterChart data={studentData} />;
-      case 'radar':
-        return <RadarChart specificStudentData={specificStudentData} data={[]} />;
-      default:
-        return <p>Please select a chart type.</p>;
-    }
-  };
+    const renderChart = () => {
+        switch (chartType) {
+            case "line":
+                return <LineChart data={studentData} />;
+            case "Bar":
+                return <BarChart data={studentData} />;
+            case "scatter":
+                return <ScatterChart data={studentData} />;
+            case "radar":
+                return (
+                    <RadarChart
+                        specificStudentData={specificStudentData}
+                        data={[]}
+                    />
+                );
+            default:
+                return <p>Please select a chart type.</p>;
+        }
+    };
 
-  return (
-    <div className="p-6">
-      <h1 className="text-3xl font-bold mb-4">
-        Data Visualization
-        <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-      </h1>
-      <div className="mb-6">
-        <label className="mb-2">Select Chart Type:
-          <select
-            className="w-30 mb-2"
-            value={chartType}
-            onChange={(e) => setChartType(e.target.value)}
-          >
-            <option value="">Select</option>
-            <option value="line">Line</option>
-            <option value="Bar">Bar</option>
-            <option value="scatter">Scatter</option>
-            <option value="radar">Radar</option>
-          </select>
-        </label>
-      </div>
-      {renderChart()}
-    </div>
-  );
+    return (
+        <div>
+            <div>
+                <h1 className="text-2xl font-bold mb-5">Data Visualization</h1>
+                <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+            </div>
+            <div className="my-6">
+                <label className="mb-2">
+                    Select Chart Type:
+                    <select
+                        className="w-30 mb-2"
+                        value={chartType}
+                        onChange={(e) => setChartType(e.target.value)}
+                    >
+                        <option value="">Select</option>
+                        <option value="line">Line</option>
+                        <option value="Bar">Bar</option>
+                        <option value="scatter">Scatter</option>
+                        <option value="radar">Radar</option>
+                    </select>
+                </label>
+            </div>
+            {renderChart()}
+        </div>
+    );
 };
 
 export default DashboardGenerator;
