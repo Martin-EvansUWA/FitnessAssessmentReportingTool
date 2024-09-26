@@ -2,15 +2,15 @@ const LoginModal = () => {
     return (
         <>
             <div>
-                <h2 style={{ fontSize: "32px" }}>I'm a Student!</h2>
+                <h2 className="text-4xl">I'm a Student!</h2>
                 <br />
                 <form>
                     <input
                         type="email"
                         id="email"
                         name="email"
-                        placeholder="Email"
-                        style={{ border: "2px solid #d9d9d9", padding: "5px" }}
+                        placeholder="UWA Email"
+                        className="border-2 border-gray-300 p-1"
                     />
                     <br />
                     <br />
@@ -19,28 +19,19 @@ const LoginModal = () => {
                         id="password"
                         name="password"
                         placeholder="Password"
-                        style={{ border: "2px solid #d9d9d9", padding: "5px" }}
+                        className="border-2 border-gray-300 p-1"
                     />
                     <br />
                     <br />
                     <button
                         type="submit"
-                        style={{
-                            backgroundColor: "#ffc220",
-                            color: "#003087",
-                            marginRight: "10px",
-                            padding: "5px",
-                        }}
+                        className="bg-yellow-400 text-blue-900 mr-2 p-1"
                     >
                         Register
                     </button>
                     <button
                         type="submit"
-                        style={{
-                            backgroundColor: "#003087",
-                            color: "white",
-                            padding: "5px",
-                        }}
+                        className="bg-blue-900 text-white p-1"
                     >
                         Login
                     </button>
@@ -48,12 +39,7 @@ const LoginModal = () => {
                 <br />
                 <a
                     href="#"
-                    style={{
-                        textAlign: "right",
-                        textDecorationLine: "underline",
-                        color: "#6C6363",
-                        fontWeight: "bold",
-                    }}
+                    className="text-right underline text-gray-600 font-bold"
                 >
                     Forgot Password
                 </a>
