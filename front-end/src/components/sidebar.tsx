@@ -48,7 +48,7 @@ const Sidebar = ({
                             content.titleOnClick && content.titleOnClick();
                             toggleSelectedSection(null);
                         }}
-                        className="text-white font-bold"
+                        className="text-white font-bold transform transition-transform duration-200 hover:scale-105"
                     >
                         {content.title}
                     </button>
@@ -73,11 +73,11 @@ const Sidebar = ({
                                             toggleSelectedSection(index);
                                             value.sectionOnClick();
                                         }}
-                                        className={
+                                        className={`transform transition-transform duration-200 hover:scale-105 ${
                                             selectedSection === index
                                                 ? "text-black p-1"
                                                 : "text-white p-1"
-                                        }
+                                        }`}
                                     >
                                         {value.sectionName}
                                     </button>
@@ -96,7 +96,7 @@ const Sidebar = ({
                             footerButton.onClick();
                             toggleSelectedSection(null);
                         }}
-                        className="flex items-center text-white"
+                        className="flex items-center text-white transform transition-transform duration-200 hover:scale-105"
                     >
                         <FontAwesomeIcon icon={footerButton.fontAwesomeIcon} />
                         <p className="ml-2">{footerButton.text}</p>

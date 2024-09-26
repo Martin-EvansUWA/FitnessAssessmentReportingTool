@@ -69,7 +69,7 @@ const AddNewForm = () => {
             <div className="flex flex-row-reverse">
                 <button
                     title="Get Form Template"
-                    className="font-bold"
+                    className="font-bold transform transition-transform duration-200 hover:scale-105"
                     onClick={handleGetRequest}
                 >
                     Continue

@@ -64,7 +64,7 @@ const StudentFormManager = ({
                 </div>
             </div>
             <div className="flex flex-row justify-between">
-                <button className="flex flex-col">
+                <button className="flex flex-col transform transition-transform duration-200 hover:scale-105">
                     <FontAwesomeIcon
                         icon={faEdit}
                         className="text-2xl md:text-4xl"
@@ -72,7 +72,7 @@ const StudentFormManager = ({
                     <span className="invisible md:visible font-bold">Edit</span>
                 </button>
                 <button
-                    className="flex flex-col items-center"
+                    className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105"
                     onClick={goToFormResults}
                 >
                     <FontAwesomeIcon
@@ -83,7 +83,7 @@ const StudentFormManager = ({
                         Dashboard
                     </span>
                 </button>
-                <button className="flex flex-col items-center">
+                <button className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105">
                     <FontAwesomeIcon
                         icon={faTrash}
                         className="text-2xl md:text-4xl text-red-500"
