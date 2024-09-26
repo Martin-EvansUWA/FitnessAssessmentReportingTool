@@ -16,10 +16,7 @@ const LandingPage = () => {
         setTempPageToggle(!tempPageToggle);
     };
     const toggleButton = (
-        <button
-            className="absolute top-0 right-0 m-5 px-2 py-1 bg-white border-2 border-black rounded-md"
-            onClick={togglePage}
-        >
+        <button className="font-bold" onClick={togglePage}>
             Go to real landing page
         </button>
     );
