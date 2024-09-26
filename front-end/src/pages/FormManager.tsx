@@ -2,32 +2,16 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import Layout from "../components/layout";
-import { SidebarData } from "../interface/sidebarInterface";
 import { backEndUrl } from '../global_helpers/constants';
-
-// Define the interface for form submissions and form details
-interface FormSubmission {
-    student_id: number;
-    first_name: string;
-    last_name: string;
-    subject_ID: number;
-    submission_time: string;
-}
-
-interface FormDetails {
-    form_template_id: number;
-    title: string;
-    description: string;
-    created_at: string;
-}
-
-interface SpecificStudentData {
-    student_id: number;
-    first_name: string;
-    last_name: string;
-    responce_id: number;
-    responses: any; // Modify as per actual structure
-}
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import {
+    formHistorySidebarInfoAdmin,
+    SidebarData,
+    SidebarSection,
+    FormSubmission,
+    FormDetails, 
+    SpecificStudentData
+} from "../interface/sidebarInterface";
 
 const GetNewFormPage = () => {
     const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>([]);
@@ -37,7 +21,38 @@ const GetNewFormPage = () => {
     const [studentDataError, setStudentDataError] = useState<string | null>(null);
     const [showDeleteOptions, setShowDeleteOptions] = useState(false);
     const [selectedSubmissions, setSelectedSubmissions] = useState<{ student_id: number; submission_time: string }[]>([]);
+    const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
+    const [fetchedFormHistory, setFetchedFormHistory] = useState<
+        formHistorySidebarInfoAdmin[]
+    >([]);
+    const [addNewFormSelected, setAddNewFormSelected] =
+        useState<boolean>(false);
+    
+    
+    const baseSidebar: SidebarData = {
+        title: "My Forms",
+        titleOnClick: () => {
+            setSelectedFormId(null);
+        },
+        footer: [
+            {
+                text: "Add a new form",
+                fontAwesomeIcon: faPlus,
+                onClick: () => {
+                    window.location.href = '/create-new-form-template';
+                },
+            },
+        ],
+        sections: [] as SidebarSection[],
+    };
+        
 
+
+    const [sidebarData, setSidebarData] = useState<SidebarData>({
+        ...baseSidebar,
+        sections: [] as SidebarSection[],
+    });
+    
     const fetchFormData = async (formTemplateId: number) => {
         try {
             const response = await axios.get(`${backEndUrl}/forms/${formTemplateId}/submissions`);
@@ -72,6 +87,65 @@ const GetNewFormPage = () => {
             fetchSpecificStudentData(submission.subject_ID, formDetails.form_template_id);
         }
     };
+
+    
+    // Update the getFormHistory function to call fetchFormSubmissions when a section is clicked
+    const getFormHistory = async () => {
+        try {
+            const response = await axios.get(`${backEndUrl}/retrieve_admin_sidebar_info/1`);
+            setFetchedFormHistory(response.data);
+            console.log("Fetched form history:", response.data);
+    
+            const sections: SidebarSection[] = response.data.map((form: formHistorySidebarInfoAdmin) => ({
+                [form.FormTemplateID]: {
+                    sectionName: `${form.Title} [${new Date(form.CreatedAt).toLocaleString()}]`,
+                    sectionOnClick: () => {
+                        setAddNewFormSelected(false);
+                        setSelectedFormId(form.FormTemplateID);
+                        setFormSubmissions([]); // Clear previous submissions
+                        fetchFormData(form.FormTemplateID); // Fetch form data for the selected form ID
+                    },
+                },
+            }));
+    
+            return sections;
+        } catch (error) {
+            console.error("Error fetching form history:", error);
+            toast.error("Failed to fetch your form history!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Bounce,
+            });
+            return [];
+        }
+    };
+    
+    
+    
+    
+    const buildSidebarData = (formHistory: SidebarSection[]) => {
+        return {
+            ...baseSidebar,
+            sections: formHistory,
+        };
+    };
+    
+    
+    useEffect(() => {
+        const fetchData = async () => {
+            const formHistory = await getFormHistory();
+            setSidebarData(buildSidebarData(formHistory));
+        };
+        fetchData();
+    }, []);
+    
+
 
     const handleDeleteTemplate = async () => {
         if (!formDetails) return;
@@ -137,48 +211,9 @@ const GetNewFormPage = () => {
     };
     
 
-    const dummySidebarData: SidebarData = {
-        title: "Form Manager",
-        footer: [
-            {
-                text: "Add a new form",
-                fontAwesomeIcon: faPlus,
-                onClick: () => {
-                    window.location.href = '/create-new-form-template';
-                },
-            },
-        ],
-        sections: [
-            {
-                "SSEH2201 - Sem 1 2024": {
-                    sectionName: "SSEH2201 - Sem 1 2024",
-                    sectionOnClick: () => {
-                        fetchFormData(3);
-                    },
-                },
-            },
-            {
-                "SSEH3301 - Sem 2 2023": {
-                    sectionName: "SSEH3301 - Sem 2 2023",
-                    sectionOnClick: () => {
-                        fetchFormData(3);
-                    },
-                },
-            },
-            {
-                "SSEH3301 - Sem 1 2023": {
-                    sectionName: "SSEH3301 - Sem 1 2023",
-                    sectionOnClick: () => {
-                        fetchFormData(3);
-                    },
-                },
-            },
-        ],
-    };
-
     return (
         <Layout
-            sidebarContent={dummySidebarData}
+            sidebarContent={sidebarData}
             mainContent={
                 <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', padding: '20px', maxHeight: 'calc(100vh - 150px)' }}>
                     <div style={{ flex: '1', overflowY: 'auto' }}>
@@ -263,7 +298,6 @@ const GetNewFormPage = () => {
                                             const studentDetails = item["Student Details"];
                                             return (
                                                 <div key={index}>
-                                                    <h3 style={{ fontWeight: 'bold' }}>{studentDetails?.Name || "Unnamed Student"}</h3>
                                                     <ul>
                                                         {Object.entries(studentDetails).map(([key, value]) => (
                                                             <li key={key}>

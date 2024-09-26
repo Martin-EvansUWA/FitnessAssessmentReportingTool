@@ -31,3 +31,33 @@ export interface formHistorySidebarInfo {
     CreatedAt: string;
     CompletedAt: string;
 }
+
+export interface formHistorySidebarInfoAdmin {
+    FormTemplateID: number;
+    Title: string;
+    CreatedAt: string;
+}
+
+
+export interface FormSubmission {
+    student_id: number;
+    first_name: string;
+    last_name: string;
+    subject_ID: number;
+    submission_time: string;
+}
+
+export interface FormDetails {
+    form_template_id: number;
+    title: string;
+    description: string;
+    created_at: string;
+}
+
+export interface SpecificStudentData {
+    student_id: number;
+    first_name: string;
+    last_name: string;
+    responce_id: number;
+    responses: any; // Modify as per actual structure
+}

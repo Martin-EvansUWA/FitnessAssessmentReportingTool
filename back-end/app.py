@@ -39,18 +39,19 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
-    response = {}
-    forms = crud.get_formtemplates_by_admin(db, admin_id)
+    response = []
+    forms = crud.get_form_templates_by_admin(db, admin_id)
 
-    sidebar_info = {}
     for form in forms:
-        sidebar_info.update({form.id: form.title})
-
-    response["sidebar_info"] = sidebar_info
+        form_info = {
+            "FormTemplateID": form.FormTemplateID ,
+            "Title": form.Title,
+            "CreatedAt": form.CreatedAt,                      
+        }
+        response.append(form_info)
 
     return response
 
