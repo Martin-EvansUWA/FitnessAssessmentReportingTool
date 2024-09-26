@@ -1,4 +1,9 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import {
+    faFileExcel,
+    faPlus,
+    faTrash,
+} from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
@@ -348,22 +353,28 @@ const AdminFormManagerPage = () => {
             <div className="my-5 flex flex-col-reverse md:flex-row md:justify-between">
                 <button
                     onClick={() => setShowDeleteOptions(!showDeleteOptions)}
-                    className="bg-red-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
+                    className="bg-red-500 text-white px-4 h-10 rounded transform transition-transform duration-200 hover:scale-105"
                 >
-                    {showDeleteOptions ? "Cancel" : "Delete Response"}
+                    {showDeleteOptions ? "Cancel" : "Delete Response(s)"}
                 </button>
-                <div className="flex justify-between my-2 md:my-0 md:space-x-2">
+                <div className="flex justify-between my-2 md:my-0 md:space-x-10">
                     <button
                         onClick={handleExport}
-                        className="bg-green-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
+                        className="transform transition-transform duration-200 hover:scale-105"
                     >
-                        Export to Excel
+                        <FontAwesomeIcon
+                            icon={faFileExcel}
+                            className="fa-2xl md:text-5xl text-green-500"
+                        />
                     </button>
                     <button
                         onClick={handleDeleteTemplate}
-                        className="bg-red-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
+                        className="transform transition-transform duration-200 hover:scale-105"
                     >
-                        Delete Form Template
+                        <FontAwesomeIcon
+                            icon={faTrash}
+                            className="fa-2xl md:text-5xl text-red-500"
+                        />
                     </button>
                 </div>
             </div>
