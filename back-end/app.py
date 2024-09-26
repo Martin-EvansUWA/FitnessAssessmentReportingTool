@@ -39,7 +39,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
+
+# [Admin] Sending admin id, to receive a list of form templates to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
     response = []
@@ -47,9 +48,9 @@ def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
 
     for form in forms:
         form_info = {
-            "FormTemplateID": form.FormTemplateID ,
+            "FormTemplateID": form.FormTemplateID,
             "Title": form.Title,
-            "CreatedAt": form.CreatedAt,                      
+            "CreatedAt": form.CreatedAt,
         }
         response.append(form_info)
 

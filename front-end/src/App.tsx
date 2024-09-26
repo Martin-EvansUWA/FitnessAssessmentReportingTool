@@ -2,7 +2,7 @@ import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
 import CreateNewFormTemplatePage from "./pages/createNewFormTemplatePage";
 import DataEntryPage from "./pages/dataEntryPage";
-import FormHistory from "./pages/FormManager";
+import FormHistory from "./pages/adminFormManagerPage";
 import FormResults from "./pages/formResults";
 import LandingPage from "./pages/landingPage";
 import StudentFormManagerPage from "./pages/studentFormManagerPage";
