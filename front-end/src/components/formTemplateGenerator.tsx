@@ -176,11 +176,11 @@ const FormTemplateGenerator = () => {
         <>
             <div className="flex">
                 <div className="flex flex-col w-full space-y-3">
-                    <div className="flex flex-col md:flex-row justify-between">
+                    <div className="flex flex-col w-full">
                         <label className="font-bold" htmlFor="formTitle">
                             Clone From [Optional]:
                         </label>
-                        <div className="space-x-2">
+                        <div>
                             <input
                                 type="text"
                                 placeholder="Form Template ID"
@@ -188,7 +188,7 @@ const FormTemplateGenerator = () => {
                                 onChange={(e) =>
                                     setFormIdToClone(e.target.value)
                                 }
-                                className="border-2 border-gray-300 rounded-md h-7"
+                                className="border-2 border-gray-300 rounded-md h-7 mr-2"
                             />
                             <button
                                 onClick={cloneFormTemplate}
