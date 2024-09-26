@@ -39,10 +39,11 @@ const GetNewFormPage = () => {
         title: "My Form Templates",
         titleOnClick: () => {
             setSelectedFormId(null);
+            setFormDetails(null);
         },
         footer: [
             {
-                text: "Add a new form",
+                text: "Create new form template",
                 fontAwesomeIcon: faPlus,
                 onClick: () => {
                     window.location.href = "/create-new-form-template";
@@ -317,6 +318,110 @@ const GetNewFormPage = () => {
         }
     };
 
+    const defaultMainContentView = (
+        <>
+            <p className="my-5">
+                Welcome to your Form Template Manager! Here you can view the
+                form templates you have created or create a new one.
+            </p>
+            <p className="my-5">
+                Select a form from the sidebar to view or edit it. Otherwise, if
+                you want to create a new form tempalte, click "Create new form
+                template".
+            </p>
+        </>
+    );
+
+    const formTemplateView = (
+        <>
+            <div className="flex justify-between items-center">
+                <div className="mt-5">
+                    <p>
+                        <strong>Description: </strong>{" "}
+                        {formDetails?.description}
+                    </p>
+                    <p>
+                        <strong>Created At: </strong> {formDetails?.created_at}
+                    </p>
+                </div>
+                <div>
+                    <button
+                        onClick={handleExport}
+                        className="bg-green-500 text-white px-4 py-2 rounded mr-4"
+                    >
+                        Export to Excel
+                    </button>
+                    <button
+                        onClick={() => setShowDeleteOptions(!showDeleteOptions)}
+                        className="bg-red-500 text-white px-4 py-2 rounded"
+                    >
+                        {showDeleteOptions ? "Cancel" : "Delete Response"}
+                    </button>
+                </div>
+            </div>
+            <div className="table-container">
+                <table className="min-w-full bg-white">
+                    <thead>
+                        <tr>
+                            {showDeleteOptions && <th>Select</th>}
+                            <th>Name</th>
+                            <th>Student ID</th>
+                            <th>Subject ID</th>
+                            <th>Submission Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {formSubmissions.map((submission) => (
+                            <tr
+                                key={`${submission.student_id}-${submission.submission_time}`}
+                                onDoubleClick={() =>
+                                    handleRowDoubleClick(submission)
+                                }
+                                className="hover:bg-gray-100 cursor-pointer"
+                            >
+                                {showDeleteOptions && (
+                                    <td>
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedSubmissions.some(
+                                                (sub) =>
+                                                    sub.student_id ===
+                                                        submission.student_id &&
+                                                    sub.submission_time ===
+                                                        submission.submission_time
+                                            )}
+                                            onChange={() =>
+                                                handleCheckboxChange(submission)
+                                            }
+                                        />
+                                    </td>
+                                )}
+                                <td>{`${submission.first_name} ${submission.last_name}`}</td>
+                                <td>{submission.student_id}</td>
+                                <td>{submission.subject_ID}</td>
+                                <td>{submission.submission_time}</td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+                {showDeleteOptions && (
+                    <button
+                        onClick={handleDeleteSelected}
+                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+                    >
+                        Confirm Deletion
+                    </button>
+                )}
+            </div>
+            <button
+                onClick={handleDeleteTemplate}
+                className="mt-4 bg-red-500 text-white px-4 py-2 rounded self-end"
+            >
+                Delete Form Template
+            </button>
+        </>
+    );
+
     return (
         <>
             <Layout
@@ -327,120 +432,13 @@ const GetNewFormPage = () => {
                             <h1 className="text-2xl font-bold mb-5">
                                 {formDetails
                                     ? formDetails.title
-                                    : "Form Manager"}
+                                    : "Form Template Manager"}
                             </h1>
                             <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-                            {formDetails && (
-                                <div className="flex justify-between items-center">
-                                    <div>
-                                        <p>
-                                            <strong>Form ID: </strong>{" "}
-                                            {formDetails.form_template_id}
-                                        </p>
-                                        <p>
-                                            <strong>Created At: </strong>{" "}
-                                            {formDetails.created_at}
-                                        </p>
-                                        <p>
-                                            <strong>Description: </strong>{" "}
-                                            {formDetails.description}
-                                        </p>
-                                    </div>
-                                    <div>
-                                        <button
-                                            onClick={handleExport}
-                                            className="bg-green-500 text-white px-4 py-2 rounded mr-4"
-                                        >
-                                            Export to Excel
-                                        </button>
-                                        <button
-                                            onClick={() =>
-                                                setShowDeleteOptions(
-                                                    !showDeleteOptions
-                                                )
-                                            }
-                                            className="bg-red-500 text-white px-4 py-2 rounded"
-                                        >
-                                            {showDeleteOptions
-                                                ? "Cancel"
-                                                : "Delete Response"}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            <br />
-
-                            <div className="table-container">
-                                <table className="min-w-full bg-white">
-                                    <thead>
-                                        <tr>
-                                            {showDeleteOptions && (
-                                                <th>Select</th>
-                                            )}
-                                            <th>Name</th>
-                                            <th>Student ID</th>
-                                            <th>Subject ID</th>
-                                            <th>Submission Time</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {formSubmissions.map((submission) => (
-                                            <tr
-                                                key={`${submission.student_id}-${submission.submission_time}`}
-                                                onDoubleClick={() =>
-                                                    handleRowDoubleClick(
-                                                        submission
-                                                    )
-                                                }
-                                                className="hover:bg-gray-100 cursor-pointer"
-                                            >
-                                                {showDeleteOptions && (
-                                                    <td>
-                                                        <input
-                                                            type="checkbox"
-                                                            checked={selectedSubmissions.some(
-                                                                (sub) =>
-                                                                    sub.student_id ===
-                                                                        submission.student_id &&
-                                                                    sub.submission_time ===
-                                                                        submission.submission_time
-                                                            )}
-                                                            onChange={() =>
-                                                                handleCheckboxChange(
-                                                                    submission
-                                                                )
-                                                            }
-                                                        />
-                                                    </td>
-                                                )}
-                                                <td>{`${submission.first_name} ${submission.last_name}`}</td>
-                                                <td>{submission.student_id}</td>
-                                                <td>{submission.subject_ID}</td>
-                                                <td>
-                                                    {submission.submission_time}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                                {showDeleteOptions && (
-                                    <button
-                                        onClick={handleDeleteSelected}
-                                        className="mt-4 bg-red-600 text-white px-4 py-2 rounded"
-                                    >
-                                        Confirm Deletion
-                                    </button>
-                                )}
-                            </div>
+                            {formDetails
+                                ? formTemplateView
+                                : defaultMainContentView}
                         </div>
-
-                        <button
-                            onClick={handleDeleteTemplate}
-                            className="mt-4 bg-red-800 text-white px-4 py-2 rounded self-end"
-                        >
-                            Delete Form Template
-                        </button>
 
                         {/* Popup for specific student data */}
                         {showStudentPopup && (
@@ -450,7 +448,6 @@ const GetNewFormPage = () => {
                                         Student Details
                                     </h2>
                                     <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
-                                    <br />
                                     {studentDataError ? (
                                         <p>{studentDataError}</p>
                                     ) : (
@@ -496,7 +493,6 @@ const GetNewFormPage = () => {
                                             }
                                         )
                                     )}
-                                    <br />
                                     <button
                                         className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
                                         onClick={() =>
