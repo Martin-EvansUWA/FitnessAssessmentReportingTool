@@ -1,4 +1,7 @@
+from difflib import SequenceMatcher
 from tempfile import NamedTemporaryFile
+
+# DimUser CRUD operations
 from typing import Any, Dict, List
 
 import numpy as np
@@ -10,9 +13,6 @@ import models
 import schemas
 from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
-# DimUser CRUD operations
-from typing import Dict, Any, List
-from difflib import SequenceMatcher
 
 # Get Student via their StudentID
 def get_DimUser(db: Session, DimStudent_ID: int):
@@ -276,6 +276,20 @@ def get_student_form_response(db: Session, form_template_id: int, studentID: int
     return responses
 
 
+def get_student_form_response_fact_user_form_id(db: Session, fact_user_form_id: int):
+    """Fetch a form response for a specific fact_user_form_id."""
+    response = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(
+            FactUserForm,
+            FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID,
+        )
+        .where(FactUserForm.FactUserFormID == fact_user_form_id)
+    ).scalar_one()
+
+    return response
+
+
 def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
     # Query the form template for the given ID
     form_template = (
@@ -314,8 +328,12 @@ def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
                     # Iterate over exercises in the matched category
                     for exercise in exercises:
                         # Check for case-insensitive match and 85% similarity for exercises
-                        for user_exercise, user_value in user_form_response[user_category].items():
-                            exercise_similarity = similar(exercise.lower(), user_exercise.lower())
+                        for user_exercise, user_value in user_form_response[
+                            user_category
+                        ].items():
+                            exercise_similarity = similar(
+                                exercise.lower(), user_exercise.lower()
+                            )
                             if exercise_similarity >= 0.85:
                                 # Always rename to form template exercise name (ensures case correction)
                                 filtered_data[category][exercise] = user_value
@@ -326,7 +344,6 @@ def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
             filtered_responses.append(filtered_data)
     print(filtered_responses)
     return filtered_responses
-
 
 
 def similar(a, b):

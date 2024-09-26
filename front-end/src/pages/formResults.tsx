@@ -1,103 +1,144 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useLocation } from 'react-router-dom'; // Import useLocation to get the state
-import DashboardGenerator from '../components/dashboardGenerator';
-import MyResults from '../components/myResults';
-import Layout from '../components/layout';
-import { SidebarData } from '../interface/sidebarInterface';
+import { faHome } from "@fortawesome/free-solid-svg-icons";
+import axios from "axios";
+import React, { useCallback, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Bounce, toast, ToastContainer } from "react-toastify";
+import DashboardGenerator from "../components/dashboardGenerator";
+import Layout from "../components/layout";
+import MyResults from "../components/myResults";
 import { backEndUrl } from "../global_helpers/constants";
+import { SidebarData } from "../interface/sidebarInterface";
 
 // Define generic types for fetched data
 interface CategoryData {
-  [test: string]: number | string;
+    [test: string]: number | string;
 }
 
-const initialSidebarData: SidebarData = {
-  title: 'SSEH2201 - 2024 Sem1',
-  footer: [],
-  sections: [
-    {
-      'My Results': {
-        sectionName: 'My Results',
-        sectionOnClick: () => {} // Placeholder; will be set in the component
-      }
-    },
-    {
-      'Data Visualization': {
-        sectionName: 'Data Visualization',
-        sectionOnClick: () => {} // Placeholder; will be set in the component
-      }
-    }
-  ]
-};
-
-// Placeholder student ID
-const StudentID = 123456789;
+const defaultMainContent = (
+    <div>
+        <h1 className="text-2xl font-bold mb-5">My Dashboard</h1>
+        <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+        <p className="my-5">
+            Welcome to your Dashboard! Here you can view your results and
+            visualize your data.
+        </p>
+        <p className="my-5">
+            To get started, select an option from the sidebar to view your
+            results or visualize your data.
+        </p>
+    </div>
+);
 
 const FormResults: React.FC = () => {
-  const location = useLocation(); // Get the state from the navigate
-  const { formID } = location.state || {}; // Get formID from state, fallback to undefined
+    const location = useLocation();
+    const { factUserFormID, formTitle } = location.state || {};
+    const [mainContent, setMainContent] = useState(defaultMainContent);
+    const [studentData, setStudentData] = useState([] as CategoryData[]);
 
-  const [mainContent, setMainContent] = useState<JSX.Element>(<div>Loading...</div>);
-  const [sidebarData, setSidebarData] = useState<SidebarData>(initialSidebarData);
-  const [studentData, setStudentData] = useState<CategoryData[]>([]); // Updated type
+    const navigate = useNavigate();
 
-  useEffect(() => {
-    if (formID) {
-      const fetchData = async () => {
-        try {
-          const studentResponse = await axios.get<CategoryData[]>(`${backEndUrl}/specific_student_data/${StudentID}/${formID}`);
-          setStudentData(studentResponse.data);
-          setMainContent(
-            studentResponse.data.length > 0
-              ? <MyResults studentData={studentResponse.data} />
-              : <div>No data available</div>
-          );
-        } catch (error) {
-          console.error('Error fetching data:', error);
-          setMainContent(<div>Error loading data</div>);
+    useEffect(() => {
+        if (factUserFormID) {
+            const fetchData = async () => {
+                try {
+                    const studentResponse = await axios.get<CategoryData[]>(
+                        `${backEndUrl}/get_specific_student_data_fact_user_form_id/${factUserFormID}`
+                    );
+                    console.log(
+                        "Successfully fetched data:",
+                        studentResponse.data
+                    );
+                    setStudentData(studentResponse.data);
+                } catch (error) {
+                    console.error("Error fetching data:", error);
+                    toast.error("Failed to fetch your results!", {
+                        position: "top-right",
+                        autoClose: 5000,
+                        hideProgressBar: false,
+                        closeOnClick: true,
+                        pauseOnHover: true,
+                        draggable: true,
+                        progress: undefined,
+                        theme: "colored",
+                        transition: Bounce,
+                    });
+                    setStudentData([]);
+                }
+            };
+
+            fetchData();
         }
-      };
+    }, [factUserFormID]);
 
-      fetchData();
-    } else {
-      setMainContent(<div>No form ID provided</div>);
-    }
-  }, [formID]); // Fetch new data when formID changes
+    const handleDataVisualizationClick = useCallback(() => {
+        setMainContent(<DashboardGenerator />);
+    }, []);
 
-  // Handler for "Data Visualization" click
-  const handleDataVisualizationClick = () => {
-    setMainContent(<DashboardGenerator />);
-  };
-
-  // Handler for "My Results" click
-  const handleMyResultsClick = () => {
-    if (studentData.length > 0) {
-      setMainContent(<MyResults studentData={studentData} />);
-    }
-  };
-
-  // Set the onClick handlers for sidebar sections
-  const sidebarContent: SidebarData = {
-    ...sidebarData,
-    sections: sidebarData.sections.map((section) => {
-      const sectionName = Object.keys(section)[0];
-      return {
-        [sectionName]: {
-          ...section[sectionName],
-          sectionOnClick: sectionName === 'Data Visualization'
-            ? handleDataVisualizationClick
-            : sectionName === 'My Results'
-            ? handleMyResultsClick
-            : (section[sectionName as keyof typeof section] as { sectionOnClick: () => void }).sectionOnClick
+    const handleMyResultsClick = useCallback(() => {
+        if (Object.keys(studentData).length > 0) {
+            setMainContent(<MyResults studentData={studentData} />);
+        } else {
+            setMainContent(
+                <div>
+                    <h1 className="text-2xl font-bold mb-5">My Results</h1>
+                    <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                    <p className="my-5">
+                        No results available for this form. Please check your
+                        connection or complete the form to view your results.
+                    </p>
+                </div>
+            );
         }
-      };
-    })
-  };
+    }, [studentData]);
 
-  return (
-    <Layout sidebarContent={sidebarContent} mainContent={mainContent} />
-  );
+    const sidebarContent: SidebarData = {
+        title: formTitle || "Form Results",
+        titleOnClick: () => {
+            setMainContent(defaultMainContent);
+        },
+        sections: [
+            {
+                "My Results": {
+                    sectionName: "My Results",
+                    sectionOnClick: handleMyResultsClick,
+                },
+            },
+            {
+                "Data Visualization": {
+                    sectionName: "Data Visualization",
+                    sectionOnClick: handleDataVisualizationClick,
+                },
+            },
+        ],
+        footer: [
+            {
+                text: "Return to Form Manager",
+                fontAwesomeIcon: faHome,
+                onClick: () => {
+                    navigate("/student-form-manager");
+                },
+            },
+        ],
+    };
+
+    return (
+        <>
+            <Layout sidebarContent={sidebarContent} mainContent={mainContent} />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+                transition={Bounce}
+            />
+        </>
+    );
 };
 
 export default FormResults;
