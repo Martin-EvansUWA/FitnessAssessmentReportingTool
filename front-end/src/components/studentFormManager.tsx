@@ -86,9 +86,9 @@ const StudentFormManager = ({
                 <button className="flex flex-col items-center">
                     <FontAwesomeIcon
                         icon={faTrash}
-                        className="text-2xl md:text-4xl"
+                        className="text-2xl md:text-4xl text-red-500"
                     />
-                    <span className="invisible md:visible font-bold">
+                    <span className="invisible md:visible font-bold text-red-500">
                         Delete
                     </span>
                 </button>
