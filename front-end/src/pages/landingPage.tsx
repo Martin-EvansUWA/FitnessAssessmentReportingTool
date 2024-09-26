@@ -26,14 +26,7 @@ const LandingPage = () => {
     /////////////////////////////////////////////////////////////
 
     return tempPageToggle ? (
-        <div className="flex flex-col h-screen">
-            This is a dummy page that lets you act as both a student and an
-            admin.
-            <br />
-            Click the button to move to the actual landing Page.
-            <br />
-            This page will be deleted once the user authentication is
-            implemented.
+        <div className="flex flex-col">
             <ConditionalLinks className={"font-bold mx-10"} />
             {toggleButton}
         </div>

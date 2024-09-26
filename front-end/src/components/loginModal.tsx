@@ -86,7 +86,7 @@ const LoginModal = ({
 
             <a
                 href="#"
-                className="text-center underline text-gray-600 font-bold mt-32"
+                className="text-center underline text-gray-600 font-bold mt-5"
             >
                 Forgot Password
             </a>

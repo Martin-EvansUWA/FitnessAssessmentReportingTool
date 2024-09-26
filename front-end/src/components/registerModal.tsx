@@ -111,7 +111,7 @@ const RegisterModal = ({
 
             <a
                 href="#"
-                className="text-center underline text-gray-600 font-bold mt-32"
+                className="text-center underline text-gray-600 font-bold mt-5"
                 onClick={toggleIsLoginCallBack}
             >
                 I have an account
