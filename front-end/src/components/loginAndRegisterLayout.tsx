@@ -19,7 +19,7 @@ const LoginAndRegisterLayout: React.FC<LoginAndRegisterLayoutProps> = ({
                     isLogin ? "md:flex-row" : "md:flex-row-reverse"
                 }`}
             >
-                <div className="bg-white h-[85%] rounded-3xl w-full shadow-2xl md:w-2/3 md:h-full">
+                <div className="bg-white h-[85%] rounded-3xl w-full shadow-2xl md:w-2/3 md:h-full grid content-center">
                     {isLogin ? loginContent : registerContent}
                 </div>
                 <div
@@ -32,7 +32,7 @@ const LoginAndRegisterLayout: React.FC<LoginAndRegisterLayoutProps> = ({
                     </p>
                     <button
                         onClick={toggleIsLogin}
-                        className="bg-uwa-yellow w-1/2 h-8 font-bold text-sm"
+                        className="bg-uwa-yellow w-1/2 h-8 font-bold text-sm transform transition-transform duration-200 hover:scale-105"
                     >
                         {isLogin ? "Register" : "Login"}
                     </button>
