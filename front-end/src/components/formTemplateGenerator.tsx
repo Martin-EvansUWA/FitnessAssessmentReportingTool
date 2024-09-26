@@ -162,39 +162,33 @@ const FormTemplateGenerator = () => {
                 console.error("Error fetching template:", error);
             });
     };
-    
-        const cloneFormTemplateButton = (
-            <button
-                onClick={() => cloneFormTemplate()}
-                className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00] ml-4"
-            >
-                Clone Form
-            </button>
-        );
+
+    const cloneFormTemplateButton = (
+        <button
+            onClick={() => cloneFormTemplate()}
+            className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00] ml-4"
+        >
+            Clone Form
+        </button>
+    );
 
     const formMetaData = (
         <>
             <div className="flex">
-                <div className="flex flex-col w-full md:w-[30rem] space-y-3">
-                    <div className="flex justify-between items-center">
-                        <div>
-                            <label className="font-bold" htmlFor="formTitle">
-                                Form Title:
-                            </label>
+                <div className="flex flex-col w-full space-y-3">
+                    <div className="flex flex-col md:flex-row justify-between">
+                        <label className="font-bold" htmlFor="formTitle">
+                            Clone From [Optional]:
+                        </label>
+                        <div className="space-x-2">
                             <input
                                 type="text"
-                                placeholder="Title"
-                                className="border-2 border-gray-300 rounded-md h-7"
-                                onChange={(e) => setFormTemplateName(e.target.value)}
-                            />
-                        </div>
-                        <div className="flex items-center space-x-2"> {/* Use space-x-2 for consistent spacing */}
-                            <input
-                                type="text"
-                                placeholder="Form ID"
+                                placeholder="Form Template ID"
                                 value={formIdToClone}
-                                onChange={(e) => setFormIdToClone(e.target.value)}
-                                className="border-2 border-gray-300 rounded-md h-7 w-32" // Set a width to prevent wrapping
+                                onChange={(e) =>
+                                    setFormIdToClone(e.target.value)
+                                }
+                                className="border-2 border-gray-300 rounded-md h-7"
                             />
                             <button
                                 onClick={cloneFormTemplate}
@@ -203,6 +197,19 @@ const FormTemplateGenerator = () => {
                                 Clone
                             </button>
                         </div>
+                    </div>
+                    <div className="flex flex-col w-full">
+                        <label className="font-bold" htmlFor="formTitle">
+                            Form Title:
+                        </label>
+                        <input
+                            type="text"
+                            placeholder="Title"
+                            className="border-2 border-gray-300 rounded-md h-7 w-[50%]"
+                            onChange={(e) =>
+                                setFormTemplateName(e.target.value)
+                            }
+                        />
                     </div>
 
                     <div className="flex flex-col w-full">
@@ -243,8 +250,6 @@ const FormTemplateGenerator = () => {
     );
 
     const categories = useMemo(() => Object.keys(template), [template]);
-    
-
 
     return (
         <div className="flex flex-col min-h-full">
@@ -441,12 +446,10 @@ const FormTemplateGenerator = () => {
             </div>
             <div ref={bottomRef} />
             <div className="flex justify-end p-5">
-                    {responseData ? (
+                {responseData ? (
                     returnToFormManagerButton
                 ) : (
-                    <>
-                        {saveFormTemplateButton}
-                    </>
+                    <>{saveFormTemplateButton}</>
                 )}
             </div>
         </div>

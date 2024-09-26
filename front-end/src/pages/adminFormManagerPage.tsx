@@ -7,6 +7,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
+import FormTemplateGenerator from "../components/formTemplateGenerator";
 import Layout from "../components/layout";
 import { backEndUrl } from "../global_helpers/constants";
 import {
@@ -39,19 +40,22 @@ const AdminFormManagerPage = () => {
     >([]);
     const [addNewFormSelected, setAddNewFormSelected] =
         useState<boolean>(false);
+    const [createNewFormTemplateView, setCreateNewFormTemplateView] =
+        useState<boolean>(false);
 
     const baseSidebar: SidebarData = {
         title: "My Form Templates",
         titleOnClick: () => {
             setSelectedFormId(null);
             setFormDetails(null);
+            setCreateNewFormTemplateView(false);
         },
         footer: [
             {
                 text: "Create new form template",
                 fontAwesomeIcon: faPlus,
                 onClick: () => {
-                    window.location.href = "/create-new-form-template";
+                    setCreateNewFormTemplateView((prev) => !prev);
                 },
             },
         ],
@@ -187,7 +191,21 @@ const AdminFormManagerPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             const formHistory = await getFormHistory();
-            setSidebarData(buildSidebarData(formHistory));
+            const newFormHistory = formHistory.map((form) => {
+                const formId = Object.keys(form)[0];
+                return {
+                    [formId]: {
+                        ...form[formId],
+                        sectionOnClick: () => {
+                            setSelectedFormId(parseInt(formId));
+                            setFormSubmissions([]); // Clear previous submissions
+                            fetchFormData(parseInt(formId)); // Fetch form data for the selected form ID
+                            setCreateNewFormTemplateView(false);
+                        },
+                    },
+                };
+            });
+            setSidebarData(buildSidebarData(newFormHistory));
         };
         fetchData();
     }, []);
@@ -440,84 +458,91 @@ const AdminFormManagerPage = () => {
             <Layout
                 sidebarContent={sidebarData}
                 mainContent={
-                    <div className="flex flex-col">
-                        <div className="flex-1">
-                            <h1 className="text-2xl font-bold mb-5">
+                    createNewFormTemplateView ? (
+                        <FormTemplateGenerator />
+                    ) : (
+                        <div className="flex flex-col">
+                            <div className="flex-1">
+                                <h1 className="text-2xl font-bold mb-5">
+                                    {formDetails
+                                        ? formDetails.title
+                                        : "Form Template Manager"}
+                                </h1>
+                                <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
                                 {formDetails
-                                    ? formDetails.title
-                                    : "Form Template Manager"}
-                            </h1>
-                            <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-                            {formDetails
-                                ? formTemplateView
-                                : defaultMainContentView}
-                        </div>
+                                    ? formTemplateView
+                                    : defaultMainContentView}
+                            </div>
 
-                        {/* Popup for specific student data */}
-                        {showStudentPopup && (
-                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                <div className="bg-white p-5 rounded-lg shadow-lg">
-                                    <h2 className="font-bold text-lg">
-                                        Student Details
-                                    </h2>
-                                    <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
-                                    {studentDataError ? (
-                                        <p>{studentDataError}</p>
-                                    ) : (
-                                        specificStudentData &&
-                                        Array.isArray(specificStudentData) &&
-                                        specificStudentData.map(
-                                            (
-                                                item: Record<string, any>,
-                                                index: number
-                                            ) => {
-                                                const studentDetails =
-                                                    item["Student Details"];
-                                                return (
-                                                    <div key={index}>
-                                                        <ul>
-                                                            {Object.entries(
-                                                                studentDetails
-                                                            ).map(
-                                                                ([
-                                                                    key,
-                                                                    value,
-                                                                ]) => (
-                                                                    <li
-                                                                        key={
-                                                                            key
-                                                                        }
-                                                                    >
-                                                                        <strong>
-                                                                            {
+                            {/* Popup for specific student data */}
+                            {showStudentPopup && (
+                                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                    <div className="bg-white p-5 rounded-lg shadow-lg">
+                                        <h2 className="font-bold text-lg">
+                                            Student Details
+                                        </h2>
+                                        <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
+                                        {studentDataError ? (
+                                            <p>{studentDataError}</p>
+                                        ) : (
+                                            specificStudentData &&
+                                            Array.isArray(
+                                                specificStudentData
+                                            ) &&
+                                            specificStudentData.map(
+                                                (
+                                                    item: Record<string, any>,
+                                                    index: number
+                                                ) => {
+                                                    const studentDetails =
+                                                        item["Student Details"];
+                                                    return (
+                                                        <div key={index}>
+                                                            <ul>
+                                                                {Object.entries(
+                                                                    studentDetails
+                                                                ).map(
+                                                                    ([
+                                                                        key,
+                                                                        value,
+                                                                    ]) => (
+                                                                        <li
+                                                                            key={
                                                                                 key
                                                                             }
-                                                                            :
-                                                                        </strong>{" "}
-                                                                        {String(
-                                                                            value
-                                                                        )}
-                                                                    </li>
-                                                                )
-                                                            )}
-                                                        </ul>
-                                                    </div>
-                                                );
+                                                                        >
+                                                                            <strong>
+                                                                                {
+                                                                                    key
+                                                                                }
+
+                                                                                :
+                                                                            </strong>{" "}
+                                                                            {String(
+                                                                                value
+                                                                            )}
+                                                                        </li>
+                                                                    )
+                                                                )}
+                                                            </ul>
+                                                        </div>
+                                                    );
+                                                }
+                                            )
+                                        )}
+                                        <button
+                                            className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
+                                            onClick={() =>
+                                                setShowStudentPopup(false)
                                             }
-                                        )
-                                    )}
-                                    <button
-                                        className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-                                        onClick={() =>
-                                            setShowStudentPopup(false)
-                                        }
-                                    >
-                                        Close
-                                    </button>
+                                        >
+                                            Close
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
-                    </div>
+                            )}
+                        </div>
+                    )
                 }
             />
             <ToastContainer
