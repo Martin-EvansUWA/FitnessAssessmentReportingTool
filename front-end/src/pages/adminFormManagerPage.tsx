@@ -1,6 +1,6 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import Layout from "../components/layout";
 import { backEndUrl } from "../global_helpers/constants";
@@ -129,7 +129,6 @@ const GetNewFormPage = () => {
         }
     };
 
-    // Update the getFormHistory function to call fetchFormSubmissions when a section is clicked
     const getFormHistory = async () => {
         try {
             const response = await axios.get(
@@ -323,30 +322,16 @@ const GetNewFormPage = () => {
             <Layout
                 sidebarContent={sidebarData}
                 mainContent={
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            height: "100vh",
-                            padding: "20px",
-                            maxHeight: "calc(100vh - 150px)",
-                        }}
-                    >
-                        <div style={{ flex: "1", overflowY: "auto" }}>
-                            <h1 className="text-3xl font-bold mb-4">
+                    <div className="flex flex-col">
+                        <div className="flex-1 overflow-y-auto">
+                            <h1 className="text-2xl font-bold mb-5">
                                 {formDetails
                                     ? formDetails.title
                                     : "Form Manager"}
-                                <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
                             </h1>
+                            <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
                             {formDetails && (
-                                <div
-                                    style={{
-                                        display: "flex",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                    }}
-                                >
+                                <div className="flex justify-between items-center">
                                     <div>
                                         <p>
                                             <strong>Form ID: </strong>{" "}
@@ -357,7 +342,7 @@ const GetNewFormPage = () => {
                                             {formDetails.created_at}
                                         </p>
                                         <p>
-                                            <strong>Description: </strong>
+                                            <strong>Description: </strong>{" "}
                                             {formDetails.description}
                                         </p>
                                     </div>
@@ -387,7 +372,7 @@ const GetNewFormPage = () => {
                             <br />
 
                             <div className="table-container">
-                                <table>
+                                <table className="min-w-full bg-white">
                                     <thead>
                                         <tr>
                                             {showDeleteOptions && (
@@ -408,6 +393,7 @@ const GetNewFormPage = () => {
                                                         submission
                                                     )
                                                 }
+                                                className="hover:bg-gray-100 cursor-pointer"
                                             >
                                                 {showDeleteOptions && (
                                                     <td>
@@ -458,14 +444,9 @@ const GetNewFormPage = () => {
 
                         {/* Popup for specific student data */}
                         {showStudentPopup && (
-                            <div className="popup">
-                                <div className="popup-content">
-                                    <h2
-                                        style={{
-                                            fontWeight: "bold",
-                                            fontSize: "1.2em",
-                                        }}
-                                    >
+                            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                                <div className="bg-white p-5 rounded-lg shadow-lg">
+                                    <h2 className="font-bold text-lg">
                                         Student Details
                                     </h2>
                                     <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
@@ -475,7 +456,7 @@ const GetNewFormPage = () => {
                                     ) : (
                                         specificStudentData &&
                                         Array.isArray(specificStudentData) &&
-                                        (specificStudentData.map(
+                                        specificStudentData.map(
                                             (
                                                 item: Record<string, any>,
                                                 index: number
@@ -513,7 +494,7 @@ const GetNewFormPage = () => {
                                                     </div>
                                                 );
                                             }
-                                        ) as React.ReactNode)
+                                        )
                                     )}
                                     <br />
                                     <button
