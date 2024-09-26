@@ -1,20 +1,7 @@
 const RegisterModal = () => {
     return (
         <>
-            <div
-                style={{
-                    border: "2px solid #d9d9d9",
-                    borderRadius: "8px",
-                    backgroundColor: "white",
-                    textAlign: "center",
-                    width: "340px",
-                    height: "523px",
-                    position: "absolute",
-                    left: "37.5%",
-                    top: "12%",
-                    paddingTop: "73.5px",
-                }}
-            >
+            <div>
                 <h2 style={{ fontSize: "32px" }}>I'm a Student!</h2>
                 <br />
                 <form style={{ lineHeight: "0.5" }}>
