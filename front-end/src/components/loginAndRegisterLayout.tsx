@@ -1,9 +1,9 @@
 import React from "react";
 import { LoginAndRegisterLayoutProps } from "../interface/loginAndRegisterInterface";
+import LoginModal from "./loginModal";
+import RegisterModal from "./registerModal";
 
 const LoginAndRegisterLayout: React.FC<LoginAndRegisterLayoutProps> = ({
-    loginContent = <></>,
-    registerContent = <></>,
     className = "",
 }) => {
     const [isLogin, setIsLogin] = React.useState(true);
@@ -20,7 +20,11 @@ const LoginAndRegisterLayout: React.FC<LoginAndRegisterLayoutProps> = ({
                 }`}
             >
                 <div className="bg-white h-[85%] rounded-3xl w-full shadow-2xl md:w-2/3 md:h-full grid content-center">
-                    {isLogin ? loginContent : registerContent}
+                    {isLogin ? (
+                        <LoginModal toggleIsLoginCallBack={toggleIsLogin} />
+                    ) : (
+                        <RegisterModal toggleIsLoginCallBack={toggleIsLogin} />
+                    )}
                 </div>
                 <div
                     className={`bg-uwa-blue shadow-2xl h-[15%] w-4/5 flex flex-col items-center justify-center rounded-b-3xl md:rounded-none md:w-1/3 md:h-2/3 ${
