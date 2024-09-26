@@ -13,7 +13,7 @@ import {
     SpecificStudentData,
 } from "../interface/sidebarInterface";
 
-const GetNewFormPage = () => {
+const AdminFormManagerPage = () => {
     const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>(
         []
     );
@@ -334,7 +334,7 @@ const GetNewFormPage = () => {
 
     const formTemplateView = (
         <>
-            <div className="flex justify-between items-center">
+            <div className="flex flex-col">
                 <div className="mt-5">
                     <p>
                         <strong>Description: </strong>{" "}
@@ -344,23 +344,31 @@ const GetNewFormPage = () => {
                         <strong>Created At: </strong> {formDetails?.created_at}
                     </p>
                 </div>
-                <div>
+            </div>
+            <div className="my-5 flex flex-col-reverse md:flex-row md:justify-between">
+                <button
+                    onClick={() => setShowDeleteOptions(!showDeleteOptions)}
+                    className="bg-red-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
+                >
+                    {showDeleteOptions ? "Cancel" : "Delete Response"}
+                </button>
+                <div className="flex justify-between my-2 md:my-0 md:space-x-2">
                     <button
                         onClick={handleExport}
-                        className="bg-green-500 text-white px-4 py-2 rounded mr-4"
+                        className="bg-green-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
                     >
                         Export to Excel
                     </button>
                     <button
-                        onClick={() => setShowDeleteOptions(!showDeleteOptions)}
-                        className="bg-red-500 text-white px-4 py-2 rounded"
+                        onClick={handleDeleteTemplate}
+                        className="bg-red-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
                     >
-                        {showDeleteOptions ? "Cancel" : "Delete Response"}
+                        Delete Form Template
                     </button>
                 </div>
             </div>
-            <div className="table-container">
-                <table className="min-w-full bg-white">
+            <div className="w-full">
+                <table className="bg-white">
                     <thead>
                         <tr>
                             {showDeleteOptions && <th>Select</th>}
@@ -407,18 +415,12 @@ const GetNewFormPage = () => {
                 {showDeleteOptions && (
                     <button
                         onClick={handleDeleteSelected}
-                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
+                        className="mt-4 bg-red-500 text-white px-4 py-2 rounded transform transition-transform duration-200 hover:scale-105"
                     >
                         Confirm Deletion
                     </button>
                 )}
             </div>
-            <button
-                onClick={handleDeleteTemplate}
-                className="mt-4 bg-red-500 text-white px-4 py-2 rounded self-end"
-            >
-                Delete Form Template
-            </button>
         </>
     );
 
@@ -428,7 +430,7 @@ const GetNewFormPage = () => {
                 sidebarContent={sidebarData}
                 mainContent={
                     <div className="flex flex-col">
-                        <div className="flex-1 overflow-y-auto">
+                        <div className="flex-1">
                             <h1 className="text-2xl font-bold mb-5">
                                 {formDetails
                                     ? formDetails.title
@@ -524,4 +526,4 @@ const GetNewFormPage = () => {
     );
 };
 
-export default GetNewFormPage;
+export default AdminFormManagerPage;
