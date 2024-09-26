@@ -331,7 +331,7 @@ const AdminFormManagerPage = () => {
             </p>
             <p className="my-5">
                 Select a form from the sidebar to view or edit it. Otherwise, if
-                you want to create a new form tempalte, click "Create new form
+                you want to create a new form template, click "Create new form
                 template".
             </p>
         </>
@@ -378,8 +378,8 @@ const AdminFormManagerPage = () => {
                     </button>
                 </div>
             </div>
-            <div className="w-full">
-                <table className="bg-white">
+            <div className="w-full overflow-x-auto">
+                <table className="min-w-full bg-white">
                     <thead>
                         <tr>
                             {showDeleteOptions && <th>Select</th>}
