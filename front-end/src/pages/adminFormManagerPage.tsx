@@ -375,7 +375,7 @@ const AdminFormManagerPage = () => {
                 >
                     {showDeleteOptions ? "Cancel" : "Delete Response(s)"}
                 </button>
-                <div className="flex justify-between my-2 md:my-0 md:space-x-10">
+                <div className="flex justify-end my-2 space-x-10 md:my-0">
                     <button
                         onClick={handleExport}
                         className="transform transition-transform duration-200 hover:scale-105"

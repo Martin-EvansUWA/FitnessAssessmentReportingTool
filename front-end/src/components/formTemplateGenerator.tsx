@@ -205,7 +205,7 @@ const FormTemplateGenerator = () => {
                         <input
                             type="text"
                             placeholder="Title"
-                            className="border-2 border-gray-300 rounded-md h-7 w-[50%]"
+                            className="border-2 border-gray-300 rounded-md h-7 md:w-[50%]"
                             onChange={(e) =>
                                 setFormTemplateName(e.target.value)
                             }
