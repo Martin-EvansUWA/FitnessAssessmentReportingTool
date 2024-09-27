@@ -384,7 +384,7 @@ def get_normative_results(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/forms/{form_template_id}/submissions")
+@app.get("/read_form_submissions/{form_template_id}")
 def read_form_submissions(
     current_user: Annotated[DimUser, Depends(get_current_admin)],
     form_template_id: int,

@@ -69,9 +69,15 @@ const AdminFormManagerPage = () => {
     });
 
     const fetchFormData = async (formTemplateId: number) => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/forms/${formTemplateId}/submissions`
+                `${backEndUrl}/read_form_submissions/${formTemplateId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("access_token")}`,
+                    },
+                }
             );
             setFormDetails(response.data.form_details as FormDetails);
             setFormSubmissions(response.data.submissions as FormSubmission[]);
