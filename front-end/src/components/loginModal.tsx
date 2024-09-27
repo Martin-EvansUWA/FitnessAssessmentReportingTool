@@ -1,4 +1,8 @@
+import axios from "axios";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
+import { useState } from "react";
+import { backEndUrl } from "../global_helpers/constants";
 
 const text = "Hello Again!";
 const containerVariants = {
@@ -35,6 +39,37 @@ const LoginModal = ({
 }: {
     toggleIsLoginCallBack: () => void;
 }) => {
+    const [userID, setUserID] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const response = await axios.post(
+                `${backEndUrl}/login_user`,
+                {
+                    grant_type: "",
+                    username: userID,
+                    password: password,
+                    scope: "",
+                    client_id: "",
+                    client_secret: "",
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                }
+            );
+            Cookies.set("access_token", response.data["access_token"], {
+                expires: 1,
+            });
+            console.log("Successful Login: ", response);
+        } catch (error) {
+            console.log("Failed to Login: ", error);
+        }
+    };
+
     return (
         <div className="flex flex-col">
             <motion.h2
@@ -50,13 +85,18 @@ const LoginModal = ({
                 ))}
             </motion.h2>
 
-            <form className="flex flex-col space-y-3 w-[90%] md:w-2/3 m-auto">
+            <form
+                className="flex flex-col space-y-3 w-[90%] md:w-2/3 m-auto"
+                onSubmit={handleSubmit}
+            >
                 <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="UWA Email"
+                    type="text"
+                    id="userID"
+                    name="userID"
+                    placeholder="UWA ID"
                     className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105"
+                    value={userID}
+                    onChange={(e) => setUserID(e.target.value)}
                 />
 
                 <input
@@ -65,6 +105,8 @@ const LoginModal = ({
                     name="password"
                     placeholder="Password"
                     className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                 />
 
                 <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
