@@ -11,7 +11,7 @@ from crud import (
     create_fact_user_form,
     create_dim_user_form_response,
     delete_DimUser,
-    get_admin,
+    promote_User,
     get_all_fact_user_forms,
     get_DimUser,
     get_fact_user_form,
@@ -25,15 +25,15 @@ from schemas import (
     FactUserFormCreate,
 )
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./back-end/test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///test.db"
 
 engine = create_engine(
     SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
 )
 SessionTest = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
 db = SessionTest()
+
 models.Base.metadata.drop_all(bind=engine)
 models.Base.metadata.create_all(bind=engine)
 
@@ -46,7 +46,7 @@ def test_user_creation():
         LastName="Smith",
         password="password1234",
         UserID=23621647,
-        isAdmin=True
+        isAdmin=False
     )
 
     temp_user2 = DimUserCreate(
@@ -71,6 +71,16 @@ def test_user_creation():
 
     assert queried_user.FirstName == "Robert"
     assert queried_user.LastName == "Horry"
+    
+
+    promote_User(db, 23621647)
+
+    queried_user = get_DimUser(db, 23621647)
+
+    assert queried_user.isAdmin == True
+
+
+    
 
 
 # Test Form Creation

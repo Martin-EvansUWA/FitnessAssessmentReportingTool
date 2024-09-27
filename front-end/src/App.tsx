@@ -1,6 +1,6 @@
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import "./App.css";
-import FormHistory from "./pages/adminFormManagerPage";
+import AdminFormManagerPage from "./pages/adminFormManagerPage";
 import DataEntryPage from "./pages/dataEntryPage";
 import FormResults from "./pages/formResults";
 import LandingPage from "./pages/landingPage";
@@ -18,7 +18,10 @@ function App() {
                     element={<StudentFormManagerPage />}
                 />
                 <Route path="/data-entry" element={<DataEntryPage />} />
-                <Route path="/form-history" element={<FormHistory />} />
+                <Route
+                    path="/admin-form-manager"
+                    element={<AdminFormManagerPage />}
+                />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
         </Router>
