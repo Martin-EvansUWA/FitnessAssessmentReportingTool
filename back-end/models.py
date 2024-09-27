@@ -18,7 +18,7 @@ class DimUser(Base):
     def __repr__(self):
         return (
             f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
-            f"LastName='{self.LastName}', StudentId={self.UserID}, "
+            f"LastName='{self.LastName}', UserID={self.UserID}, "
             f"email='{self.email}')"
         )
 

@@ -114,7 +114,6 @@ def test_create_fact_user_form():
 
 # Test get all fact user forms
 
-
 def test_get_all_forms():
     all_forms = get_all_fact_user_forms(db, 0, 100)
     for form in all_forms:
