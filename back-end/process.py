@@ -1,7 +1,7 @@
 import json
 
 from schemas import DimFormTemplateCreate, FactUserFormCreate, DimUserCreate
-from auth import hash_password
+from auth import get_password_hash
 
 
 
@@ -13,7 +13,7 @@ def createNewUser(form_data: dict):
         FirstName=form_data["FirstName"],
         LastName=form_data["LastName"],
         isAdmin=form_data["isAdmin"],
-        password=hash_password(form_data["password"])
+        password=get_password_hash(form_data["password"])
     )
     return new_user
 
