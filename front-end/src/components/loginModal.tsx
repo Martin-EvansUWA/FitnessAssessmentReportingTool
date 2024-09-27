@@ -2,6 +2,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import Cookies from "js-cookie";
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl } from "../global_helpers/constants";
 
@@ -44,6 +45,16 @@ const LoginModal = ({
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
 
+    const navigate = useNavigate();
+
+    const redirectHandler = (isAdmin: boolean) => {
+        if (isAdmin) {
+            navigate("/admin-form-manager");
+        } else {
+            navigate("/student-form-manager");
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -66,6 +77,7 @@ const LoginModal = ({
             Cookies.set("access_token", response.data["access_token"], {
                 expires: 1,
             });
+            redirectHandler(response.data["isAdmin"]);
             console.log("Successful Login: ", response);
             toast.success("Login successful!", {
                 position: "top-right",
