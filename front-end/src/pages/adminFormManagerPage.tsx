@@ -56,7 +56,7 @@ const AdminFormManagerPage = () => {
                 text: "Create new form template",
                 fontAwesomeIcon: faPlus,
                 onClick: () => {
-                    setCreateNewFormTemplateView((prev) => !prev);
+                    setCreateNewFormTemplateView(true);
                 },
             },
         ],
