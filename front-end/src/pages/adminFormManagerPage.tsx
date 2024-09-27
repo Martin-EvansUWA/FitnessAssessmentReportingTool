@@ -192,26 +192,32 @@ const AdminFormManagerPage = () => {
 
     }
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const formHistory = await getFormHistory();
-            const newFormHistory = formHistory.map((form) => {
-                const formId = Object.keys(form)[0];
-                return {
-                    [formId]: {
-                        ...form[formId],
-                        sectionOnClick: () => {
-                            setSelectedFormId(parseInt(formId));
-                            setFormSubmissions([]); // Clear previous submissions
-                            fetchFormData(parseInt(formId)); // Fetch form data for the selected form ID
-                            setCreateNewFormTemplateView(false);
-                        },
+    // Callback function to be used when user clicks on a form in the sidebar
+    const viewIndividualForm = (formId: string) => {
+        setSelectedFormId(parseInt(formId));
+        setFormSubmissions([]); // Clear previous submissions
+        fetchFormData(parseInt(formId)); // Fetch form data for the selected form ID
+        setCreateNewFormTemplateView(false);
+    };
+
+    const updateFormTemplateHistory = async () => {
+        const formHistory = await getFormHistory();
+        const newFormHistory = formHistory.map((form) => {
+            const formId = Object.keys(form)[0];
+            return {
+                [formId]: {
+                    ...form[formId],
+                    sectionOnClick: () => {
+                        viewIndividualForm(formId);
                     },
-                };
-            });
-            setSidebarData(buildSidebarData(newFormHistory));
-        };
-        fetchData();
+                },
+            };
+        });
+        setSidebarData(buildSidebarData(newFormHistory));
+    };
+
+    useEffect(() => {
+        updateFormTemplateHistory();
     }, []);
 
     const handleDeleteTemplate = async () => {
@@ -364,6 +370,10 @@ const AdminFormManagerPage = () => {
             <div className="flex flex-col">
                 <div className="mt-5">
                     <p>
+                        <strong>Form Template ID: </strong>
+                        {formDetails?.form_template_id}
+                    </p>
+                    <p>
                         <strong>Description: </strong>{" "}
                         {formDetails?.description}
                     </p>
@@ -463,7 +473,11 @@ const AdminFormManagerPage = () => {
                 sidebarContent={sidebarData}
                 mainContent={
                     createNewFormTemplateView ? (
-                        <FormTemplateGenerator  />
+                        <FormTemplateGenerator
+                            updateFormTemplateHistory={
+                                updateFormTemplateHistory
+                            }
+                        />
                     ) : (
                         <div className="flex flex-col">
                             <div className="flex-1">

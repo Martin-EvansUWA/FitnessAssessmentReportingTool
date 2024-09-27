@@ -1,25 +1,41 @@
 import json
 
-from schemas import DimFormTemplateCreate, FactUserFormCreate
+from schemas import DimFormTemplateCreate, FactUserFormCreate, DimUserCreate
+from auth import hash_password
 
 
+
+# Create a new student from raw data
+def createNewUser(form_data: dict):
+    new_user = DimUserCreate(
+        UserID=form_data["UserID"],
+        email=form_data["email"],
+        FirstName=form_data["FirstName"],
+        LastName=form_data["LastName"],
+        isAdmin=form_data["isAdmin"],
+        password=hash_password(form_data["password"])
+    )
+    return new_user
+
+
+# Create new schema from raw data
 def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
     form_schema = DimFormTemplateCreate(
         Title=form_data["Title"],
         Description=form_data.get("Description"),
-        StaffID=form_data["StaffID"],
+        UserID=form_data["UserID"],
         FormTemplate=form_data["FormTemplate"],
         CreatedAt=form_data["CreatedAt"],
     )
     return form_schema
 
-
+# Create a form response from raw data
 def createFactUserFormSchema(
     form_data: dict, userFormResponseID: int
 ) -> FactUserFormCreate:
     form_response_schema = FactUserFormCreate(
-        StudentID=form_data["StudentID"],
-        SubjectStudentID=form_data["SubjectStudentID"],
+        UserID=form_data["UserID"],
+        SubjectUserID=form_data["SubjectUserID"],
         CreatedAt=form_data["CreatedAt"],
         CompleteAt=form_data["CompleteAt"],
         IsComplete=form_data["IsComplete"],

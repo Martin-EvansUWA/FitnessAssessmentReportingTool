@@ -18,7 +18,7 @@ export interface FormTemplateCreateResponse {
 
 export interface FormTemplateJSON {
     FormTemplateID: number;
-    StaffID: number;
+    UserID: number;
     FormTemplate: FormTemplate;
     Title: string;
     Description: string;
