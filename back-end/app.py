@@ -145,9 +145,9 @@ async def register_student(form_data: DimUserCreate, db: Session = Depends(get_d
 """ ADMIN FUNCTIONS """
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
-def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
+def retrieve_admin_templates( current_user: Annotated[DimUser, Depends(get_current_admin)], db: Session = Depends(get_db),):
     response = []
-    forms = crud.get_form_templates_by_admin(db, admin_id)
+    forms = crud.get_form_templates_by_admin(db, current_user.UserID)
 
     for form in forms:
         form_info = {
@@ -162,7 +162,7 @@ def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
 
 # [Admin] Retrieve admin form template, to display on admin dashboard
 @app.get("/retrieve_admin_form_template/{form_id}")
-def retrive_admin_form_template(form_template_id: int, db: Session = Depends(get_db)):
+def retrive_admin_form_template(form_template_id: int, current_user: Annotated[DimUser, Depends(get_current_admin)], db: Session = Depends(get_db)):
     response = {}
     form_template = crud.get_dim_form_template(db, form_template_id=form_template_id)
     response.update({form_template_id: form_template})
@@ -171,7 +171,7 @@ def retrive_admin_form_template(form_template_id: int, db: Session = Depends(get
 
 # [Admin] Create a new form template
 @app.post("/create_form")
-def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
+def add_form(form_data: DimFormTemplateCreate, current_user: Annotated[DimUser, Depends(get_current_admin)], db: Session = Depends(get_db)):
     try:
         # Process form data and add to database
         processed_data = createFormTemplateSchema(form_data.dict())
@@ -188,10 +188,10 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 """ STUDENT FUNCTIONS"""
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info/{student_id}")
-def retrieve_student_form_sidebar_info(user_id: int, db: Session = Depends(get_db)):
+def retrieve_student_form_sidebar_info(current_user: Annotated[DimUser, Depends(get_current_user)], db: Session = Depends(get_db)):
     response = []
     forms = crud.get_fact_multiple_user_forms(
-        db, user_id=user_id
+        db, user_id=current_user.UserID
     )  # Student ID could be both StudentID or SubjectStudentID
 
     for form in forms:
@@ -214,7 +214,7 @@ def retrieve_student_form_sidebar_info(user_id: int, db: Session = Depends(get_d
 
 # [Student] Retrieve form template by form id
 @app.get("/retrieve_form_template/{form_id}")
-def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
+def retrieve_form_template(form_id: int, current_user: Annotated[DimUser, Depends(get_current_user)],  db: Session = Depends(get_db)):
     try:
         form_template = crud.get_dim_form_template(db, form_id)
     except ValueError as e:
@@ -228,8 +228,8 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 
 # [Student] Get previous student forms
 @app.get("/get_student_form")
-def get_student_form(student_id: int, subject_id: int, db: Session = Depends(get_db)):
-    form = crud.get_fact_user_form(db, student_id, subject_id)
+def get_student_form(subject_id: int,current_user: Annotated[DimUser, Depends(get_current_user)],  db: Session = Depends(get_db)):
+    form = crud.get_fact_user_form(db, current_user.UserID, subject_id)
     return form
 
 
@@ -237,6 +237,7 @@ def get_student_form(student_id: int, subject_id: int, db: Session = Depends(get
 @app.get("/get_student_form_description/{fact_user_form_id}")
 def get_student_form_description(
     fact_user_form_id: int,
+    current_user: Annotated[DimUser, Depends(get_current_user)], 
     db: Session = Depends(get_db),
 ):
     form_template_id = crud.get_form_template_id_from_fact_user_form(
@@ -254,7 +255,9 @@ def get_student_form_description(
 # [Student] Save student form data
 @app.post("/save_form_entry")
 def save_form_entry(
-    form_data: DataEntryPageSubmissionData, db: Session = Depends(get_db)
+    form_data: DataEntryPageSubmissionData,
+    current_user: Annotated[DimUser, Depends(get_current_user)], 
+    db: Session = Depends(get_db)
 ):
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)
@@ -276,7 +279,9 @@ def save_form_entry(
 
 # get all students data
 @app.get("/student_data/{FormID}")
-def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
+def get_student_form_responses(FormID: int,
+    current_user: Annotated[DimUser, Depends(get_current_user)],  
+    db: Session = Depends(get_db)):
     students = crud.get_filtered_exercises_by_form_template_id(
         db, form_template_id=FormID
     )
@@ -287,10 +292,10 @@ def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
 
 
 # get specific students data
-@app.get("/specific_student_data/{UserID}/{FormID}")
-def get_specific_student_data(UserID=int, FormID=int, db: Session = Depends(get_db)):
+@app.get("/specific_student_data/{FormID}")
+def get_specific_student_data(current_user: Annotated[DimUser, Depends(get_current_user)], FormID=int,  db: Session = Depends(get_db)):
     student = crud.get_student_form_response(
-        db, form_template_id=FormID, user_id=UserID
+        db, form_template_id=FormID, user_id=current_user.UserID
     )  # Example with student ID 1
 
     return student
@@ -299,28 +304,27 @@ def get_specific_student_data(UserID=int, FormID=int, db: Session = Depends(get_
 # get specific students data from factUserFormID
 @app.get("/get_specific_student_data_fact_user_form_id/{fact_user_form_id}")
 def get_specific_student_data_fact_user_form_id(
-    fact_user_form_id=int, db: Session = Depends(get_db)
+    current_user: Annotated[DimUser, Depends(get_current_user)],fact_user_form_id=int, db: Session = Depends(get_db)
 ):
     student = crud.get_student_form_response_fact_user_form_id(
         db, fact_user_form_id=fact_user_form_id
     )
-
     return student
 
 
 @app.get("/normative_results/{student_id}/{form_template_id}")
 def get_normative_results(
-    student_id: int, form_template_id: int, db: Session = Depends(get_db)
+    current_user: Annotated[DimUser, Depends(get_current_user)], form_template_id: int, db: Session = Depends(get_db)
 ):
     try:
-        results = calculate_normative_results(db, form_template_id, student_id)
+        results = calculate_normative_results(db, form_template_id, current_user.UserID)
         return results
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/forms/{form_template_id}/submissions")
-def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
+def read_form_submissions(current_user: Annotated[DimUser, Depends(get_current_admin)],form_template_id: int, db: Session = Depends(get_db)):
     # Get form details
     form_details = (
         db.query(DimFormTemplate)
@@ -357,7 +361,7 @@ def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
 
 # dosn't work but I dont know exactly what going wrong
 @app.delete("/forms/delete-submissions")
-def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db)):
+def delete_form_submissions(current_user: Annotated[DimUser, Depends(get_current_admin)], student_ids: List[int], db: Session = Depends(get_db)):
     if not student_ids:
         return {"message": "No student IDs provided."}
 
@@ -373,7 +377,7 @@ def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db
 
 
 @app.get("/forms/{form_template_id}/export", response_class=FileResponse)
-def export_form_responses(form_template_id: int, db: Session = Depends(get_db)):
+def export_form_responses(current_user: Annotated[DimUser, Depends(get_current_admin)], form_template_id: int, db: Session = Depends(get_db)):
     # Use the existing function to get responses
     responses = get_form_responses(db, form_template_id)
     # Logic to convert responses to CSV/XLSX format and return the file
