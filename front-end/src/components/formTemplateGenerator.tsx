@@ -20,11 +20,13 @@ const initialTemplate: FormTemplate = {
 };
 
 interface formTemplateGeneratorProps {
-    updateFormTemplateHistory: () => {};
+    updateFormTemplateHistory: () => void;
+    viewAdminFormManagerDefault: () => void;
 }
 
 const FormTemplateGenerator = ({
     updateFormTemplateHistory,
+    viewAdminFormManagerDefault,
 }: formTemplateGeneratorProps) => {
     const [template, setTemplate] = useState<FormTemplate>(initialTemplate);
     const [formTemplateTitle, setFormTemplateName] = useState<string>("");
@@ -261,7 +263,10 @@ const FormTemplateGenerator = ({
 
     const returnToFormManagerButton = (
         <button
-            onClick={() => setResponseData(null)} // TODO: Once Form Manager page is implemented, replace this with a redirect
+            onClick={() => {
+                setResponseData(null);
+                viewAdminFormManagerDefault();
+            }}
             className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
         >
             Return to Form Manager

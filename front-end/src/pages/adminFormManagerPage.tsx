@@ -44,12 +44,16 @@ const AdminFormManagerPage = () => {
     const [createNewFormTemplateView, setCreateNewFormTemplateView] =
         useState<boolean>(false);
 
+    const viewAdminFormManagerDefault = () => {
+        setSelectedFormId(null);
+        setFormDetails(null);
+        setCreateNewFormTemplateView(false);
+    };
+
     const baseSidebar: SidebarData = {
         title: "My Form Templates",
         titleOnClick: () => {
-            setSelectedFormId(null);
-            setFormDetails(null);
-            setCreateNewFormTemplateView(false);
+            viewAdminFormManagerDefault();
         },
         footer: [
             {
@@ -502,9 +506,8 @@ const AdminFormManagerPage = () => {
                 mainContent={
                     createNewFormTemplateView ? (
                         <FormTemplateGenerator
-                            updateFormTemplateHistory={
-                                updateFormTemplateHistory
-                            }
+                            updateFormTemplateHistory={updateFormTemplateHistory}
+                            viewAdminFormManagerDefault={viewAdminFormManagerDefault}
                         />
                     ) : (
                         <div className="flex flex-col">
