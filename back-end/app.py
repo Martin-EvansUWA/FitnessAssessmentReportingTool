@@ -71,7 +71,9 @@ app.add_middleware(
 """ AUTHENTICATION FUNCTIONS"""
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -80,7 +82,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(id=user_id)
     except InvalidTokenError:
         raise CREDENTIALS_EXCEPTION
-    user = crud.get_DimUser(get_db(), user_id == token_data.id)
+    user = crud.get_DimUser(db, user_id=token_data.id)
     if user is None:
         raise CREDENTIALS_EXCEPTION
     return user
@@ -215,7 +217,7 @@ def add_form(
 
 
 # [Student] Get sidebar info of student forms
-@app.get("/retrieve_student_form_sidebar_info/{student_id}")
+@app.get("/retrieve_student_form_sidebar_info")
 def retrieve_student_form_sidebar_info(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),

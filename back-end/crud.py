@@ -14,13 +14,9 @@ import schemas
 from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
 
-# Get Student via their StudentID
+# Get user via their UserID
 def get_DimUser(db: Session, user_id: int):
-    return (
-        db.query(models.DimUser)
-        .filter(models.DimUser.UserID == user_id)
-        .first()
-    )
+    return db.query(models.DimUser).filter(models.DimUser.UserID == user_id).first()
 
 
 # Get Student via their email
@@ -38,10 +34,10 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     db_DimUser = models.DimUser(
         email=DimUser.email,
         hashed_password=DimUser.password,
-        FirstName=DimUser.FirstName, 
-        LastName=DimUser.LastName,  
+        FirstName=DimUser.FirstName,
+        LastName=DimUser.LastName,
         UserID=DimUser.UserID,
-        isAdmin=False
+        isAdmin=False,
     )
     db.add(db_DimUser)
     db.commit()
@@ -50,31 +46,26 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
 
 
 def promote_User(db: Session, user_id: int):
-    user = (
-        db.query(models.DimUser)
-        .filter(models.DimUser.UserID == user_id)
-        .first()
-    )
+    user = db.query(models.DimUser).filter(models.DimUser.UserID == user_id).first()
     if not user:
         return {"msg": "User not found", "status": "error"}
-    
+
     user.isAdmin = True
 
     db.commit()
     db.refresh(user)
 
     return {"msg": "User promoted successfully", "status": "success"}
+
+
 # Delete a user
 def delete_DimUser(db: Session, user_id: int):
     temp_user = (
-        db.query(models.DimUser)
-        .filter(models.DimUser.UserID == user_id)
-        .first()
+        db.query(models.DimUser).filter(models.DimUser.UserID == user_id).first()
     )
     db.delete(temp_user)
     db.commit()
     return {"msg": "Student deleted successfully"}
-
 
 
 # Get an admin by id
@@ -118,7 +109,7 @@ def create_dim_form_template(
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         CreatedAt=dim_form_template.CreatedAt,
-        Description=dim_form_template.Description
+        Description=dim_form_template.Description,
     )
     db.add(db_dim_form_template)
     db.commit()

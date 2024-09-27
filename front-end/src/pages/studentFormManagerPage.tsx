@@ -1,5 +1,6 @@
 import { faPlus } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
@@ -68,10 +69,15 @@ const StudentFormManagerPage = () => {
     });
 
     const getFormHistory = async () => {
+        const access_token = Cookies.get("access_token");
         try {
-            // TODO: Replace 12345678 with actual student ID once authentication is implemented
             const response = await axios.get(
-                `${backEndUrl}/retrieve_student_form_sidebar_info/${12345678}`
+                `${backEndUrl}/retrieve_student_form_sidebar_info`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             setFetchedFormHistory(response.data);
             console.log("Fetched form history:", response.data);
