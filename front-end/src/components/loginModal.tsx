@@ -44,10 +44,22 @@ const LoginModal = ({
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`${backEndUrl}/login_user`, {
-                username: userID,
-                password: password,
-            });
+            const response = await axios.post(
+                `${backEndUrl}/login_user`,
+                {
+                    grant_type: "",
+                    username: userID,
+                    password: password,
+                    scope: "",
+                    client_id: "",
+                    client_secret: "",
+                },
+                {
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                }
+            );
             console.log("Successful Login: ", response);
         } catch (error) {
             console.log("Failed to Login: ", error);
