@@ -94,7 +94,7 @@ const LoginModal = ({
                     id="userID"
                     name="userID"
                     placeholder="UWA ID"
-                    className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105"
+                    className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                     value={userID}
                     onChange={(e) => setUserID(e.target.value)}
                 />
@@ -104,7 +104,7 @@ const LoginModal = ({
                     id="password"
                     name="password"
                     placeholder="Password"
-                    className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105"
+                    className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                 />
@@ -112,13 +112,13 @@ const LoginModal = ({
                 <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
                     <button
                         type="submit"
-                        className="bg-uwa-blue text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105"
+                        className="bg-uwa-blue text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                     >
                         Login
                     </button>
                     <button
                         type="button"
-                        className="bg-uwa-yellow text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105"
+                        className="bg-uwa-yellow text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                         onClick={toggleIsLoginCallBack}
                     >
                         Register
