@@ -119,21 +119,18 @@ const FormTemplateGenerator = ({
         []
     );
 
-    const saveFormTemplate = () => {
+    const saveFormTemplate = async () => {
         const access_token = Cookies.get("access_token");
         let userId = 0;
         // Fetch User Id
         try {
-            axios
-                .get(`${backEndUrl}/get_user_id`, {
-                    headers: {
-                        Authorization: `Bearer ${access_token}`,
-                    },
-                })
-                .then((response) => {
-                    console.log("User Id:", response.data);
-                    userId = response.data;
-                });
+            const response = await axios.get(`${backEndUrl}/get_user_id`, {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+            console.log("User Id:", response.data);
+            userId = response.data;
         } catch (error) {
             console.error("Error fetching User Id:", error);
         }
@@ -178,8 +175,14 @@ const FormTemplateGenerator = ({
     );
 
     const cloneFormTemplate = () => {
+        const access_token = Cookies.get("access_token");
         axios
-            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`) // Use formIdToClone
+            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${access_token}`,
+                },
+            })
             .then((response) => {
                 const fetchedTemplate = response.data.FormTemplate;
                 setTemplate(fetchedTemplate);
@@ -268,8 +271,8 @@ const FormTemplateGenerator = ({
     // Save Form button
     const saveFormTemplateButton = (
         <button
-            onClick={() => {
-                saveFormTemplate();
+            onClick={async () => {
+                await saveFormTemplate();
                 updateFormTemplateHistory();
             }}
             className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
