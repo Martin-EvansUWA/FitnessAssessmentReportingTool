@@ -53,7 +53,7 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
 def delete_DimUser(db: Session, DimStudent_ID: int):
     temp_user = (
         db.query(models.DimUser)
-        .filter(models.DimUser.StudentID == DimStudent_ID)
+        .filter(models.DimUser.UserID == DimStudent_ID)
         .first()
     )
     db.delete(temp_user)
@@ -99,7 +99,7 @@ def create_dim_form_template(
     db: Session, dim_form_template: schemas.DimFormTemplateCreate
 ):
     db_dim_form_template = models.DimFormTemplate(
-        StaffID=dim_form_template.UserID,
+        UserID=dim_form_template.UserID,
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
@@ -205,8 +205,8 @@ def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreat
     db_fact_user_form = models.FactUserForm(
         FormTemplateID=fact_user_form.FormTemplateID,
         UserFormResponseID=fact_user_form.UserFormResponseID,
-        StudentID=fact_user_form.UserID,
-        SubjectStudentID=fact_user_form.SubjectUserID,
+        UserID=fact_user_form.UserID,
+        SubjectUserID=fact_user_form.SubjectUserID,
         IsComplete=fact_user_form.IsComplete,
         CreatedAt=fact_user_form.CreatedAt,
         CompleteAt=fact_user_form.CompleteAt,

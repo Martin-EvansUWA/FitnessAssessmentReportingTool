@@ -188,10 +188,10 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 """ STUDENT FUNCTIONS"""
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info/{student_id}")
-def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(get_db)):
+def retrieve_student_form_sidebar_info(user_id: int, db: Session = Depends(get_db)):
     response = []
     forms = crud.get_fact_multiple_user_forms(
-        db, student_id
+        db, user_id=user_id
     )  # Student ID could be both StudentID or SubjectStudentID
 
     for form in forms:
@@ -201,8 +201,8 @@ def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(ge
             "UserFormResponseID": form.UserFormResponseID,
             "FormTemplateID": form.FormTemplateID,
             "title": form_template.Title,
-            "StudentID": form.StudentID,
-            "SubjectStudentID": form.SubjectStudentID,
+            "UserID": form.UserID,
+            "SubjectUserID": form.SubjectUserID,
             "IsComplete": form.IsComplete,
             "CreatedAt": form.CreatedAt,
             "CompletedAt": form.CompleteAt,
@@ -287,10 +287,10 @@ def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
 
 
 # get specific students data
-@app.get("/specific_student_data/{StudentID}/{FormID}")
-def get_specific_student_data(StudentID=int, FormID=int, db: Session = Depends(get_db)):
+@app.get("/specific_student_data/{UserID}/{FormID}")
+def get_specific_student_data(UserID=int, FormID=int, db: Session = Depends(get_db)):
     student = crud.get_student_form_response(
-        db, form_template_id=FormID, studentID=StudentID
+        db, form_template_id=FormID, user_id=UserID
     )  # Example with student ID 1
 
     return student
@@ -342,7 +342,7 @@ def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
         "submissions_count": len(submissions),  # Count of submissions
         "submissions": [
             {
-                "student_id": submission[3],  # Access StudentID from the tuple
+                "user_id": submission[3],  # Access UserID from the tuple
                 "first_name": submission[1],  # Access FirstName from the tuple
                 "last_name": submission[2],  # Access LastName from the tuple
                 "subject_ID": submission[4],
@@ -362,7 +362,7 @@ def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db
         return {"message": "No student IDs provided."}
 
     try:
-        db.query(FactUserForm).filter(FactUserForm.StudentID.in_(student_ids)).delete(
+        db.query(FactUserForm).filter(FactUserForm.UserID.in_(student_ids)).delete(
             synchronize_session=False
         )
         db.commit()

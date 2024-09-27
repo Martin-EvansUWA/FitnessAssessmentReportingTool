@@ -19,7 +19,6 @@ from crud import (
     get_all_fact_user_forms,
 )
 from schemas import (
-    DimAdminCreate,
     DimFormTemplateCreate,
     DimUserCreate,
     DimUserFormResponseCreate,
@@ -46,7 +45,8 @@ def test_user_creation():
         FirstName="John",
         LastName="Smith",
         password="password1234",
-        StudentID=23621647,
+        UserID=23621647,
+        isAdmin=True
     )
 
     temp_user2 = DimUserCreate(
@@ -54,7 +54,8 @@ def test_user_creation():
         FirstName="Robert",
         LastName="Horry",
         password="mypassword",
-        StudentID=17651211,
+        UserID=17651211,
+        isAdmin=False
     )
 
     create_DimUser(db, temp_user)
@@ -79,7 +80,7 @@ def test_create_form():
     temp_test = DimFormTemplateCreate(
         Title="My Newest Form",
         Description="A form to determine the best bench press in the class",
-        StaffID=77771111,
+        UserID=77771111,
         CreatedAt=date.today().strftime("%d/%m/%Y"),
         FormTemplate=temp_layout,
     )
@@ -93,9 +94,9 @@ def test_create_fact_user_form():
     ret = create_dim_user_form_response(db, test_input)
 
     test_fact_form = FactUserFormCreate(
-        StudentID=23621647,
+        UserID=23621647,
         FormTemplateID=1,
-        SubjectStudentID=17651211,
+        SubjectUserID=17651211,
         CreatedAt=date.today().strftime("%d/%m/%Y"),
         CompleteAt="",
         IsComplete=False,
@@ -107,7 +108,7 @@ def test_create_fact_user_form():
     q_fact_form = get_fact_user_form(db, 23621647, 17651211)
     q_user_response = get_dim_user_form_response(db, ret.UserFormResponseID)
 
-    assert q_fact_form.StudentID == 23621647
+    assert q_fact_form.UserID == 23621647
     assert type(q_user_response.UserFormResponse) == dict
 
 
@@ -117,7 +118,7 @@ def test_create_fact_user_form():
 def test_get_all_forms():
     all_forms = get_all_fact_user_forms(db, 0, 100)
     for form in all_forms:
-        assert form.StudentID != None
+        assert form.UserID != None
 
 
 #
@@ -130,12 +131,5 @@ def test_user_deletion():
 
     response_2 = delete_DimUser(db, 17651211)
     assert response_2["msg"] == "Student deleted successfully"
-
-
-# Test Admin Deletion
-def test_admin_deletion():
-    response = delete_admin(db, 77771111)
-    assert response["msg"] == "Admin deleted successfully"
-
 
 db.close()

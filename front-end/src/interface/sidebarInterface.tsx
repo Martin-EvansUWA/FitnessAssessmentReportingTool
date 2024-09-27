@@ -25,8 +25,8 @@ export interface formHistorySidebarInfo {
     UserFormResponseID: number;
     FormTemplateID: number;
     title: string;
-    StudentID: number;
-    SubjectStudentID: number;
+    UserID: number;
+    SubjectUserID: number;
     IsComplete: boolean;
     CreatedAt: string;
     CompletedAt: string;
