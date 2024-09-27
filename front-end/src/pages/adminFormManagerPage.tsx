@@ -188,11 +188,6 @@ const AdminFormManagerPage = () => {
         };
     };
 
-    const updateFormTemplateHistory = async () => {
-        const formHistory = await getFormHistory();
-        setSidebarData(buildSidebarData(formHistory));
-    };
-
     // Callback function to be used when user clicks on a form in the sidebar
     const viewIndividualForm = (formId: string) => {
         setSelectedFormId(parseInt(formId));
@@ -201,23 +196,24 @@ const AdminFormManagerPage = () => {
         setCreateNewFormTemplateView(false);
     };
 
-    useEffect(() => {
-        const fetchData = async () => {
-            const formHistory = await getFormHistory();
-            const newFormHistory = formHistory.map((form) => {
-                const formId = Object.keys(form)[0];
-                return {
-                    [formId]: {
-                        ...form[formId],
-                        sectionOnClick: () => {
-                            viewIndividualForm(formId);
-                        },
+    const updateFormTemplateHistory = async () => {
+        const formHistory = await getFormHistory();
+        const newFormHistory = formHistory.map((form) => {
+            const formId = Object.keys(form)[0];
+            return {
+                [formId]: {
+                    ...form[formId],
+                    sectionOnClick: () => {
+                        viewIndividualForm(formId);
                     },
-                };
-            });
-            setSidebarData(buildSidebarData(newFormHistory));
-        };
-        fetchData();
+                },
+            };
+        });
+        setSidebarData(buildSidebarData(newFormHistory));
+    };
+
+    useEffect(() => {
+        updateFormTemplateHistory();
     }, []);
 
     const handleDeleteTemplate = async () => {
