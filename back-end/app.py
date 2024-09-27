@@ -51,7 +51,7 @@ models.Base.metadata.create_all(bind=engine)
 def get_db():
     db = SessionLocal()
     try:
-        return db
+        yield db
     finally:
         db.close()
 
@@ -141,26 +141,26 @@ async def register_student(form_data: DimUserCreate, db: Session = Depends(get_d
 """ ADMIN FUNCTIONS """
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
-def retrieve_admin_templates(admin_id: int):
-    response = {}
-    forms = crud.get_formtemplates_by_admin(get_db(), admin_id)
+def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
+    response = []
+    forms = crud.get_form_templates_by_admin(db, admin_id)
 
-    sidebar_info = {}
     for form in forms:
-        sidebar_info.update({form.id: form.title})
-
-    response["sidebar_info"] = sidebar_info
+        form_info = {
+            "FormTemplateID": form.FormTemplateID,
+            "Title": form.Title,
+            "CreatedAt": form.CreatedAt,
+        }
+        response.append(form_info)
 
     return response
 
 
 # [Admin] Retrieve admin form template, to display on admin dashboard
 @app.get("/retrieve_admin_form_template/{form_id}")
-def retrive_admin_form_template(form_template_id: int):
+def retrive_admin_form_template(form_template_id: int, db: Session = Depends(get_db)):
     response = {}
-    form_template = crud.get_dim_form_template(
-        get_db(), form_template_id=form_template_id
-    )
+    form_template = crud.get_dim_form_template(db, form_template_id=form_template_id)
     response.update({form_template_id: form_template})
     return response
 
@@ -183,20 +183,28 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 
 """ STUDENT FUNCTIONS"""
 # [Student] Get sidebar info of student forms
-@app.get("/retrieve_student_form_sidebar_info")
-def retrieve_student_form_sidebar_info(student_id: int):
-    response = {}
-    forms = crud.get_multiple_fact_user_forms(get_db(), student_id)
+@app.get("/retrieve_student_form_sidebar_info/{student_id}")
+def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(get_db)):
+    response = []
+    forms = crud.get_fact_multiple_user_forms(
+        db, student_id
+    )  # Student ID could be both StudentID or SubjectStudentID
 
-    sidebar_info = {}
     for form in forms:
-        form_info = {}
-        form_template = crud.get_dim_form_template(get_db(), form.FormTemplateID)
-        form_info["subjectID"] = form.SubjectStudentID
-        form_info["studentID"] = form.StudentID
-        form_info["description"] = form_template.Description
-        sidebar_info.update({form_template.Title: form_info})
-    response["sidebar_info"] = sidebar_info
+        form_template = crud.get_dim_form_template(db, form.FormTemplateID)
+        form_info = {
+            "FactUserFormID": form.FactUserFormID,
+            "UserFormResponseID": form.UserFormResponseID,
+            "FormTemplateID": form.FormTemplateID,
+            "title": form_template.Title,
+            "StudentID": form.StudentID,
+            "SubjectStudentID": form.SubjectStudentID,
+            "IsComplete": form.IsComplete,
+            "CreatedAt": form.CreatedAt,
+            "CompletedAt": form.CompleteAt,
+        }
+        response.append(form_info)
+
     return response
 
 
@@ -216,21 +224,26 @@ def retrieve_form_template(form_id: int, db: Session = Depends(get_db)):
 
 # [Student] Get previous student forms
 @app.get("/get_student_form")
-def get_student_form(student_id: int, subject_id: int):
-    form = crud.get_fact_user_form(get_db(), student_id, subject_id)
+def get_student_form(student_id: int, subject_id: int, db: Session = Depends(get_db)):
+    form = crud.get_fact_user_form(db, student_id, subject_id)
     return form
 
 
 # [Student] Get form description
-@app.get("/get_student_form_description")
-def get_student_form(form_template_id: int, student_id: int, subject_id: int):
-    form_info = {}
-    form_template = crud.get_dim_form_template(
-        get_db(), form_template_id=form_template_id
-    )
-    form_info.update({"title": form_template.Title})
-    form_info.update({"subjectID": student_id})
-    form_info.update({"studentID": subject_id})
+@app.get("/get_student_form_description/{fact_user_form_id}")
+def get_student_form_description(
+    fact_user_form_id: int,
+    db: Session = Depends(get_db),
+):
+    form_template_id = crud.get_form_template_id_from_fact_user_form(
+        db, fact_user_form_id
+    )  # Get FormTemplateID from FactUserForm table using FactUserFormID
+    form_template = crud.get_dim_form_template(db, form_template_id=form_template_id)
+    form_info = {
+        "FormTemplateID": form_template.FormTemplateID,
+        "Title": form_template.Title,
+        "Description": form_template.Description,
+    }
     return form_info
 
 
@@ -275,6 +288,18 @@ def get_specific_student_data(StudentID=int, FormID=int, db: Session = Depends(g
     student = crud.get_student_form_response(
         db, form_template_id=FormID, studentID=StudentID
     )  # Example with student ID 1
+
+    return student
+
+
+# get specific students data from factUserFormID
+@app.get("/get_specific_student_data_fact_user_form_id/{fact_user_form_id}")
+def get_specific_student_data_fact_user_form_id(
+    fact_user_form_id=int, db: Session = Depends(get_db)
+):
+    student = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id=fact_user_form_id
+    )
 
     return student
 
