@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl } from "../global_helpers/constants";
 
-const text = "Hi, Nice to meet you!";
+const text = "Hi, nice to meet you!";
 const containerVariants = {
     hidden: { opacity: 0 },
     visible: (i = 1) => ({
@@ -213,7 +213,7 @@ const RegisterModal = ({
                         type="text"
                         id="number"
                         name="userID"
-                        placeholder="UWA Student Number"
+                        placeholder="UWA ID"
                         className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                         value={userID}
                         onChange={(e) => setUserID(e.target.value)}
