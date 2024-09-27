@@ -4,7 +4,7 @@ from sqlalchemy.sql import func
 
 from database import Base
 
-
+# User model
 class DimUser(Base):
     __tablename__ = "dim_user"
 
@@ -18,10 +18,10 @@ class DimUser(Base):
         return (
             f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
             f"LastName='{self.LastName}', StudentId={self.StudentID}, "
-            f"email='{self.email}')"
+            f"email='{self.email}'), disabled={self.disabled}"
         )
 
-
+# Admin model
 class DimAdmin(Base):
     __tablename__ = "dim_admin"
 
@@ -31,7 +31,7 @@ class DimAdmin(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
 
-
+# Form template model
 class DimFormTemplate(Base):
     __tablename__ = "dim_form_templates"
 
@@ -42,14 +42,14 @@ class DimFormTemplate(Base):
     Description = Column(String)
     CreatedAt = Column(String)
 
-
+# User data response model
 class DimUserFormResponse(Base):
     __tablename__ = "dim_user_form_response"
 
     UserFormResponseID = Column(Integer, primary_key=True)
     UserFormResponse = Column(JSON)
 
-
+# User form response model
 class FactUserForm(Base):
     __tablename__ = "fact_user_form"
     FactUserFormID = Column(Integer, primary_key=True, index=True, autoincrement=True)
