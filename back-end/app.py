@@ -161,8 +161,8 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
 
 
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
-@app.get("/retrieve_admin_sidebar_info/{admin_id}")
-def retrieve_admin_templates(
+@app.get("/retrieve_admin_sidebar_info")
+def retrieve_admin_sidebar_info(
     current_user: Annotated[DimUser, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):

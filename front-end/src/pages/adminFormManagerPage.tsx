@@ -5,6 +5,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import FormTemplateGenerator from "../components/formTemplateGenerator";
@@ -140,9 +141,15 @@ const AdminFormManagerPage = () => {
     };
 
     const getFormHistory = async () => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/retrieve_admin_sidebar_info/1`
+                `${backEndUrl}/retrieve_admin_sidebar_info`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             setFetchedFormHistory(response.data);
             console.log("Fetched form history:", response.data);
