@@ -112,8 +112,11 @@ async def login(
         data={"sub": user.UserID}, expires_delta=access_token_expires
     )
     ret_token = Token(access_token=access_token, token_type="bearer")
-    response.set_cookie(key="access_token", value=ret_token)
-    return ret_token
+
+    response = {}
+    response.update({"access_token": ret_token.access_token})
+    response.update({"isAdmin": user.isAdmin})
+    return response
 
 
 @app.get("/logout")
