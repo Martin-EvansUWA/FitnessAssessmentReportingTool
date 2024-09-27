@@ -116,6 +116,8 @@ async def login(
     response = {}
     response.update({"access_token": ret_token.access_token})
     response.update({"isAdmin": user.isAdmin})
+    response.update({"user_first_name": user.FirstName})
+    response.update({"user_last_name": user.LastName})
     return response
 
 

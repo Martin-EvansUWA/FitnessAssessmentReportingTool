@@ -55,6 +55,28 @@ const LoginModal = ({
         }
     };
 
+    const cookieHandler = (response: {
+        data: {
+            access_token: string;
+            isAdmin: boolean;
+            user_first_name: string;
+            user_last_name: string;
+        };
+    }) => {
+        Cookies.set("access_token", response.data["access_token"], {
+            expires: 1,
+        });
+        Cookies.set("isAdmin", response.data["isAdmin"].toString(), {
+            expires: 1,
+        });
+        Cookies.set("user_first_name", response.data["user_first_name"], {
+            expires: 1,
+        });
+        Cookies.set("user_last_name", response.data["user_last_name"], {
+            expires: 1,
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
@@ -74,9 +96,7 @@ const LoginModal = ({
                     },
                 }
             );
-            Cookies.set("access_token", response.data["access_token"], {
-                expires: 1,
-            });
+            cookieHandler(response);
             redirectHandler(response.data["isAdmin"]);
             console.log("Successful Login: ", response);
             toast.success("Login successful!", {

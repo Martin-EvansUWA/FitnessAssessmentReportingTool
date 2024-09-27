@@ -85,7 +85,7 @@ const RegisterModal = ({
                     theme: "colored",
                     transition: Bounce,
                 });
-                // Handle successful registration (e.g., redirect, show success message)
+                toggleIsLoginCallBack();
             }
         } catch (error) {
             if (axios.isAxiosError(error) && error.response) {
