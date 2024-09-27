@@ -360,6 +360,10 @@ const AdminFormManagerPage = () => {
             <div className="flex flex-col">
                 <div className="mt-5">
                     <p>
+                        <strong>Form Template ID: </strong>
+                        {formDetails?.form_template_id}
+                    </p>
+                    <p>
                         <strong>Description: </strong>{" "}
                         {formDetails?.description}
                     </p>
