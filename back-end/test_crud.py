@@ -6,12 +6,10 @@ from sqlalchemy.orm import sessionmaker
 
 import models
 from crud import (
-    create_admin,
     create_dim_form_template,
     create_DimUser,
     create_fact_user_form,
     create_dim_user_form_response,
-    delete_admin,
     delete_DimUser,
     get_admin,
     get_all_fact_user_forms,
@@ -72,24 +70,6 @@ def test_user_creation():
 
     assert queried_user.FirstName == "Robert"
     assert queried_user.LastName == "Horry"
-
-
-# Create Admin Creation
-def test_admin_creation():
-    temp_admin = DimAdminCreate(
-        email="admin1234@outlook.com",
-        FirstName="Nat",
-        LastName="Reginald",
-        StaffID=77771111,
-        password="adminpassword",
-    )
-
-    create_admin(db, temp_admin)
-
-    q_admin = get_admin(db, 77771111)
-
-    assert q_admin.FirstName == "Nat"
-    assert q_admin.LastName == "Reginald"
 
 
 # Test Form Creation

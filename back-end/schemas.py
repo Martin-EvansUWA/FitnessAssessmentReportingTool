@@ -8,7 +8,7 @@ from pydantic import BaseModel
 class DimFormTemplateBase(BaseModel):
     Title: str
     Description: Optional[str] = None
-    StaffID: int
+    UserID: int
     FormTemplate: Dict[str, Any]  # JSON data
     CreatedAt: str
 
@@ -52,15 +52,15 @@ class FactUserFormBase(BaseModel):
 class FactUserFormCreate(FactUserFormBase):
     UserFormResponseID: int
     FormTemplateID: int
-    StudentID: int
-    SubjectStudentID: int
+    UserID: int
+    SubjectUserID: int
 
 
 class FactUserForm(FactUserFormBase):
     UserFormResponseID: int
     FormTemplateID: int
-    StudentID: int
-    SubjectStudentID: int
+    UserID: int
+    SubjectUserID: int
 
     class Config:
         orm_mode = True
@@ -68,10 +68,11 @@ class FactUserForm(FactUserFormBase):
 
 # DimUser Schema
 class DimUserBase(BaseModel):
-    StudentID: int
+    UserID: int
     email: str
     FirstName: str
     LastName: str
+    isAdmin: bool
 
 
 class DimUserCreate(DimUserBase):
@@ -84,32 +85,12 @@ class DimUser(DimUserBase):
     class Config:
         orm_mode = True
 
-
-# Admin Schema
-class AdminBase(BaseModel):
-    email: str
-    FirstName: str
-    LastName: str
-    StaffID: int
-
-
-class DimAdminCreate(AdminBase):
-    password: str
-
-
-class DimAdmin(AdminBase):
-    hashed_password: str
-
-    class Config:
-        orm_mode = True
-
-
 # Data Entry Page Submission Data Schema
 class DataEntryPageSubmissionData(BaseModel):
     UserFormResponse: Dict[str, Any]  # JSON data
     FormTemplateID: int
-    StudentID: int
-    SubjectStudentID: int
+    UserID: int
+    SubjectUserID: int
     IsComplete: bool
     CreatedAt: str
     CompleteAt: str

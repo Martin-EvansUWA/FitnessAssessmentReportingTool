@@ -20,11 +20,12 @@ from sqlalchemy.exc import IntegrityError
 from auth import (
     Token,
     TokenData,
-    authenticate_student,
+    authenticate_user,
     create_access_token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
     SECRET_KEY,
     ALGORITHM,
+    CREDENTIALS_EXCEPTION
 )
 
 
@@ -70,29 +71,32 @@ app.add_middleware(
 
 
 """ AUTHENTICATION FUNCTIONS"""
-async def get_current_student_user(token: Annotated[str, Depends(oauth2_scheme)]):
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        student_id: str = payload.get("sub")
-        if student_id is None:
-            raise credentials_exception
-        token_data = TokenData(id=student_id)
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise CREDENTIALS_EXCEPTION
+        token_data = TokenData(id=user_id)
     except InvalidTokenError:
-        raise credentials_exception
-    user = crud.get_DimUser(get_db(), DimStudent_ID=token_data.id)
+        raise CREDENTIALS_EXCEPTION
+    user = crud.get_DimUser(get_db(), user_id==token_data.id)
     if user is None:
-        raise credentials_exception
+        raise CREDENTIALS_EXCEPTION
     return user
 
 
+
+async def get_current_admin(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+):
+    if not current_user.isAdmin:
+        raise CREDENTIALS_EXCEPTION
+    return current_user
+
 @app.post("/login_user")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response):
-    user = authenticate_student(get_db(), form_data.username, form_data.password)
+    user = authenticate_user(get_db(), form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -101,7 +105,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], resp
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.StudentID}, expires_delta=access_token_expires
+        data={"sub": user.UserID}, expires_delta=access_token_expires
     )
     ret_token = Token(access_token=access_token, token_type="bearer")
     response.set_cookie(key="access_token", value=ret_token)
@@ -112,9 +116,9 @@ async def logout(response: Response):
     response.delete_cookie("access_token")
     return 200
 
-@app.get("/current_student_user")
+@app.get("/current_user")
 async def current_user(
-    current_user: Annotated[DimUser, Depends(get_current_student_user)],
+    current_user: Annotated[DimUser, Depends(get_current_user)],
 ):
     return current_user.FirstName
 
