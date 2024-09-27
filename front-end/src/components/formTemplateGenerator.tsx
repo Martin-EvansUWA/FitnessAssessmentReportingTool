@@ -31,6 +31,7 @@ const FormTemplateGenerator = () => {
         useState<FormTemplateCreateResponse | null>(null); // State to store response data
 
     const bottomRef = useRef<HTMLDivElement>(null);
+    const [formIdToClone, setFormIdToClone] = useState<string>("");
 
     useEffect(() => {
         console.log("Template updated:", template);
@@ -150,23 +151,67 @@ const FormTemplateGenerator = () => {
         </>
     );
 
+    const cloneFormTemplate = () => {
+        axios
+            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`) // Use formIdToClone
+            .then((response) => {
+                const fetchedTemplate = response.data.FormTemplate;
+                setTemplate(fetchedTemplate);
+            })
+            .catch((error) => {
+                console.error("Error fetching template:", error);
+            });
+    };
+
+    const cloneFormTemplateButton = (
+        <button
+            onClick={() => cloneFormTemplate()}
+            className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00] ml-4"
+        >
+            Clone Form
+        </button>
+    );
+
     const formMetaData = (
         <>
             <div className="flex">
-                <div className="flex flex-col w-full md:w-[30rem] space-y-3">
-                    <div className="flex flex-row justify-between">
+                <div className="flex flex-col w-full space-y-3">
+                    <div className="flex flex-col w-full">
+                        <label className="font-bold" htmlFor="formTitle">
+                            Clone From [Optional]:
+                        </label>
+                        <div>
+                            <input
+                                type="text"
+                                placeholder="Form Template ID"
+                                value={formIdToClone}
+                                onChange={(e) =>
+                                    setFormIdToClone(e.target.value)
+                                }
+                                className="border-2 border-gray-300 rounded-md h-7 mr-2"
+                            />
+                            <button
+                                onClick={cloneFormTemplate}
+                                className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
+                            >
+                                Clone
+                            </button>
+                        </div>
+                    </div>
+                    <div className="flex flex-col w-full">
                         <label className="font-bold" htmlFor="formTitle">
                             Form Title:
                         </label>
                         <input
                             type="text"
                             placeholder="Title"
-                            className="border-2 border-gray-300 rounded-md h-7"
+                            className="border-2 border-gray-300 rounded-md h-7 md:w-[50%]"
                             onChange={(e) =>
                                 setFormTemplateName(e.target.value)
                             }
                         />
                     </div>
+
                     <div className="flex flex-col w-full">
                         <label className="font-bold" htmlFor="formDescription">
                             Form Description:
@@ -401,9 +446,11 @@ const FormTemplateGenerator = () => {
             </div>
             <div ref={bottomRef} />
             <div className="flex justify-end p-5">
-                {responseData
-                    ? returnToFormManagerButton
-                    : saveFormTemplateButton}
+                {responseData ? (
+                    returnToFormManagerButton
+                ) : (
+                    <>{saveFormTemplateButton}</>
+                )}
             </div>
         </div>
     );

@@ -129,7 +129,7 @@ def create_dim_form_template(
 def get_form_templates_by_admin(db: Session, admin_id: int):
     return (
         db.query(models.DimFormTemplate)
-        .filter(models.DimFormTemplate.AdminId == admin_id)
+        .filter(models.DimFormTemplate.StaffID == admin_id)
         .all()
     )
 
