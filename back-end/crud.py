@@ -41,7 +41,7 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
         FirstName=DimUser.FirstName, 
         LastName=DimUser.LastName,  
         UserID=DimUser.UserID,
-        isAdmin=DimUser.isAdmin,
+        isAdmin=False
     )
     db.add(db_DimUser)
     db.commit()
@@ -49,11 +49,26 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     return db_DimUser
 
 
+def promote_User(db: Session, user_id: int):
+    user = (
+        db.query(models.DimUser)
+        .filter(models.DimUser.UserID == user_id)
+        .first()
+    )
+    if not user:
+        return {"msg": "User not found", "status": "error"}
+    
+    user.isAdmin = True
+
+    db.commit()
+    db.refresh(user)
+
+    return {"msg": "User promoted successfully", "status": "success"}
 # Delete a user
-def delete_DimUser(db: Session, DimStudent_ID: int):
+def delete_DimUser(db: Session, user_id: int):
     temp_user = (
         db.query(models.DimUser)
-        .filter(models.DimUser.UserID == DimStudent_ID)
+        .filter(models.DimUser.UserID == user_id)
         .first()
     )
     db.delete(temp_user)

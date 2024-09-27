@@ -44,7 +44,6 @@ def authenticate_user(db, user_id: int, password: str):
         return False
     return user
 
-
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
     to_encode = data.copy()
     if expires_delta:
@@ -55,21 +54,12 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-"""
- Return a hashed password
-"""
-def hash_password(password: str):
-    return password
-
-def get_user(db, student_id: str):
-    user = get_DimUser(db,student_id)
+def get_user(db, user_id: str):
+    user = get_DimUser(db,user_id)
     if user == None:
         return None
     return user
 
-"""
- Returns user based off given token
-"""
 
 
 
