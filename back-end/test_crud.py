@@ -119,10 +119,6 @@ def test_get_all_forms():
     for form in all_forms:
         assert form.UserID != None
 
-
-#
-
-
 # Test User Deletion
 def test_user_deletion():
     response = delete_DimUser(db, 23621647)
