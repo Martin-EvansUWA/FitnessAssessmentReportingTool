@@ -1,5 +1,6 @@
 import axios from "axios";
 import { motion } from "framer-motion";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
 
@@ -60,6 +61,9 @@ const LoginModal = ({
                     },
                 }
             );
+            Cookies.set("access_token", response.data["access_token"], {
+                expires: 1,
+            });
             console.log("Successful Login: ", response);
         } catch (error) {
             console.log("Failed to Login: ", error);
