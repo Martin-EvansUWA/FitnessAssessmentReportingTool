@@ -116,9 +116,12 @@ async def login(
     response = {}
     response.update({"access_token": ret_token.access_token})
     response.update({"isAdmin": user.isAdmin})
+    response.update({"user_first_name": user.FirstName})
+    response.update({"user_last_name": user.LastName})
     return response
 
 
+# TODO: Remove this endpoint since logout is handled by the frontend? - Double check logic
 @app.get("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")

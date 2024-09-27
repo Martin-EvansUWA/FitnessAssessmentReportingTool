@@ -36,7 +36,7 @@ const LoginAndRegisterLayout: React.FC<LoginAndRegisterLayoutProps> = ({
                     </p>
                     <button
                         onClick={toggleIsLogin}
-                        className="bg-uwa-yellow w-1/2 h-8 font-bold text-sm transform transition-transform duration-200 hover:scale-105"
+                        className="bg-uwa-yellow w-1/2 h-8 font-bold text-sm rounded-xl transform transition-transform duration-200 hover:scale-105"
                     >
                         {isLogin ? "Register" : "Login"}
                     </button>

@@ -1,33 +1,31 @@
-import React from "react";
+import Cookies from "js-cookie";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import uwaSportScienceImg2 from "../assets/uwa-sport-science-2.jpg";
 import uwaSportScienceImg3 from "../assets/uwa-sport-science-3.jpg";
 import uwaSportScienceImg from "../assets/uwa-sport-science.jpg";
-import ConditionalLinks from "../components/conditionalLinks";
 import LoginAndRegisterLayout from "../components/loginAndRegisterLayout";
 import NavigationBar from "../components/navigationBar";
 
 const LandingPage = () => {
     const imgCss = "object-cover w-1/3 border-8 rounded-3xl border-[#e0e0e0]";
 
-    /////////////////// Temporary Page Toggle ///////////////////
-    // Remove once the user authentication is implemented
-    const [tempPageToggle, setTempPageToggle] = React.useState(true);
-    const togglePage = () => {
-        setTempPageToggle(!tempPageToggle);
-    };
-    const toggleButton = (
-        <button className="font-bold" onClick={togglePage}>
-            Go to real landing page
-        </button>
-    );
-    /////////////////////////////////////////////////////////////
+    const navigate = useNavigate();
 
-    return tempPageToggle ? (
-        <div className="flex flex-col">
-            <ConditionalLinks className={"font-bold mx-10"} />
-            {toggleButton}
-        </div>
-    ) : (
+    useEffect(() => {
+        const access_token = Cookies.get("access_token");
+        // If the user is already logged in, redirect them to the correct page
+        if (access_token) {
+            const isAdmin = Cookies.get("isAdmin");
+            if (isAdmin === "true") {
+                navigate("/admin-form-manager");
+            } else {
+                navigate("/student-form-manager");
+            }
+        }
+    }, [navigate]);
+
+    return (
         <div className="flex flex-col h-screen">
             <NavigationBar className="relative w-full h-16" />
             <LoginAndRegisterLayout className="flex md:absolute h-full w-full justify-center items-center" />
