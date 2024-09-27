@@ -127,8 +127,8 @@ const DataEntryPage = () => {
     const handleSave = () => {
         // Formatted form data to send to the backend
         const formattedFormData = {
-            StudentID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
-            SubjectStudentID: subjectStudentNumber,
+            UserID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
+            SubjectUserID: subjectStudentNumber,
             CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
             IsComplete: false, //TODO: Add logic to check if the form is complete
@@ -216,7 +216,7 @@ const DataEntryPage = () => {
                         <span className="text-gray-900 font-bold">
                             Created By:
                         </span>{" "}
-                        {formContentObj.StaffID}
+                        {formContentObj.UserID}
                     </h2>
                     <h2 className="text-lg font-semibold my-3 text-gray-700">
                         <span className="text-gray-900 font-bold">

@@ -34,7 +34,7 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: int | None = None
+    id: int
 
 def authenticate_user(db, user_id: int, password: str):
     user = crud.get_DimUser(db, user_id)
