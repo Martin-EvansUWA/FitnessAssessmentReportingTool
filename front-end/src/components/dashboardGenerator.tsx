@@ -7,7 +7,7 @@ import RadarChart from "./charts/RadarChart";
 import ScatterChart from "./charts/ScatterChart";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const StudentID = 64332;
+const UserID = 64332;
 const FormID = 5;
 
 const DashboardGenerator: React.FC = () => {
@@ -28,7 +28,7 @@ const DashboardGenerator: React.FC = () => {
 
         // Fetch specific student data
         axios
-            .get(`${backEndUrl}/normative_results/${StudentID}/${FormID}`)
+            .get(`${backEndUrl}/normative_results/${UserID}/${FormID}`)
             .then((response) => {
                 setSpecificStudentData(response.data);
             })

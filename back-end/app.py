@@ -1,19 +1,49 @@
 import json
 from http.client import HTTPException
 
-from fastapi import Depends, FastAPI
+
+# Website Imports
+from fastapi import Depends, FastAPI, HTTPException, status, Response
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
+# Login and Encryption Imports
+import jwt
+from datetime import datetime, timedelta, timezone
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from typing_extensions import Annotated
+from jwt.exceptions import InvalidTokenError
+from sqlalchemy.exc import IntegrityError
+# Auth Imports
+from auth import (
+    Token,
+    TokenData,
+    authenticate_user,
+    create_access_token,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    SECRET_KEY,
+    ALGORITHM,
+    CREDENTIALS_EXCEPTION
+)
+
+
+# Database Imports  ``
 import crud
 import models
 from crud import *
 from database import SessionLocal, engine
 from models import *
-from process import createFactUserFormSchema, createFormTemplateSchema
-from schemas import DataEntryPageSubmissionData, DimFormTemplateCreate
+from process import createFactUserFormSchema, createFormTemplateSchema, createNewUser
+from schemas import (
+    DataEntryPageSubmissionData,
+    DimFormTemplateCreate,
+    DimUserCreate,
+    DimUserFormResponseCreate,
+    DimUser,
+)
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -28,8 +58,8 @@ def get_db():
 
 
 # app implementation
-
 app = FastAPI()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_user")
 
 app.add_middleware(
     CORSMiddleware,
@@ -40,7 +70,80 @@ app.add_middleware(
 )
 
 
-# [Admin] Sending admin id, to receive a list of form templates to display on the sidebar of the admin dashboard
+""" AUTHENTICATION FUNCTIONS"""
+async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise CREDENTIALS_EXCEPTION
+        token_data = TokenData(id=user_id)
+    except InvalidTokenError:
+        raise CREDENTIALS_EXCEPTION
+    user = crud.get_DimUser(get_db(), user_id==token_data.id)
+    if user is None:
+        raise CREDENTIALS_EXCEPTION
+    return user
+
+
+
+async def get_current_admin(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+):
+    if not current_user.isAdmin:
+        raise CREDENTIALS_EXCEPTION
+    return current_user
+
+@app.post("/login_user")
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response):
+    user = authenticate_user(get_db(), form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.UserID}, expires_delta=access_token_expires
+    )
+    ret_token = Token(access_token=access_token, token_type="bearer")
+    response.set_cookie(key="access_token", value=ret_token)
+    return ret_token
+
+@app.get("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return 200
+
+@app.get("/current_user")
+async def current_user(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+):
+    return current_user.FirstName
+
+
+@app.post("/register_student")
+async def register_student(form_data: DimUserCreate, db: Session = Depends(get_db)):
+    new_user = createNewUser(form_data=form_data.dict())
+    try:
+        ret = crud.create_DimUser(db, new_user)
+        if ret is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Incorrect username or password",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        else:
+            return 200
+    except IntegrityError:
+        raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User already exists",
+            )
+
+""" ADMIN FUNCTIONS """
+# [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
     response = []
@@ -83,12 +186,13 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
     return response
 
 
+""" STUDENT FUNCTIONS"""
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info/{student_id}")
-def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(get_db)):
+def retrieve_student_form_sidebar_info(user_id: int, db: Session = Depends(get_db)):
     response = []
     forms = crud.get_fact_multiple_user_forms(
-        db, student_id
+        db, user_id=user_id
     )  # Student ID could be both StudentID or SubjectStudentID
 
     for form in forms:
@@ -98,8 +202,8 @@ def retrieve_student_form_sidebar_info(student_id: int, db: Session = Depends(ge
             "UserFormResponseID": form.UserFormResponseID,
             "FormTemplateID": form.FormTemplateID,
             "title": form_template.Title,
-            "StudentID": form.StudentID,
-            "SubjectStudentID": form.SubjectStudentID,
+            "UserID": form.UserID,
+            "SubjectUserID": form.SubjectUserID,
             "IsComplete": form.IsComplete,
             "CreatedAt": form.CreatedAt,
             "CompletedAt": form.CompleteAt,
@@ -168,6 +272,9 @@ def save_form_entry(
     return {"status": 200, "message": "Form entry saved successfully"}
 
 
+""" DATA VISUALISATION FUNCTION"""
+
+
 # get all students data
 @app.get("/student_data/{FormID}")
 def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
@@ -181,10 +288,10 @@ def get_student_form_responses(FormID: int, db: Session = Depends(get_db)):
 
 
 # get specific students data
-@app.get("/specific_student_data/{StudentID}/{FormID}")
-def get_specific_student_data(StudentID=int, FormID=int, db: Session = Depends(get_db)):
+@app.get("/specific_student_data/{UserID}/{FormID}")
+def get_specific_student_data(UserID=int, FormID=int, db: Session = Depends(get_db)):
     student = crud.get_student_form_response(
-        db, form_template_id=FormID, studentID=StudentID
+        db, form_template_id=FormID, user_id=UserID
     )  # Example with student ID 1
 
     return student
@@ -236,7 +343,7 @@ def read_form_submissions(form_template_id: int, db: Session = Depends(get_db)):
         "submissions_count": len(submissions),  # Count of submissions
         "submissions": [
             {
-                "student_id": submission[3],  # Access StudentID from the tuple
+                "user_id": submission[3],  # Access UserID from the tuple
                 "first_name": submission[1],  # Access FirstName from the tuple
                 "last_name": submission[2],  # Access LastName from the tuple
                 "subject_ID": submission[4],
@@ -256,7 +363,7 @@ def delete_form_submissions(student_ids: List[int], db: Session = Depends(get_db
         return {"message": "No student IDs provided."}
 
     try:
-        db.query(FactUserForm).filter(FactUserForm.StudentID.in_(student_ids)).delete(
+        db.query(FactUserForm).filter(FactUserForm.UserID.in_(student_ids)).delete(
             synchronize_session=False
         )
         db.commit()
