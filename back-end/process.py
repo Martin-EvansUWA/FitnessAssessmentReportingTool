@@ -12,7 +12,6 @@ def createNewUser(form_data: dict):
         email=form_data["email"],
         FirstName=form_data["FirstName"],
         LastName=form_data["LastName"],
-        isAdmin=form_data["isAdmin"],
         password=get_password_hash(form_data["password"])
     )
     return new_user

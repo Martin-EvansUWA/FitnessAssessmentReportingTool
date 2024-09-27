@@ -72,7 +72,6 @@ class DimUserBase(BaseModel):
     email: str
     FirstName: str
     LastName: str
-    isAdmin: bool
 
 
 class DimUserCreate(DimUserBase):
@@ -80,6 +79,7 @@ class DimUserCreate(DimUserBase):
 
 
 class DimUser(DimUserBase):
+    isAdmin: bool
     hashed_password: str
 
     class Config:
