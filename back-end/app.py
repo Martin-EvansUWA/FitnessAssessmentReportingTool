@@ -73,6 +73,7 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
         # Process form data and add to database
         processed_data = createFormTemplateSchema(form_data.dict())
         created_form_template = crud.create_dim_form_template(db, processed_data)
+        print(created_form_template)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

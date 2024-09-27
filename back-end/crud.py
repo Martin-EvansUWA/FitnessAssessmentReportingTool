@@ -118,7 +118,8 @@ def create_dim_form_template(
         StaffID=dim_form_template.StaffID,  # Set AdminId appropriately
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
-        Description=dim_form_template.Description,
+        CreatedAt=dim_form_template.CreatedAt,
+        Description=dim_form_template.Description
     )
     db.add(db_dim_form_template)
     db.commit()
