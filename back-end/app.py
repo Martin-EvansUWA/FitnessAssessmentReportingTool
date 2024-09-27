@@ -73,7 +73,6 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
         # Process form data and add to database
         processed_data = createFormTemplateSchema(form_data.dict())
         created_form_template = crud.create_dim_form_template(db, processed_data)
-        print(created_form_template)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -277,3 +276,9 @@ def export_form_responses(form_template_id: int, db: Session = Depends(get_db)):
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         filename="form_responses.xlsx",
     )
+
+
+@app.delete("/form-template-delete/{form_template_id}")
+def delete_template_and_responses(form_template_id: int, db: Session = Depends(get_db)):
+    delete_form_template_and_related_entries(db, form_template_id)
+    return {"message": "Form template and related responses deleted successfully"}

@@ -343,7 +343,6 @@ def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
         # Add the filtered response to the list only if it contains at least one matching entry
         if has_matching_entry:
             filtered_responses.append(filtered_data)
-    print(filtered_responses)
     return filtered_responses
 
 
@@ -464,3 +463,14 @@ def create_export_file(responses):
     with NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         df.to_excel(tmp.name, index=False)
         return tmp.name
+
+#[admin delete]
+def delete_form_template_and_related_entries(db: Session, form_template_id: int):
+    fact_user_forms = db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).all()
+    if fact_user_forms:
+        user_form_response_ids = [fact.UserFormResponseID for fact in fact_user_forms]
+        db.query(DimUserFormResponse).filter(DimUserFormResponse.UserFormResponseID.in_(user_form_response_ids)).delete(synchronize_session=False)
+        db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).delete(synchronize_session=False)
+
+    db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).delete(synchronize_session=False)
+    db.commit()

@@ -188,6 +188,10 @@ const AdminFormManagerPage = () => {
         };
     };
 
+    const fetchSidebarSection = () => {
+
+    }
+
     useEffect(() => {
         const fetchData = async () => {
             const formHistory = await getFormHistory();
@@ -223,7 +227,7 @@ const AdminFormManagerPage = () => {
 
         try {
             await axios.delete(
-                `${backEndUrl}/forms/${formDetails.form_template_id}`
+                `${backEndUrl}/form-template-delete/${formDetails.form_template_id}`
             );
             setFormDetails(null);
             setFormSubmissions([]);
@@ -459,7 +463,7 @@ const AdminFormManagerPage = () => {
                 sidebarContent={sidebarData}
                 mainContent={
                     createNewFormTemplateView ? (
-                        <FormTemplateGenerator />
+                        <FormTemplateGenerator  />
                     ) : (
                         <div className="flex flex-col">
                             <div className="flex-1">
