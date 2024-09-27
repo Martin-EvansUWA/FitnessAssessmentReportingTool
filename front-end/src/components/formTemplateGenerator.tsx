@@ -18,7 +18,13 @@ const initialTemplate: FormTemplate = {
     },
 };
 
-const FormTemplateGenerator = () => {
+interface formTemplateGeneratorProps {
+    updateFormTemplateHistory: () => {};
+}
+
+const FormTemplateGenerator = ({
+    updateFormTemplateHistory,
+}: formTemplateGeneratorProps) => {
     const [template, setTemplate] = useState<FormTemplate>(initialTemplate);
     const [formTemplateTitle, setFormTemplateName] = useState<string>("");
     const [formTemplateDescription, setFormTemplateDescription] =
@@ -242,7 +248,10 @@ const FormTemplateGenerator = () => {
     // Save Form button
     const saveFormTemplateButton = (
         <button
-            onClick={() => saveFormTemplate()}
+            onClick={() => {
+                saveFormTemplate();
+                updateFormTemplateHistory();
+            }}
             className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
         >
             Save Form

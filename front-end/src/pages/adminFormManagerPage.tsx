@@ -188,6 +188,19 @@ const AdminFormManagerPage = () => {
         };
     };
 
+    const updateFormTemplateHistory = async () => {
+        const formHistory = await getFormHistory();
+        setSidebarData(buildSidebarData(formHistory));
+    };
+
+    // Callback function to be used when user clicks on a form in the sidebar
+    const viewIndividualForm = (formId: string) => {
+        setSelectedFormId(parseInt(formId));
+        setFormSubmissions([]); // Clear previous submissions
+        fetchFormData(parseInt(formId)); // Fetch form data for the selected form ID
+        setCreateNewFormTemplateView(false);
+    };
+
     useEffect(() => {
         const fetchData = async () => {
             const formHistory = await getFormHistory();
@@ -197,10 +210,7 @@ const AdminFormManagerPage = () => {
                     [formId]: {
                         ...form[formId],
                         sectionOnClick: () => {
-                            setSelectedFormId(parseInt(formId));
-                            setFormSubmissions([]); // Clear previous submissions
-                            fetchFormData(parseInt(formId)); // Fetch form data for the selected form ID
-                            setCreateNewFormTemplateView(false);
+                            viewIndividualForm(formId);
                         },
                     },
                 };
@@ -459,7 +469,11 @@ const AdminFormManagerPage = () => {
                 sidebarContent={sidebarData}
                 mainContent={
                     createNewFormTemplateView ? (
-                        <FormTemplateGenerator />
+                        <FormTemplateGenerator
+                            updateFormTemplateHistory={
+                                updateFormTemplateHistory
+                            }
+                        />
                     ) : (
                         <div className="flex flex-col">
                             <div className="flex-1">
