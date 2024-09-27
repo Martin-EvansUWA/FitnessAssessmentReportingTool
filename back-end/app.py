@@ -123,8 +123,8 @@ async def current_user(
     return current_user.FirstName
 
 
-@app.post("/register_student")
-async def register_student(form_data: DimUserCreate, db: Session = Depends(get_db)):
+@app.post("/register")
+async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
     new_user = createNewUser(form_data=form_data.dict())
     try:
         ret = crud.create_DimUser(db, new_user)
