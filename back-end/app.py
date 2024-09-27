@@ -1,37 +1,36 @@
 import json
+from datetime import datetime, timedelta, timezone
 from http.client import HTTPException
-
-
-# Website Imports
-from fastapi import Depends, FastAPI, HTTPException, status, Response
-from fastapi.encoders import jsonable_encoder
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
 
 # Login and Encryption Imports
 import jwt
-from datetime import datetime, timedelta, timezone
+
+# Website Imports
+from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi.encoders import jsonable_encoder
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from typing_extensions import Annotated
 from jwt.exceptions import InvalidTokenError
 from sqlalchemy.exc import IntegrityError
-# Auth Imports
-from auth import (
-    Token,
-    TokenData,
-    authenticate_user,
-    create_access_token,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    SECRET_KEY,
-    ALGORITHM,
-    CREDENTIALS_EXCEPTION
-)
-
+from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 # Database Imports  ``
 import crud
 import models
+
+# Auth Imports
+from auth import (
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    ALGORITHM,
+    CREDENTIALS_EXCEPTION,
+    SECRET_KEY,
+    Token,
+    TokenData,
+    authenticate_user,
+    create_access_token,
+)
 from crud import *
 from database import SessionLocal, engine
 from models import *
@@ -39,11 +38,10 @@ from process import createFactUserFormSchema, createFormTemplateSchema, createNe
 from schemas import (
     DataEntryPageSubmissionData,
     DimFormTemplateCreate,
+    DimUser,
     DimUserCreate,
     DimUserFormResponseCreate,
-    DimUser,
 )
-
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -71,6 +69,8 @@ app.add_middleware(
 
 
 """ AUTHENTICATION FUNCTIONS"""
+
+
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
@@ -80,11 +80,10 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(id=user_id)
     except InvalidTokenError:
         raise CREDENTIALS_EXCEPTION
-    user = crud.get_DimUser(get_db(), user_id==token_data.id)
+    user = crud.get_DimUser(get_db(), user_id == token_data.id)
     if user is None:
         raise CREDENTIALS_EXCEPTION
     return user
-
 
 
 async def get_current_admin(
@@ -94,8 +93,11 @@ async def get_current_admin(
         raise CREDENTIALS_EXCEPTION
     return current_user
 
+
 @app.post("/login_user")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response):
+async def login(
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()], response: Response
+):
     user = authenticate_user(get_db(), form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -111,10 +113,12 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], resp
     response.set_cookie(key="access_token", value=ret_token)
     return ret_token
 
+
 @app.get("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")
     return 200
+
 
 @app.get("/current_user")
 async def current_user(
@@ -138,11 +142,14 @@ async def register_student(form_data: DimUserCreate, db: Session = Depends(get_d
             return 200
     except IntegrityError:
         raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="User already exists",
-            )
+            status_code=status.HTTP_409_CONFLICT,
+            detail="User already exists",
+        )
+
 
 """ ADMIN FUNCTIONS """
+
+
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
 @app.get("/retrieve_admin_sidebar_info/{admin_id}")
 def retrieve_admin_templates(admin_id: int, db: Session = Depends(get_db)):
@@ -176,7 +183,6 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
         # Process form data and add to database
         processed_data = createFormTemplateSchema(form_data.dict())
         created_form_template = crud.create_dim_form_template(db, processed_data)
-        print(created_form_template)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
@@ -187,6 +193,8 @@ def add_form(form_data: DimFormTemplateCreate, db: Session = Depends(get_db)):
 
 
 """ STUDENT FUNCTIONS"""
+
+
 # [Student] Get sidebar info of student forms
 @app.get("/retrieve_student_form_sidebar_info/{student_id}")
 def retrieve_student_form_sidebar_info(user_id: int, db: Session = Depends(get_db)):
