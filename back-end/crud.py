@@ -49,7 +49,7 @@ def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     return db_DimUser
 
 
-def create_Admin(db: Session, user_id: int):
+def promote_User(db: Session, user_id: int):
     user = (
         db.query(models.DimUser)
         .filter(models.DimUser.UserID == user_id)
@@ -60,8 +60,8 @@ def create_Admin(db: Session, user_id: int):
     
     user.isAdmin = True
 
-    db.refresh(user)
     db.commit()
+    db.refresh(user)
 
     return {"msg": "User promoted successfully", "status": "success"}
 # Delete a user
