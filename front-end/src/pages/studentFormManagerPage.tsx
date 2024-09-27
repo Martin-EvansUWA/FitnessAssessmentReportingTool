@@ -22,8 +22,8 @@ import {
 //      - UserFormResponseID
 //      - FormTemplateID
 //      - FormTemplateTitle
-//      - StudentID
-//      - SubjectStudentID
+//      - UserID
+//      - SubjectUserID
 //      - IsComplete
 //      - CreatedAt
 //      - CompletedAt
@@ -166,8 +166,8 @@ const StudentFormManagerPage = () => {
                 formDescription={formDetails.Description}
                 formStartDate={formHistory?.CreatedAt || ""}
                 formCompletionDate={formHistory?.CompletedAt || ""}
-                formCreatedBy={formHistory?.StudentID.toString() || ""}
-                formCreatedFor={formHistory?.SubjectStudentID.toString() || ""}
+                formCreatedBy={formHistory?.UserID.toString() || ""}
+                formCreatedFor={formHistory?.SubjectUserID.toString() || ""}
                 factUserFormID={formHistory?.FactUserFormID || null}
             />
         );

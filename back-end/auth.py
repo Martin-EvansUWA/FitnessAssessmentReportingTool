@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, timezone
 from crud import get_DimUser
 from pydantic import BaseModel
+from fastapi import HTTPException, status
 
 
 import crud
@@ -9,6 +10,11 @@ import jwt
 from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+CREDENTIALS_EXCEPTION = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
 
 # fake secret key, needs to become env variable
 SECRET_KEY = "590236d89b9f9bedc2fb29ff95618ed31493080406d59ce5cded7dd210e3b88e"
@@ -28,10 +34,10 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: int | None = None
+    id: int
 
-def authenticate_student(db, student_id: int, password: str):
-    user = crud.get_DimUser(db, student_id)
+def authenticate_user(db, user_id: int, password: str):
+    user = crud.get_DimUser(db, user_id)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):

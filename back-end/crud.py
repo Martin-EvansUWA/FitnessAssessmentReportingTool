@@ -15,10 +15,10 @@ from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
 
 # Get Student via their StudentID
-def get_DimUser(db: Session, DimStudent_ID: int):
+def get_DimUser(db: Session, user_id: int):
     return (
         db.query(models.DimUser)
-        .filter(models.DimUser.StudentID == DimStudent_ID)
+        .filter(models.DimUser.UserID == user_id)
         .first()
     )
 
@@ -27,30 +27,33 @@ def get_DimUser(db: Session, DimStudent_ID: int):
 def get_DimUser_by_email(db: Session, email: str):
     return db.query(models.DimUser).filter(models.DimUser.email == email).first()
 
+
 # Get n amount of users
 def get_DimUsers(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.DimUser).offset(skip).limit(limit).all()
 
-# Creatre a new user
+
+# Create a new user
 def create_DimUser(db: Session, DimUser: schemas.DimUserCreate):
     db_DimUser = models.DimUser(
         email=DimUser.email,
         hashed_password=DimUser.password,
-        FirstName=DimUser.FirstName,  # Default or handle according to your logic
-        LastName=DimUser.LastName,  # Default or handle according to your logic
-        StudentID=DimUser.StudentID,
-    
+        FirstName=DimUser.FirstName, 
+        LastName=DimUser.LastName,  
+        UserID=DimUser.UserID,
+        isAdmin=DimUser.isAdmin,
     )
     db.add(db_DimUser)
     db.commit()
     db.refresh(db_DimUser)
     return db_DimUser
 
+
 # Delete a user
 def delete_DimUser(db: Session, DimStudent_ID: int):
     temp_user = (
         db.query(models.DimUser)
-        .filter(models.DimUser.StudentID == DimStudent_ID)
+        .filter(models.DimUser.UserID == DimStudent_ID)
         .first()
     )
     db.delete(temp_user)
@@ -58,45 +61,23 @@ def delete_DimUser(db: Session, DimStudent_ID: int):
     return {"msg": "Student deleted successfully"}
 
 
-# Admin CRUD operations
 
 # Get an admin by id
-def get_admin(db: Session, staff_id: int):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == staff_id).first()
+def get_admin(db: Session, admin_id: int):
+    return (
+        db.query(models.DimUser)
+        .filter(models.DimUser.UserID == admin_id and models.DimUser.isAdmin == True)
+        .first()
+    )
+
 
 # Get an admin by email
-def get_admin_by_email(db: Session, email: str):
-    return db.query(models.DimAdmin).filter(models.DimAdmin.email == email).first()
-
-# Get n amount of admins
-def get_admins(db: Session, skip: int = 0, limit: int = 100):
-    return db.query(models.DimAdmin).offset(skip).limit(limit).all()
-
-# Create new admin
-def create_admin(db: Session, new_admin: schemas.DimAdminCreate):
-    fake_hashed_password = (
-        new_admin.password + "notreallyhashed"
-    )  # Replace with actual hashing
-    db_admin = models.DimAdmin(
-        email=new_admin.email,
-        hashed_password=fake_hashed_password,
-        FirstName=new_admin.FirstName,  # Default or handle according to your logic
-        LastName=new_admin.LastName,  # Default or handle according to your logic
-        StaffID=new_admin.StaffID,  # Default or derive from logic
+def get_admin(db: Session, email: str):
+    return (
+        db.query(models.DimUser)
+        .filter(models.DimUser.email == email and models.DimUser.isAdmin == True)
+        .first()
     )
-    db.add(db_admin)
-    db.commit()
-    db.refresh(db_admin)
-    return db_admin
-
-# Delete an admin
-def delete_admin(db: Session, Staff_ID: int):
-    temp_admin = (
-        db.query(models.DimAdmin).filter(models.DimAdmin.StaffID == Staff_ID).first()
-    )
-    db.delete(temp_admin)
-    db.commit()
-    return {"msg": "Admin deleted successfully"}
 
 
 # DimFormTemplate CRUD operations
@@ -107,16 +88,18 @@ def get_dim_form_template(db: Session, form_template_id: int):
         .first()
     )
 
+
 # Get n amounts of form templates
 def get_dim_form_templates(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.DimFormTemplate).offset(skip).limit(limit).all()
+
 
 # Create new form template
 def create_dim_form_template(
     db: Session, dim_form_template: schemas.DimFormTemplateCreate
 ):
     db_dim_form_template = models.DimFormTemplate(
-        StaffID=dim_form_template.StaffID,  # Set AdminId appropriately
+        UserID=dim_form_template.UserID,
         FormTemplate=dim_form_template.FormTemplate,
         Title=dim_form_template.Title,
         Description=dim_form_template.Description,
@@ -127,20 +110,21 @@ def create_dim_form_template(
     return db_dim_form_template
 
 
-def get_form_templates_by_admin(db: Session, admin_id: int):
+def get_form_templates_by_admin(db: Session, user_id: int):
     return (
         db.query(models.DimFormTemplate)
-        .filter(models.DimFormTemplate.StaffID == admin_id)
+        .filter(models.DimFormTemplate.UserID == user_id)
         .all()
     )
+
 
 # Save a students form data
 def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
     try:
         db_student_form = models.FactUserForm(
-            FormTemplateId=student_form.FormTemplateId,
-            UserId=student_form.UserId,
-            SubjectUserId=student_form.SubjectUserId,
+            FormTemplateId=student_form.FormTemplateID,
+            UserId=student_form.UserID,
+            SubjectUserId=student_form.SubjectUserID,
             IsComplete=student_form.IsComplete,
             CreatedAt=student_form.CreatedAt,
             CompleteAt=student_form.CompleteAt,
@@ -155,6 +139,7 @@ def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
 
 # DimUserFormResponse CRUD operations
 
+
 # Get a students response
 def get_dim_user_form_response(db: Session, response_id: int):
     return (
@@ -163,9 +148,11 @@ def get_dim_user_form_response(db: Session, response_id: int):
         .first()
     )
 
+
 # Get n amount of form responses
 def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
+
 
 # Create a new form response
 def create_dim_user_form_response(
@@ -190,36 +177,36 @@ def get_fact_user_form(
     return (
         db.query(models.FactUserForm)
         .filter(
-            models.FactUserForm.StudentID == user_id,
-            models.FactUserForm.SubjectStudentID == subject_user_id,
+            models.FactUserForm.UserID == user_id,
+            models.FactUserForm.SubjectUserID == subject_user_id,
         )
         .first()
     )
 
+
 # Get all forms of a given student
 def get_fact_multiple_user_forms(
     db: Session,
-    student_id: int,
+    user_id: int,
 ):
     # Both StudentID and SubjectStudentID are used to get all forms associated with a student
     return db.query(models.FactUserForm).filter(
-        or_(
-            models.FactUserForm.StudentID == student_id,
-            models.FactUserForm.SubjectStudentID == student_id,
-        )
+        models.FactUserForm.UserID == user_id,
     )
+
 
 # Get all fact user forms
 def get_all_fact_user_forms(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.FactUserForm).offset(skip).limit(limit).all()
+
 
 # Create a new fact user form
 def create_fact_user_form(db: Session, fact_user_form: schemas.FactUserFormCreate):
     db_fact_user_form = models.FactUserForm(
         FormTemplateID=fact_user_form.FormTemplateID,
         UserFormResponseID=fact_user_form.UserFormResponseID,
-        StudentID=fact_user_form.StudentID,
-        SubjectStudentID=fact_user_form.SubjectStudentID,
+        UserID=fact_user_form.UserID,
+        SubjectUserID=fact_user_form.SubjectUserID,
         IsComplete=fact_user_form.IsComplete,
         CreatedAt=fact_user_form.CreatedAt,
         CompleteAt=fact_user_form.CompleteAt,
@@ -258,7 +245,7 @@ def get_form_responses(db: Session, form_template_id: int):
     return responses
 
 
-def get_student_form_response(db: Session, form_template_id: int, studentID: int):
+def get_student_form_response(db: Session, form_template_id: int, user_id: int):
     """Fetch all form responses for a specific student and form template."""
     responses = (
         db.execute(
@@ -270,7 +257,7 @@ def get_student_form_response(db: Session, form_template_id: int, studentID: int
             )
             .where(
                 FactUserForm.FormTemplateID == form_template_id,
-                FactUserForm.SubjectStudentID == studentID,
+                FactUserForm.SubjectUserID == user_id,
             )
         )
         .scalars()
@@ -384,10 +371,10 @@ def get_max_values(db: Session, form_template_id: int) -> Dict[str, Dict[str, in
 
 
 def calculate_normative_results(
-    db: Session, form_template_id: int, studentID: int
+    db: Session, form_template_id: int, user_id: int
 ) -> List[Dict[str, Dict[str, int]]]:
     # Get the student's specific responses
-    student_responses = get_student_form_response(db, form_template_id, studentID)
+    student_responses = get_student_form_response(db, form_template_id, user_id)
     if not student_responses:
         return [
             {}
@@ -432,10 +419,10 @@ def get_form_submissions(db: Session, form_template_id: int):
             FactUserForm,
             DimUser.FirstName,
             DimUser.LastName,
-            DimUser.StudentID,
-            FactUserForm.SubjectStudentID,
+            DimUser.UserID,
+            FactUserForm.SubjectUserID,
         )  # Include StudentID here
-        .join(DimUser, FactUserForm.StudentID == DimUser.StudentID)
+        .join(DimUser, FactUserForm.UserID == DimUser.UserID)
         .filter(FactUserForm.FormTemplateID == form_template_id)
         .order_by(DimUser.FirstName)  # Alphabetical sorting by first name
         .all()
