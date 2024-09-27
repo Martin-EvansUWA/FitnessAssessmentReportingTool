@@ -157,6 +157,16 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
         )
 
 
+""" HELPER FUNCTIONS """
+
+
+@app.get("/get_user_id")
+def get_user_id(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+):
+    return current_user.UserID
+
+
 """ ADMIN FUNCTIONS """
 
 

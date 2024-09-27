@@ -1,6 +1,7 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
 import {
@@ -119,10 +120,28 @@ const FormTemplateGenerator = ({
     );
 
     const saveFormTemplate = () => {
+        const access_token = Cookies.get("access_token");
+        let userId = 0;
+        // Fetch User Id
+        try {
+            axios
+                .get(`${backEndUrl}/get_user_id`, {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                })
+                .then((response) => {
+                    console.log("User Id:", response.data);
+                    userId = response.data;
+                });
+        } catch (error) {
+            console.error("Error fetching User Id:", error);
+        }
+
         const formTemplate = {
             Title: formTemplateTitle,
             Description: formTemplateDescription,
-            UserID: 1, // TODO: Replace with actual StaffID from session when implemented in backend
+            UserID: userId,
             FormTemplate: template,
             CreatedAt: new Date().toISOString(),
         };
@@ -132,6 +151,7 @@ const FormTemplateGenerator = ({
             .post(`${backEndUrl}/create_form`, formTemplate, {
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${access_token}`,
                 },
             })
             .then((response) => {
