@@ -101,12 +101,18 @@ const AdminFormManagerPage = () => {
     };
 
     const fetchSpecificStudentData = async (
-        responce_id: number,
+        response_id: number,
         formId: number
     ) => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/specific_student_data/${responce_id}/${formId}`
+                `${backEndUrl}/specific_student_data/${response_id}/${formId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             if (response.data) {
                 setSpecificStudentData(response.data);
