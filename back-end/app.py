@@ -121,6 +121,7 @@ async def login(
     return response
 
 
+# TODO: Remove this endpoint since logout is handled by the frontend? - Double check logic
 @app.get("/logout")
 async def logout(response: Response):
     response.delete_cookie("access_token")
