@@ -246,9 +246,15 @@ const AdminFormManagerPage = () => {
             return;
         }
 
+        const access_token = Cookies.get("access_token");
         try {
             await axios.delete(
-                `${backEndUrl}/forms/${formDetails.form_template_id}`
+                `${backEndUrl}/forms/${formDetails.form_template_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             setFormDetails(null);
             setFormSubmissions([]);
@@ -300,9 +306,13 @@ const AdminFormManagerPage = () => {
             return;
         }
 
+        const access_token = Cookies.get("access_token");
         try {
             await axios.delete(`${backEndUrl}/forms/delete-submissions`, {
                 data: { submissions: selectedSubmissions },
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
             });
             setFormSubmissions((prev) =>
                 prev.filter(
@@ -335,12 +345,15 @@ const AdminFormManagerPage = () => {
 
     const handleExport = async () => {
         if (!formDetails) return;
-
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
                 `${backEndUrl}/forms/${formDetails.form_template_id}/export`,
                 {
                     responseType: "blob", // Important for file downloads
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
                 }
             );
 
