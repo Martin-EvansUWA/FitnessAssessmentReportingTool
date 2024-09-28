@@ -5,6 +5,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import FormTemplateGenerator from "../components/formTemplateGenerator";
@@ -43,19 +44,23 @@ const AdminFormManagerPage = () => {
     const [createNewFormTemplateView, setCreateNewFormTemplateView] =
         useState<boolean>(false);
 
+    const viewAdminFormManagerDefault = () => {
+        setSelectedFormId(null);
+        setFormDetails(null);
+        setCreateNewFormTemplateView(false);
+    };
+
     const baseSidebar: SidebarData = {
         title: "My Form Templates",
         titleOnClick: () => {
-            setSelectedFormId(null);
-            setFormDetails(null);
-            setCreateNewFormTemplateView(false);
+            viewAdminFormManagerDefault();
         },
         footer: [
             {
                 text: "Create new form template",
                 fontAwesomeIcon: faPlus,
                 onClick: () => {
-                    setCreateNewFormTemplateView((prev) => !prev);
+                    setCreateNewFormTemplateView(true);
                 },
             },
         ],
@@ -68,9 +73,15 @@ const AdminFormManagerPage = () => {
     });
 
     const fetchFormData = async (formTemplateId: number) => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/forms/${formTemplateId}/submissions`
+                `${backEndUrl}/read_form_submissions/${formTemplateId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${Cookies.get("access_token")}`,
+                    },
+                }
             );
             setFormDetails(response.data.form_details as FormDetails);
             setFormSubmissions(response.data.submissions as FormSubmission[]);
@@ -94,12 +105,18 @@ const AdminFormManagerPage = () => {
     };
 
     const fetchSpecificStudentData = async (
-        responce_id: number,
+        response_id: number,
         formId: number
     ) => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/specific_student_data/${responce_id}/${formId}`
+                `${backEndUrl}/specific_student_data/${response_id}/${formId}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             if (response.data) {
                 setSpecificStudentData(response.data);
@@ -140,9 +157,15 @@ const AdminFormManagerPage = () => {
     };
 
     const getFormHistory = async () => {
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/retrieve_admin_sidebar_info/1`
+                `${backEndUrl}/retrieve_admin_sidebar_info`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             setFetchedFormHistory(response.data);
             console.log("Fetched form history:", response.data);
@@ -227,9 +250,15 @@ const AdminFormManagerPage = () => {
             return;
         }
 
+        const access_token = Cookies.get("access_token");
         try {
             await axios.delete(
-                `${backEndUrl}/forms/${formDetails.form_template_id}`
+                `${backEndUrl}/forms/${formDetails.form_template_id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
             );
             setFormDetails(null);
             setFormSubmissions([]);
@@ -281,9 +310,13 @@ const AdminFormManagerPage = () => {
             return;
         }
 
+        const access_token = Cookies.get("access_token");
         try {
             await axios.delete(`${backEndUrl}/forms/delete-submissions`, {
                 data: { submissions: selectedSubmissions },
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
             });
             setFormSubmissions((prev) =>
                 prev.filter(
@@ -316,12 +349,15 @@ const AdminFormManagerPage = () => {
 
     const handleExport = async () => {
         if (!formDetails) return;
-
+        const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
                 `${backEndUrl}/forms/${formDetails.form_template_id}/export`,
                 {
                     responseType: "blob", // Important for file downloads
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
                 }
             );
 
@@ -470,9 +506,8 @@ const AdminFormManagerPage = () => {
                 mainContent={
                     createNewFormTemplateView ? (
                         <FormTemplateGenerator
-                            updateFormTemplateHistory={
-                                updateFormTemplateHistory
-                            }
+                            updateFormTemplateHistory={updateFormTemplateHistory}
+                            viewAdminFormManagerDefault={viewAdminFormManagerDefault}
                         />
                     ) : (
                         <div className="flex flex-col">

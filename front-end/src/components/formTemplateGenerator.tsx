@@ -1,6 +1,7 @@
 import { faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { backEndUrl } from "../global_helpers/constants";
 import {
@@ -19,11 +20,13 @@ const initialTemplate: FormTemplate = {
 };
 
 interface formTemplateGeneratorProps {
-    updateFormTemplateHistory: () => {};
+    updateFormTemplateHistory: () => void;
+    viewAdminFormManagerDefault: () => void;
 }
 
 const FormTemplateGenerator = ({
     updateFormTemplateHistory,
+    viewAdminFormManagerDefault,
 }: formTemplateGeneratorProps) => {
     const [template, setTemplate] = useState<FormTemplate>(initialTemplate);
     const [formTemplateTitle, setFormTemplateName] = useState<string>("");
@@ -118,11 +121,26 @@ const FormTemplateGenerator = ({
         []
     );
 
-    const saveFormTemplate = () => {
+    const saveFormTemplate = async () => {
+        const access_token = Cookies.get("access_token");
+        let userId = 0;
+        // Fetch User Id
+        try {
+            const response = await axios.get(`${backEndUrl}/get_user_id`, {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+            console.log("User Id:", response.data);
+            userId = response.data;
+        } catch (error) {
+            console.error("Error fetching User Id:", error);
+        }
+
         const formTemplate = {
             Title: formTemplateTitle,
             Description: formTemplateDescription,
-            UserID: 1, // TODO: Replace with actual StaffID from session when implemented in backend
+            UserID: userId,
             FormTemplate: template,
             CreatedAt: new Date().toISOString(),
         };
@@ -132,6 +150,7 @@ const FormTemplateGenerator = ({
             .post(`${backEndUrl}/create_form`, formTemplate, {
                 headers: {
                     "Content-Type": "application/json",
+                    Authorization: `Bearer ${access_token}`,
                 },
             })
             .then((response) => {
@@ -158,8 +177,14 @@ const FormTemplateGenerator = ({
     );
 
     const cloneFormTemplate = () => {
+        const access_token = Cookies.get("access_token");
         axios
-            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`) // Use formIdToClone
+            .get(`${backEndUrl}/retrieve_form_template/${formIdToClone}`, {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${access_token}`,
+                },
+            })
             .then((response) => {
                 const fetchedTemplate = response.data.FormTemplate;
                 setTemplate(fetchedTemplate);
@@ -238,7 +263,10 @@ const FormTemplateGenerator = ({
 
     const returnToFormManagerButton = (
         <button
-            onClick={() => setResponseData(null)} // TODO: Once Form Manager page is implemented, replace this with a redirect
+            onClick={() => {
+                setResponseData(null);
+                viewAdminFormManagerDefault();
+            }}
             className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"
         >
             Return to Form Manager
@@ -248,8 +276,8 @@ const FormTemplateGenerator = ({
     // Save Form button
     const saveFormTemplateButton = (
         <button
-            onClick={() => {
-                saveFormTemplate();
+            onClick={async () => {
+                await saveFormTemplate();
                 updateFormTemplateHistory();
             }}
             className="bg-uwa-yellow p-2 rounded-lg font-semibold text-sm hover:bg-[#ecab00]"

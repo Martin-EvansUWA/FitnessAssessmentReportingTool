@@ -71,7 +71,9 @@ app.add_middleware(
 """ AUTHENTICATION FUNCTIONS"""
 
 
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
@@ -80,7 +82,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         token_data = TokenData(id=user_id)
     except InvalidTokenError:
         raise CREDENTIALS_EXCEPTION
-    user = crud.get_DimUser(get_db(), user_id == token_data.id)
+    user = crud.get_DimUser(db, user_id=token_data.id)
     if user is None:
         raise CREDENTIALS_EXCEPTION
     return user
@@ -155,12 +157,22 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
         )
 
 
+""" HELPER FUNCTIONS """
+
+
+@app.get("/get_user_id")
+def get_user_id(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+):
+    return current_user.UserID
+
+
 """ ADMIN FUNCTIONS """
 
 
 # [Admin] Sending admin id, to receive a list of form to display on the sidebar of the admin dashboard
-@app.get("/retrieve_admin_sidebar_info/{admin_id}")
-def retrieve_admin_templates(
+@app.get("/retrieve_admin_sidebar_info")
+def retrieve_admin_sidebar_info(
     current_user: Annotated[DimUser, Depends(get_current_admin)],
     db: Session = Depends(get_db),
 ):
@@ -215,7 +227,7 @@ def add_form(
 
 
 # [Student] Get sidebar info of student forms
-@app.get("/retrieve_student_form_sidebar_info/{student_id}")
+@app.get("/retrieve_student_form_sidebar_info")
 def retrieve_student_form_sidebar_info(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
@@ -372,7 +384,7 @@ def get_normative_results(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@app.get("/forms/{form_template_id}/submissions")
+@app.get("/read_form_submissions/{form_template_id}")
 def read_form_submissions(
     current_user: Annotated[DimUser, Depends(get_current_admin)],
     form_template_id: int,
