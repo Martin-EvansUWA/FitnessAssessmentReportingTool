@@ -21,3 +21,6 @@ Windows powershell
 foo@bar:~$ idk lol i need to figure this out when we start deciding deployment
 
 ```
+
+TODO:
+1. set env variable permanently within a shell.
