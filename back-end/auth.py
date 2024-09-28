@@ -6,6 +6,7 @@ from fastapi import HTTPException, status
 
 import crud
 import jwt
+import os
 
 from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -17,7 +18,8 @@ CREDENTIALS_EXCEPTION = HTTPException(
     )
 
 # fake secret key, needs to become env variable
-SECRET_KEY = "590236d89b9f9bedc2fb29ff95618ed31493080406d59ce5cded7dd210e3b88e"
+
+SECRET_KEY = os.getenv("SECRETKEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 
