@@ -129,7 +129,6 @@ const DataEntryPage = () => {
         const access_token = Cookies.get("access_token");
         // Formatted form data to send to the backend
         const formattedFormData = {
-            UserID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
             SubjectUserID: subjectStudentNumber,
             CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
@@ -148,7 +147,6 @@ const DataEntryPage = () => {
         return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {
-                    "Content-Type": "application/json",
                     Authorization: `Bearer ${access_token}`
                 },
             })
