@@ -8,6 +8,7 @@ import Layout from "../components/layout";
 import MyResults from "../components/myResults";
 import { backEndUrl } from "../global_helpers/constants";
 import { SidebarData } from "../interface/sidebarInterface";
+import Cookies from "js-cookie";
 
 // Define generic types for fetched data
 interface CategoryData {
@@ -41,8 +42,14 @@ const FormResults: React.FC = () => {
         if (factUserFormID) {
             const fetchData = async () => {
                 try {
+                    const access_token = Cookies.get("access_token");
                     const studentResponse = await axios.get<CategoryData[]>(
-                        `${backEndUrl}/get_specific_student_data_fact_user_form_id/${factUserFormID}`
+                        `${backEndUrl}/get_specific_student_data_fact_user_form_id/${factUserFormID}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${access_token}`,
+                            },
+                        }
                     );
                     console.log(
                         "Successfully fetched data:",
