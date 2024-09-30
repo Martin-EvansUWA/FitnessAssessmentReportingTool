@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { backEndUrl } from "../global_helpers/constants";
 import { FormTemplateJSON } from "../interface/formInterface";
+import Cookies from "js-cookie";
 
 const AddNewForm = () => {
     const [formTemplateID, setFormTemplateID] = useState<string>("");
@@ -14,20 +15,25 @@ const AddNewForm = () => {
 
     const handleGetRequest = () => {
         // Send GET request to backend with formTemplateID
+        const access_token = Cookies.get("access_token");
         if (formTemplateID) {
-            axios
-                .get(`${backEndUrl}/retrieve_form_template/${formTemplateID}`)
-                .then((response) => {
-                    console.log("Success:", response.data);
-                    setFetchState(""); // Clear fetch state on success
-                    navigate("/data-entry", {
-                        state: { data: response.data as FormTemplateJSON },
-                    }); // Redirect and pass data
-                })
-                .catch((error) => {
-                    console.error("Error:", error);
-                    setFetchState("Error: Form Template ID not found");
-                });
+            const response =  axios.get(
+                `${backEndUrl}/retrieve_form_template/${formTemplateID}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            ).then((response) => {
+                console.log("Success:", response.data);
+                setFetchState(""); // Clear fetch state on success
+                navigate("/data-entry", {
+                    state: { data: response.data as FormTemplateJSON },
+                }); // Redirect and pass data
+            }).catch((error) => {
+                console.error("Error:", error);
+                setFetchState("Error: Form Template ID not found");
+            });;
         } else {
             setFetchState("Please enter a Form Template ID");
         }
