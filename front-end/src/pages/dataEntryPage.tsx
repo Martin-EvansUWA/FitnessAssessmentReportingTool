@@ -126,6 +126,7 @@ const DataEntryPage = () => {
     };
 
     const handleSave = () => {
+        const access_token = Cookies.get("access_token");
         // Formatted form data to send to the backend
         const formattedFormData = {
             SubjectUserID: subjectStudentNumber,
@@ -135,7 +136,6 @@ const DataEntryPage = () => {
             FormTemplateID: formContentObj.FormTemplateID,
             UserFormResponse: formData,
         };
-
         console.log(
             "Saved Form For: ",
             subjectStudentNumber,
@@ -144,7 +144,6 @@ const DataEntryPage = () => {
             formData
         );
         // Send form response data to backend
-        const access_token = Cookies.get("access_token");
         return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {

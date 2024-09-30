@@ -13,33 +13,31 @@ const AddNewForm = () => {
 
   const navigate = useNavigate();
 
-  const handleGetRequest = () => {
-    // Send GET request to backend with formTemplateID
-    if (formTemplateID) {
-      const access_token = Cookies.get("access_token");
-
-      axios
-        .get(`${backEndUrl}/retrieve_form_template/${formTemplateID}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${access_token}`,
-          },
-        })
-        .then((response) => {
-          console.log("Success:", response.data);
-          setFetchState(""); // Clear fetch state on success
-          navigate("/data-entry", {
-            state: { data: response.data as FormTemplateJSON },
-          }); // Redirect and pass data
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-          setFetchState("Error: Form Template ID not found");
-        });
-    } else {
-      setFetchState("Please enter a Form Template ID");
-    }
-  };
+    const handleGetRequest = () => {
+        // Send GET request to backend with formTemplateID
+        const access_token = Cookies.get("access_token");
+        if (formTemplateID) {
+            const response =  axios.get(
+                `${backEndUrl}/retrieve_form_template/${formTemplateID}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            ).then((response) => {
+                console.log("Success:", response.data);
+                setFetchState(""); // Clear fetch state on success
+                navigate("/data-entry", {
+                    state: { data: response.data as FormTemplateJSON },
+                }); // Redirect and pass data
+            }).catch((error) => {
+                console.error("Error:", error);
+                setFetchState("Error: Form Template ID not found");
+            });;
+        } else {
+            setFetchState("Please enter a Form Template ID");
+        }
+    };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormTemplateID(event.target.value);

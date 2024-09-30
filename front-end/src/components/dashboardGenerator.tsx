@@ -38,7 +38,13 @@ const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
 
         // Fetch specific student data
         axios
-            .get(`${backEndUrl}/normative_results/${UserID}/${factUserFormID}`)
+            .get(`${backEndUrl}/normative_results/${factUserFormID}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            )
             .then((response) => {
                 setSpecificStudentData(response.data);
             })

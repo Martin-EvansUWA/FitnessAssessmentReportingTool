@@ -139,6 +139,7 @@ async def current_user(
 
 @app.post("/register")
 async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
+    print(form_data)
     new_user = createNewUser(form_data=form_data.dict())
     try:
         ret = crud.create_DimUser(db, new_user)
@@ -244,7 +245,7 @@ def retrieve_student_form_sidebar_info(
             "UserFormResponseID": form.UserFormResponseID,
             "FormTemplateID": form.FormTemplateID,
             "title": form_template.Title,
-            "UserID": form.UserID,
+            "UserID": current_user.UserID,
             "SubjectUserID": form.SubjectUserID,
             "IsComplete": form.IsComplete,
             "CreatedAt": form.CreatedAt,
@@ -310,6 +311,7 @@ def save_form_entry(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
+    print(form_data)
     try:
         created_form_response = crud.create_dim_user_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
@@ -371,7 +373,7 @@ def get_specific_student_data_fact_user_form_id(
     return student
 
 
-@app.get("/normative_results/{student_id}/{form_template_id}")
+@app.get("/normative_results/{form_template_id}")
 def get_normative_results(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     form_template_id: int,
