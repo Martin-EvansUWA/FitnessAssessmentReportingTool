@@ -10,6 +10,7 @@ import { backEndUrl } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
 import { FormTemplateJSON } from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
+import Cookies from "js-cookie";
 
 const DataEntryPage = () => {
     const [selectedSection, setSelectedSection] = useState<number | null>(null);
@@ -125,9 +126,9 @@ const DataEntryPage = () => {
     };
 
     const handleSave = () => {
+        const access_token = Cookies.get("access_token");
         // Formatted form data to send to the backend
         const formattedFormData = {
-            UserID: 12345678, //TODO: Replace Dummy Student ID with actual student ID
             SubjectUserID: subjectStudentNumber,
             CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
@@ -135,7 +136,6 @@ const DataEntryPage = () => {
             FormTemplateID: formContentObj.FormTemplateID,
             UserFormResponse: formData,
         };
-
         console.log(
             "Saved Form For: ",
             subjectStudentNumber,
@@ -147,9 +147,10 @@ const DataEntryPage = () => {
         return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {
-                    "Content-Type": "application/json",
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${access_token}`,
                 },
-            })
+              })
             .then((response) => {
                 console.log("Success:", response.data);
                 toast.success("Progress Saved Successfully!", {

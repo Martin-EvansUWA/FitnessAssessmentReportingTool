@@ -30,10 +30,10 @@ def createFormTemplateSchema(form_data: dict) -> DimFormTemplateCreate:
 
 # Create a form response from raw data
 def createFactUserFormSchema(
-    form_data: dict, userFormResponseID: int
+    form_data: dict, userFormResponseID: int, user_id: int
 ) -> FactUserFormCreate:
     form_response_schema = FactUserFormCreate(
-        UserID=form_data["UserID"],
+        UserID=user_id,
         SubjectUserID=form_data["SubjectUserID"],
         CreatedAt=form_data["CreatedAt"],
         CompleteAt=form_data["CompleteAt"],
