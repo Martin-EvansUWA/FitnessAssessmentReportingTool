@@ -7,18 +7,21 @@ import RadarChart from "./charts/RadarChart";
 import ScatterChart from "./charts/ScatterChart";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const UserID = 64332;
-const FormID = 5;
+const UserID = 1
+interface Props {
+    factUserFormID: number | undefined; 
+}
 
-const DashboardGenerator: React.FC = () => {
+const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
     const [chartType, setChartType] = useState<string>("");
     const [studentData, setStudentData] = useState<any[]>([]);
     const [specificStudentData, setSpecificStudentData] = useState<any>({});
 
+
     useEffect(() => {
         // Fetch all student data
         axios
-            .get(`${backEndUrl}/student_data/${FormID}`)
+            .get(`${backEndUrl}/student_data/${factUserFormID}`)
             .then((response) => {
                 setStudentData(response.data);
             })
@@ -28,7 +31,7 @@ const DashboardGenerator: React.FC = () => {
 
         // Fetch specific student data
         axios
-            .get(`${backEndUrl}/normative_results/${UserID}/${FormID}`)
+            .get(`${backEndUrl}/normative_results/${UserID}/${factUserFormID}`)
             .then((response) => {
                 setSpecificStudentData(response.data);
             })

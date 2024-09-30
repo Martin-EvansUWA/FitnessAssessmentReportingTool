@@ -71,7 +71,7 @@ const FormResults: React.FC = () => {
     }, [factUserFormID]);
 
     const handleDataVisualizationClick = useCallback(() => {
-        setMainContent(<DashboardGenerator />);
+        setMainContent(<DashboardGenerator factUserFormID={factUserFormID} />);
     }, []);
 
     const handleMyResultsClick = useCallback(() => {
