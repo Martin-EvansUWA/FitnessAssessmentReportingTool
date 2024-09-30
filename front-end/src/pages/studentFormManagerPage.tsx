@@ -15,6 +15,7 @@ import {
     SidebarSection,
 } from "../interface/sidebarInterface";
 
+
 // Process for fetching form history:
 // 1) Send current user ID to backend
 // 2) Backend queries the fact_user_form table to get all forms filled out by the user or assigned to the user
@@ -110,8 +111,14 @@ const StudentFormManagerPage = () => {
     };
 
     const fetchFormDetails = (factUserFormID: number) => {
+        const access_token = Cookies.get("access_token");
         axios
-            .get(`${backEndUrl}/get_student_form_description/${factUserFormID}`)
+            .get(`${backEndUrl}/get_student_form_description/${factUserFormID}`, {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${access_token}`,
+                },
+              })
             .then((response) => {
                 console.log("Success:", response.data);
                 setFormDetails(response.data || null);

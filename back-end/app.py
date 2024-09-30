@@ -314,7 +314,7 @@ def save_form_entry(
         created_form_response = crud.create_dim_user_form_response(db, form_data)
         userFormResponseID = created_form_response.UserFormResponseID
         fact_user_form_obj = createFactUserFormSchema(
-            form_data.dict(), userFormResponseID
+            form_data.dict(), userFormResponseID, current_user.UserID
         )
         create_dim_user_form_response = crud.create_fact_user_form(
             db, fact_user_form_obj

@@ -5,6 +5,7 @@ import BarChart from "./charts/BarChart";
 import LineChart from "./charts/LineChart";
 import RadarChart from "./charts/RadarChart";
 import ScatterChart from "./charts/ScatterChart";
+import Cookies from "js-cookie";
 
 ///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
 const UserID = 1
@@ -20,8 +21,14 @@ const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
 
     useEffect(() => {
         // Fetch all student data
+        const access_token = Cookies.get("access_token");
         axios
-            .get(`${backEndUrl}/student_data/${factUserFormID}`)
+            .get(`${backEndUrl}/student_data/${factUserFormID}`, {
+                headers: {
+                  "Content-Type": "application/json",
+                  Authorization: `Bearer ${access_token}`,
+                },
+              })
             .then((response) => {
                 setStudentData(response.data);
             })

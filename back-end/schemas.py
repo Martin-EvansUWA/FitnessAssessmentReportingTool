@@ -89,7 +89,6 @@ class DimUser(DimUserBase):
 class DataEntryPageSubmissionData(BaseModel):
     UserFormResponse: Dict[str, Any]  # JSON data
     FormTemplateID: int
-    UserID: int
     SubjectUserID: int
     IsComplete: bool
     CreatedAt: str
