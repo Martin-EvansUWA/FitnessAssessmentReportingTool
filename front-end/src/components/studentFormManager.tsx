@@ -29,6 +29,10 @@ const StudentFormManager = ({
         navigate("/form-results", { state: { factUserFormID, formTitle } });
     };
 
+    const goToDataEntryPage = () => {
+        navigate("/data-entry", { state: { factUserFormID, formTitle } });
+    };
+
     return (
         <div className="flex flex-col min-h-full justify-between">
             <div>
@@ -64,7 +68,10 @@ const StudentFormManager = ({
                 </div>
             </div>
             <div className="flex flex-row justify-between">
-                <button className="flex flex-col transform transition-transform duration-200 hover:scale-105">
+                <button
+                    className="flex flex-col transform transition-transform duration-200 hover:scale-105"
+                    onClick={goToDataEntryPage}
+                >
                     <FontAwesomeIcon
                         icon={faEdit}
                         className="text-2xl md:text-4xl"
