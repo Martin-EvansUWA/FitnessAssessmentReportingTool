@@ -8,6 +8,7 @@ import AddNewForm from "../components/addNewForm";
 import Layout from "../components/layout";
 import StudentFormManager from "../components/studentFormManager";
 import { backEndUrl } from "../global_helpers/constants";
+import { HelperFunctions } from "../global_helpers/helperFunctions";
 import { formTemplateTitleAndDescription } from "../interface/formInterface";
 import {
     formHistorySidebarInfo,
@@ -84,7 +85,9 @@ const StudentFormManagerPage = () => {
 
             return response.data.map((form: formHistorySidebarInfo) => ({
                 [form.FactUserFormID]: {
-                    sectionName: `${form.title} [${form.CreatedAt}]`,
+                    sectionName: `${form.title} [${HelperFunctions.prettierDate(
+                        form.CreatedAt
+                    )}]`,
                     sectionOnClick: () => {
                         setAddNewFormSelected(false);
                         setSelectedFormId(form.FactUserFormID);

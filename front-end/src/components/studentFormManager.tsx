@@ -9,6 +9,7 @@ import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
+import { HelperFunctions } from "../global_helpers/helperFunctions";
 
 const StudentFormManager = ({
     formTitle,
@@ -95,13 +96,15 @@ const StudentFormManager = ({
                         <div className="my-5 flex flex-col">
                             <p>
                                 <span className="font-bold">Started:</span>{" "}
-                                {formStartDate}
+                                {HelperFunctions.prettierDate(formStartDate)}
                             </p>
                             <p>
                                 <span className="font-bold">
                                     Completed/Updated:
                                 </span>{" "}
-                                {formCompletionDate}
+                                {HelperFunctions.prettierDate(
+                                    formCompletionDate
+                                )}
                             </p>
                         </div>
                     </div>

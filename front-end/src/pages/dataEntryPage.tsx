@@ -269,7 +269,7 @@ const DataEntryPage = () => {
                         <span className="text-gray-900 font-bold">
                             Created At:
                         </span>{" "}
-                        {formContentObj.CreatedAt}
+                        {HelperFunctions.prettierDate(formContentObj.CreatedAt)}
                     </h2>
                 </div>
                 <hr className="w-28 border-t-2 border-uwa-yellow my-5" />
@@ -294,7 +294,7 @@ const DataEntryPage = () => {
                     <span className="text-gray-900 font-bold">
                         Form Started At:
                     </span>{" "}
-                    {formStartedAt}
+                    {HelperFunctions.prettierDate(formStartedAt)}
                 </h2>
             </div>
             <button
