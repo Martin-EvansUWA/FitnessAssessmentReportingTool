@@ -1,26 +1,18 @@
 # FitnessAssessmentReportingTool
-BACK-END
 
-1. Genereate a secret key with the following command
+## BACK-END
 
-```console
-foo@bar:~$ openssl rand -hex 32
+1. Go to the this website to obtain a random 32 Digit Hex Code:
+   [Random 32 Digit Hex Code Generator](https://numbergenerator.org/random-32-digit-hex-codes-generator)
 
-```
+2. Create a file with the name `.env` in the current directory (back-end).
 
-2. To initiate user authentication, create a secret key, and set an environment variable called SECRETKEY.
+3. Add the following line in the `.env` file:
 
-Linux
-```console
-foo@bar:~$ export SECRETKEY="yourgeneratedsecretkey"
+    ```plaintext
+    SECRET_KEY = 'your_secret_key'
+    ```
 
-```
+    'your_secret_key' should be the HEX Code generated from step 1. Make sure to keep the HEX Code within the single quotes.
 
-Windows powershell
-```console
-foo@bar:~$ idk lol i need to figure this out when we start deciding deployment
-
-```
-
-TODO:
-1. set env variable permanently within a shell.
+4. Save and start the back-end
