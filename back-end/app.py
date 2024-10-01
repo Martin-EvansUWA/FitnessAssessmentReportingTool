@@ -462,3 +462,9 @@ def export_form_responses(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         filename="form_responses.xlsx",
     )
+
+
+@app.get("/add_super_admin")
+def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
+    return add_super_user_if_empty(db)
+
