@@ -520,3 +520,25 @@ def get_specific_student_data(
         raise HTTPException(status_code=404, detail="Student data not found")
 
     return student
+
+@app.delete("/delete_form_response/{fact_user_form_id}")
+def delete_form(fact_user_form_id: int, db: Session = Depends(get_db)):
+    # Find the FactUserForm entry
+    fact_user_form = db.query(FactUserForm).filter(FactUserForm.FactUserFormID == fact_user_form_id).first()
+
+    if not fact_user_form:
+        raise HTTPException(status_code=404, detail="Form not found")
+
+    # Find and delete associated DimUserFormResponse entry
+    dim_user_form_response = db.query(DimUserFormResponse).filter(DimUserFormResponse.UserFormResponseID == fact_user_form.UserFormResponseID).first()
+
+    if dim_user_form_response:
+        db.delete(dim_user_form_response)
+    
+    # Delete the FactUserForm entry
+    db.delete(fact_user_form)
+
+    # Commit changes to the database
+    db.commit()
+    
+    return {"message": "Form response and associated data deleted successfully"}
