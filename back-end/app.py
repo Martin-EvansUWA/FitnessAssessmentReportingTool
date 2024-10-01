@@ -15,7 +15,7 @@ from jwt.exceptions import InvalidTokenError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
-
+from fastapi import Body, HTTPException
 # Database Imports  ``
 import crud
 import models
@@ -401,7 +401,7 @@ def read_form_submissions(
 
     # Get form submissions
     submissions = get_form_submissions(db, form_template_id)
-
+    
     # Return debugging information
     return {
         "form_details": {
@@ -425,26 +425,58 @@ def read_form_submissions(
         ],
     }
 
-
-# dosn't work but I dont know exactly what going wrong
 @app.delete("/forms/delete-submissions")
-def delete_form_submissions(
-    current_user: Annotated[DimUser, Depends(get_current_admin)],
-    student_ids: List[int],
+def delete_submissions(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    user_ids: List[int] = Body(...),
+    form_template_id: int = Body(...),
     db: Session = Depends(get_db),
 ):
-    if not student_ids:
-        return {"message": "No student IDs provided."}
+    print(f"Received user_ids: {user_ids}, form_template_id: {form_template_id}")
+
+    if not user_ids or not form_template_id:
+        raise HTTPException(status_code=400, detail="User IDs and form template ID are required.")
 
     try:
-        db.query(FactUserForm).filter(FactUserForm.UserID.in_(student_ids)).delete(
-            synchronize_session=False
-        )
+        # Step 1: Get the UserFormResponseIDs related to the FactUserForm entries
+        user_form_response_ids = db.query(FactUserForm.UserFormResponseID).filter(
+            FactUserForm.UserID.in_(user_ids),
+            FactUserForm.FormTemplateID == form_template_id
+        ).all()
+
+        # Flatten the list to get a list of UserFormResponseID values
+        user_form_response_ids = [id[0] for id in user_form_response_ids]  # Flatten the list
+
+        # Step 2: Delete entries from FactUserForm where UserID and FormTemplateID match
+        deleted_count_fact = db.query(FactUserForm).filter(
+            FactUserForm.UserID.in_(user_ids),
+            FactUserForm.FormTemplateID == form_template_id
+        ).delete(synchronize_session=False)
+
+        # Step 3: Delete entries from DimUserFormResponse where UserFormResponseID matches
+        if user_form_response_ids:  # Only delete if there are IDs to delete
+            deleted_count_dim = db.query(DimUserFormResponse).filter(
+                DimUserFormResponse.UserFormResponseID.in_(user_form_response_ids)
+            ).delete(synchronize_session=False)
+        else:
+            deleted_count_dim = 0  # No responses to delete
+
+        # Commit the changes
         db.commit()
-        return {"message": "Selected submissions deleted successfully."}
+
+        total_deleted = deleted_count_fact + deleted_count_dim
+        
+        if total_deleted == 0:
+            raise HTTPException(status_code=404, detail="No submissions found for the provided user IDs and form template ID.")
+
+        return {"message": f"{total_deleted} submission(s) deleted successfully."}
+
     except Exception as e:
-        db.rollback()
-        return {"error": str(e)}, 400
+        db.rollback()  # Rollback in case of error
+        print(f"Error occurred: {str(e)}")  # Log the error for debugging
+        raise HTTPException(status_code=500, detail="Internal Server Error")
+
+
 
 
 @app.get("/forms/{form_template_id}/export", response_class=FileResponse)
@@ -468,3 +500,23 @@ def export_form_responses(
 def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
     return add_super_user_if_empty(db)
 
+#[admin] delete form template
+@app.delete("/Delete_all_forms/{subjectID}/{form_template_id}")
+def delete_form_template(form_template_id: int, db: Session = Depends(get_db)):
+    return delete_form_template(form_template_id, db)
+
+@app.get("/specific_student_data_pop_up/{subject_ID}/{formId}")
+def get_specific_student_data(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    subject_ID: int,
+    formId: int,
+    db: Session = Depends(get_db),
+):
+    student = crud.get_pop_up_student_data(
+        db, form_template_id=formId, subject_id=subject_ID
+    )
+
+    if student is None:
+        raise HTTPException(status_code=404, detail="Student data not found")
+
+    return student

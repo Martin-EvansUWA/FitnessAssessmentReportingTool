@@ -17,6 +17,7 @@
         "@types/react-dom": "^18.3.0",
         "axios": "^1.7.5",
         "chart.js": "^4.4.4",
+        "date-fns": "^4.1.0",
         "framer-motion": "^11.3.30",
         "js-cookie": "^3.0.5",
         "react": "^18.3.1",

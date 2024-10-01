@@ -19,6 +19,7 @@ import {
     SidebarSection,
     SpecificStudentData,
 } from "../interface/sidebarInterface";
+import { format } from 'date-fns';
 
 const AdminFormManagerPage = () => {
     const [formSubmissions, setFormSubmissions] = useState<FormSubmission[]>(
@@ -33,7 +34,7 @@ const AdminFormManagerPage = () => {
     );
     const [showDeleteOptions, setShowDeleteOptions] = useState(false);
     const [selectedSubmissions, setSelectedSubmissions] = useState<
-        { student_id: number; submission_time: string }[]
+        { user_id: number; submission_time: string }[]
     >([]);
     const [selectedFormId, setSelectedFormId] = useState<number | null>(null);
     const [fetchedFormHistory, setFetchedFormHistory] = useState<
@@ -49,6 +50,8 @@ const AdminFormManagerPage = () => {
         setFormDetails(null);
         setCreateNewFormTemplateView(false);
     };
+    const [selectAll, setSelectAll] = useState(false);
+
 
     const baseSidebar: SidebarData = {
         title: "My Form Templates",
@@ -105,13 +108,13 @@ const AdminFormManagerPage = () => {
     };
 
     const fetchSpecificStudentData = async (
-        response_id: number,
+        subject_ID: number,
         formId: number
     ) => {
         const access_token = Cookies.get("access_token");
         try {
             const response = await axios.get(
-                `${backEndUrl}/specific_student_data/${response_id}/${formId}`,
+                `${backEndUrl}/specific_student_data_pop_up/${subject_ID}/${formId}`,
                 {
                     headers: {
                         Authorization: `Bearer ${access_token}`,
@@ -253,7 +256,7 @@ const AdminFormManagerPage = () => {
         const access_token = Cookies.get("access_token");
         try {
             await axios.delete(
-                `${backEndUrl}/forms/${formDetails.form_template_id}`,
+                `${backEndUrl}/Delete_all_forms/${formDetails.form_template_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${access_token}`,
@@ -279,53 +282,73 @@ const AdminFormManagerPage = () => {
     };
 
     const handleCheckboxChange = (submission: FormSubmission) => {
-        const { student_id, submission_time } = submission;
+        const { user_id, submission_time } = submission;
         setSelectedSubmissions((prevSelected) => {
             const isSelected = prevSelected.some(
                 (sub) =>
-                    sub.student_id === student_id &&
+                    sub.user_id === user_id &&
                     sub.submission_time === submission_time
             );
             if (isSelected) {
                 return prevSelected.filter(
                     (sub) =>
                         !(
-                            sub.student_id === student_id &&
+                            sub.user_id === user_id &&
                             sub.submission_time === submission_time
                         )
                 );
             } else {
-                return [...prevSelected, { student_id, submission_time }];
+                return [...prevSelected, { user_id, submission_time }];
             }
         });
+    };
+
+    const handleSelectAllChange = () => {
+        if (selectAll) {
+            setSelectedSubmissions([]);
+        } else {
+            setSelectedSubmissions(
+                formSubmissions.map((submission) => ({
+                    user_id: submission.user_id,
+                    submission_time: submission.submission_time,
+                }))
+            );
+        }
+        setSelectAll(!selectAll);
     };
 
     const handleDeleteSelected = async () => {
         if (
             selectedSubmissions.length === 0 ||
-            !window.confirm(
-                "Are you sure you want to delete the selected responses?"
-            )
+            !window.confirm("Are you sure you want to delete the selected responses?")
         ) {
             return;
         }
-
+    
         const access_token = Cookies.get("access_token");
         try {
+            // Extract only student IDs from the selected submissions
+            const studentIds = selectedSubmissions.map((submission) => submission.user_id);
+            console.log('My Value:', studentIds);
+    
             await axios.delete(`${backEndUrl}/forms/delete-submissions`, {
-                data: { submissions: selectedSubmissions },
+                data: {
+                    user_ids: studentIds,  // Send the array directly
+                    form_template_id: selectedFormId, // Use the selectedFormId
+                },
                 headers: {
                     Authorization: `Bearer ${access_token}`,
                 },
             });
+    
+            // Filter out the deleted submissions from the state
             setFormSubmissions((prev) =>
                 prev.filter(
                     (submission) =>
                         !selectedSubmissions.some(
                             (selected) =>
-                                selected.student_id === submission.student_id &&
-                                selected.submission_time ===
-                                    submission.submission_time
+                                selected.user_id === submission.user_id &&
+                                selected.submission_time === submission.submission_time
                         )
                 )
             );
@@ -346,6 +369,8 @@ const AdminFormManagerPage = () => {
             });
         }
     };
+    
+    
 
     const handleExport = async () => {
         if (!formDetails) return;
@@ -410,53 +435,62 @@ const AdminFormManagerPage = () => {
                         {formDetails?.description}
                     </p>
                     <p>
-                        <strong>Created At: </strong> {formDetails?.created_at}
+                        <strong>Created On: </strong> 
+                        {formDetails?.created_at && 
+                            new Date(formDetails.created_at).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            })
+                        }
                     </p>
                 </div>
             </div>
             <div className="my-5 flex flex-col-reverse md:flex-row md:justify-between">
                 <button
                     onClick={() => setShowDeleteOptions(!showDeleteOptions)}
-                    className="bg-red-500 text-white px-4 h-10 rounded transform transition-transform duration-200 hover:scale-105"
+                    className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-200"
                 >
                     {showDeleteOptions ? "Cancel" : "Delete Response(s)"}
                 </button>
                 <div className="flex justify-end my-2 space-x-10 md:my-0">
                     <button
                         onClick={handleExport}
-                        className="transform transition-transform duration-200 hover:scale-105"
+                        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition-colors duration-200"
                     >
-                        <FontAwesomeIcon
-                            icon={faFileExcel}
-                            className="fa-2xl md:text-5xl text-green-500"
-                        />
+                        Export to Excel
                     </button>
                     <button
                         onClick={handleDeleteTemplate}
-                        className="transform transition-transform duration-200 hover:scale-105"
+                        className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors duration-200"
                     >
-                        <FontAwesomeIcon
-                            icon={faTrash}
-                            className="fa-2xl md:text-5xl text-red-500"
-                        />
+                        Delete Form Template
                     </button>
                 </div>
             </div>
             <div className="w-full overflow-x-auto">
                 <table className="min-w-full bg-white">
-                    <thead>
-                        <tr>
-                            {showDeleteOptions && <th>Select</th>}
-                            <th>Name</th>
-                            <th>Student ID</th>
-                            <th>Subject ID</th>
-                            <th>Submission Time</th>
-                        </tr>
-                    </thead>
+                <thead>
+                    <tr>
+                        {showDeleteOptions && (
+                            <th>
+                                <input
+                                    type="checkbox"
+                                    checked={selectAll}
+                                    onChange={handleSelectAllChange}
+                                />
+                            </th>
+                        )}
+                        <th>Name</th>
+                        <th>Student ID</th>
+                        <th>Subject ID</th>
+                        <th>Submission Time</th>
+                    </tr>
+                </thead>
                     <tbody>
                         {formSubmissions.map((submission) => (
                             <tr
-                                key={`${submission.student_id}-${submission.submission_time}`}
+                                key={`${submission.user_id}-${submission.submission_time}`}
                                 onDoubleClick={() =>
                                     handleRowDoubleClick(submission)
                                 }
@@ -468,8 +502,8 @@ const AdminFormManagerPage = () => {
                                             type="checkbox"
                                             checked={selectedSubmissions.some(
                                                 (sub) =>
-                                                    sub.student_id ===
-                                                        submission.student_id &&
+                                                    sub.user_id ===
+                                                        submission.user_id &&
                                                     sub.submission_time ===
                                                         submission.submission_time
                                             )}
@@ -480,9 +514,9 @@ const AdminFormManagerPage = () => {
                                     </td>
                                 )}
                                 <td>{`${submission.first_name} ${submission.last_name}`}</td>
-                                <td>{submission.student_id}</td>
+                                <td>{submission.user_id}</td>
                                 <td>{submission.subject_ID}</td>
-                                <td>{submission.submission_time}</td>
+                                <td>{format(new Date(submission.submission_time), 'MMMM dd, yyyy HH:mm:ss')}</td>
                             </tr>
                         ))}
                     </tbody>
@@ -591,9 +625,12 @@ const AdminFormManagerPage = () => {
                                 </div>
                             )}
                         </div>
+                        
                     )
                 }
+                
             />
+            
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
