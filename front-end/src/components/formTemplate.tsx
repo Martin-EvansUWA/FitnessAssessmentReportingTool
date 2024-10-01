@@ -79,12 +79,12 @@ const FormTemplate = ({
                                                 ? formTemplate[section][field]
                                                 : undefined
                                         }
-                                        className={
+                                        className={`${
                                             formTemplate[section][field] !==
                                             MeasurementType.bool
                                                 ? "border border-gray-300 rounded-md p-1 w-1/3"
                                                 : "border border-gray-300 rounded-md p-1 w-6 h-6"
-                                        }
+                                        } transform transition-transform duration-200 hover:scale-105`}
                                         checked={
                                             formTemplate[section][field] ===
                                             MeasurementType.bool
@@ -112,11 +112,11 @@ const FormTemplate = ({
             <div className="text-black w-full flex flex-row justify-between">
                 <button
                     title="previous-section"
-                    className={
+                    className={`${
                         previousSection === null
                             ? "font-bold invisible"
                             : "font-bold"
-                    }
+                    } transform transition-transform duration-200 hover:scale-105`}
                     onClick={onPreviousPage}
                 >
                     <FontAwesomeIcon icon={faChevronLeft} className="fa-2xl" />
@@ -124,11 +124,11 @@ const FormTemplate = ({
                 </button>
                 <button
                     title="next-section"
-                    className={
+                    className={`${
                         nextSection === null
                             ? "font-bold invisible"
                             : "font-bold"
-                    }
+                    } transform transition-transform duration-200 hover:scale-105`}
                     onClick={onNextPage}
                 >
                     {nextSection}

@@ -273,7 +273,7 @@ const DataEntryPage = () => {
                     </label>
                     <input
                         type="text"
-                        className="h-7 border-2 border-gray-300 rounded max-w-[15rem]"
+                        className="h-7 border-2 border-gray-300 rounded max-w-[15rem] transform transition-transform duration-200 hover:scale-105"
                         aria-label="subject student number"
                         placeholder="UWA Student Number"
                         onKeyDown={HelperFunctions.handleKeyDown}
@@ -284,7 +284,7 @@ const DataEntryPage = () => {
                 </div>
             </div>
             <button
-                className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end"
+                className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end transform transition-transform duration-200 hover:scale-105"
                 onClick={() => {
                     setSelectedSection(0);
                     updateSectionNavigation(0);
