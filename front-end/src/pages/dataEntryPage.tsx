@@ -1,5 +1,6 @@
 import { faSave, faSignOut } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useCallback, useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
@@ -10,7 +11,6 @@ import { backEndUrl } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
 import { FormTemplateJSON } from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
-import Cookies from "js-cookie";
 
 const DataEntryPage = () => {
     const [selectedSection, setSelectedSection] = useState<number | null>(null);
@@ -147,10 +147,10 @@ const DataEntryPage = () => {
         return axios
             .post(`${backEndUrl}/save_form_entry`, formattedFormData, {
                 headers: {
-                  "Content-Type": "application/json",
-                  Authorization: `Bearer ${access_token}`,
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${access_token}`,
                 },
-              })
+            })
             .then((response) => {
                 console.log("Success:", response.data);
                 toast.success("Progress Saved Successfully!", {
