@@ -26,6 +26,12 @@ export class HelperFunctions {
     };
 
     static prettierDate = (date: string) => {
-        return format(new Date(date), "MMMM dd, yyyy HH:mm:ss");
+        let formatted_date = date;
+        try {
+            formatted_date = format(new Date(date), "MMMM dd, yyyy HH:mm:ss");
+        } catch (error) {
+            console.error("Error in prettierDate:", error);
+        }
+        return formatted_date;
     };
 }
