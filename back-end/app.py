@@ -6,7 +6,7 @@ from http.client import HTTPException
 import jwt
 
 # Website Imports
-from fastapi import Depends, FastAPI, HTTPException, Response, status
+from fastapi import Body, Depends, FastAPI, HTTPException, Response, status
 from fastapi.encoders import jsonable_encoder
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
@@ -15,7 +15,7 @@ from jwt.exceptions import InvalidTokenError
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
-from fastapi import Body, HTTPException
+
 # Database Imports  ``
 import crud
 import models
@@ -311,20 +311,68 @@ def save_form_entry(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
-    print(form_data)
     try:
-        created_form_response = crud.create_dim_user_form_response(db, form_data)
-        userFormResponseID = created_form_response.UserFormResponseID
-        fact_user_form_obj = createFactUserFormSchema(
-            form_data.dict(), userFormResponseID, current_user.UserID
+        existing_fact_user_form = crud.check_if_user_form_response_exists(
+            db,
+            current_user.UserID,
+            form_data.CreatedAt,
+            form_data.FormTemplateID,
+            form_data.SubjectUserID,
         )
-        create_dim_user_form_response = crud.create_fact_user_form(
-            db, fact_user_form_obj
-        )
+        if existing_fact_user_form:
+            # Update existing form response entry in DimUserFormResponse
+            crud.update_dim_user_form_response(
+                db,
+                existing_fact_user_form.UserFormResponseID,
+                form_data.UserFormResponse,
+            )
+            return {"status": 200, "message": "Form entry updated successfully"}
+        else:
+            # Create new form response entry in DimUserFormResponse
+            created_form_response = crud.create_dim_user_form_response(db, form_data)
+            userFormResponseID = created_form_response.UserFormResponseID
+            fact_user_form_obj = createFactUserFormSchema(
+                form_data.dict(), userFormResponseID, current_user.UserID
+            )
+            # Create new form response entry in FactUserForm
+            create_dim_user_form_response = crud.create_fact_user_form(
+                db, fact_user_form_obj
+            )
+            return {"status": 200, "message": "Form entry updated successfully"}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail="Form entry failed to save")
+        raise HTTPException(status_code=400, detail=str(e))
 
-    return {"status": 200, "message": "Form entry saved successfully"}
+
+# [Student] Get fact table data and form response data by fact_user_form_id
+@app.get("/retrieve_user_form_response_from_fact_table/{fact_user_form_id}")
+def retrieve_user_form_response_from_fact_table(
+    fact_user_form_id: int,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    fact_user_form = crud.get_fact_user_form_by_id(db, fact_user_form_id)
+    form_template_id = crud.get_form_template_id_from_fact_user_form(
+        db, fact_user_form_id
+    )
+    form_template = crud.get_dim_form_template(db, form_template_id)
+    form_response = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id
+    )
+    subject_user_id = crud.get_subject_user_id(db, fact_user_form_id)
+
+    response = {
+        "FormTemplateID": form_template.FormTemplateID,
+        "UserID": form_template.UserID,
+        "FormTemplate": form_template.FormTemplate,
+        "Title": form_template.Title,
+        "Description": form_template.Description,
+        "CreatedAt": form_template.CreatedAt,
+        "SubjectUserID": subject_user_id,
+        "FormStartedAt": fact_user_form.CreatedAt,
+        "UserFormResponse": form_response,
+    }
+
+    return response
 
 
 """ DATA VISUALISATION FUNCTION"""
@@ -401,7 +449,7 @@ def read_form_submissions(
 
     # Get form submissions
     submissions = get_form_submissions(db, form_template_id)
-    
+
     # Return debugging information
     return {
         "form_details": {
@@ -425,6 +473,7 @@ def read_form_submissions(
         ],
     }
 
+
 @app.delete("/forms/delete-submissions")
 def delete_submissions(
     current_user: Annotated[DimUser, Depends(get_current_user)],
@@ -435,29 +484,45 @@ def delete_submissions(
     print(f"Received user_ids: {user_ids}, form_template_id: {form_template_id}")
 
     if not user_ids or not form_template_id:
-        raise HTTPException(status_code=400, detail="User IDs and form template ID are required.")
+        raise HTTPException(
+            status_code=400, detail="User IDs and form template ID are required."
+        )
 
     try:
         # Step 1: Get the UserFormResponseIDs related to the FactUserForm entries
-        user_form_response_ids = db.query(FactUserForm.UserFormResponseID).filter(
-            FactUserForm.UserID.in_(user_ids),
-            FactUserForm.FormTemplateID == form_template_id
-        ).all()
+        user_form_response_ids = (
+            db.query(FactUserForm.UserFormResponseID)
+            .filter(
+                FactUserForm.UserID.in_(user_ids),
+                FactUserForm.FormTemplateID == form_template_id,
+            )
+            .all()
+        )
 
         # Flatten the list to get a list of UserFormResponseID values
-        user_form_response_ids = [id[0] for id in user_form_response_ids]  # Flatten the list
+        user_form_response_ids = [
+            id[0] for id in user_form_response_ids
+        ]  # Flatten the list
 
         # Step 2: Delete entries from FactUserForm where UserID and FormTemplateID match
-        deleted_count_fact = db.query(FactUserForm).filter(
-            FactUserForm.UserID.in_(user_ids),
-            FactUserForm.FormTemplateID == form_template_id
-        ).delete(synchronize_session=False)
+        deleted_count_fact = (
+            db.query(FactUserForm)
+            .filter(
+                FactUserForm.UserID.in_(user_ids),
+                FactUserForm.FormTemplateID == form_template_id,
+            )
+            .delete(synchronize_session=False)
+        )
 
         # Step 3: Delete entries from DimUserFormResponse where UserFormResponseID matches
         if user_form_response_ids:  # Only delete if there are IDs to delete
-            deleted_count_dim = db.query(DimUserFormResponse).filter(
-                DimUserFormResponse.UserFormResponseID.in_(user_form_response_ids)
-            ).delete(synchronize_session=False)
+            deleted_count_dim = (
+                db.query(DimUserFormResponse)
+                .filter(
+                    DimUserFormResponse.UserFormResponseID.in_(user_form_response_ids)
+                )
+                .delete(synchronize_session=False)
+            )
         else:
             deleted_count_dim = 0  # No responses to delete
 
@@ -465,9 +530,12 @@ def delete_submissions(
         db.commit()
 
         total_deleted = deleted_count_fact + deleted_count_dim
-        
+
         if total_deleted == 0:
-            raise HTTPException(status_code=404, detail="No submissions found for the provided user IDs and form template ID.")
+            raise HTTPException(
+                status_code=404,
+                detail="No submissions found for the provided user IDs and form template ID.",
+            )
 
         return {"message": f"{total_deleted} submission(s) deleted successfully."}
 
@@ -475,8 +543,6 @@ def delete_submissions(
         db.rollback()  # Rollback in case of error
         print(f"Error occurred: {str(e)}")  # Log the error for debugging
         raise HTTPException(status_code=500, detail="Internal Server Error")
-
-
 
 
 @app.get("/forms/{form_template_id}/export", response_class=FileResponse)
@@ -500,10 +566,12 @@ def export_form_responses(
 def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
     return add_super_user_if_empty(db)
 
-#[admin] delete form template
+
+# [admin] delete form template
 @app.delete("/Delete_all_forms/{subjectID}/{form_template_id}")
 def delete_form_template(form_template_id: int, db: Session = Depends(get_db)):
     return delete_form_template(form_template_id, db)
+
 
 @app.get("/specific_student_data_pop_up/{subject_ID}/{formId}")
 def get_specific_student_data(
