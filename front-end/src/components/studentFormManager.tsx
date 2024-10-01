@@ -179,13 +179,17 @@ const StudentFormManager = ({
                             Dashboard
                         </span>
                     </button>
-                    <button className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105">
+                    <button className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105"
+                        onClick={deleteFormResponse}
+                    >
+                        
                         <FontAwesomeIcon
                             icon={faTrash}
                             className="text-2xl md:text-4xl text-red-500"
                         />
                         <span className="invisible md:visible font-bold text-red-500">
                             Delete
+
                         </span>
                     </button>
                 </div>
