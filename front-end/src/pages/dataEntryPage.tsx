@@ -143,6 +143,22 @@ const DataEntryPage = () => {
         }));
     };
 
+    const isFormComplete = () => {
+        for (const section of Object.keys(formContentJSON)) {
+            for (const field of Object.keys(formContentJSON[section])) {
+                if (
+                    !formData[section] ||
+                    formData[section][field] === "" ||
+                    formData[section][field] === null ||
+                    formData[section][field] === undefined
+                ) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
     const handleSave = () => {
         const access_token = Cookies.get("access_token");
         // Formatted form data to send to the backend
@@ -150,7 +166,7 @@ const DataEntryPage = () => {
             SubjectUserID: subjectStudentNumber,
             CreatedAt: createdAtDateTime,
             CompleteAt: new Date().toISOString(),
-            IsComplete: false, //TODO: Add logic to check if the form is complete
+            IsComplete: isFormComplete(),
             FormTemplateID: formContentObj.FormTemplateID,
             UserFormResponse: formData,
         };
