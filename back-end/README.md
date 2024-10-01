@@ -2,7 +2,7 @@
 
 ## BACK-END
 
-1. Go to the below website to obtain a random 32 Digit Hex Code:
+1. Go to the this website to obtain a random 32 Digit Hex Code:
    [Random 32 Digit Hex Code Generator](https://numbergenerator.org/random-32-digit-hex-codes-generator)
 
 2. Create a file with the name `.env` in the current directory (back-end).
