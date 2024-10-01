@@ -79,7 +79,7 @@ const AdminFormManagerPage = () => {
                 `${backEndUrl}/read_form_submissions/${formTemplateId}`,
                 {
                     headers: {
-                        Authorization: `Bearer ${Cookies.get("access_token")}`,
+                        Authorization: `Bearer ${access_token}`,
                     },
                 }
             );
@@ -506,8 +506,12 @@ const AdminFormManagerPage = () => {
                 mainContent={
                     createNewFormTemplateView ? (
                         <FormTemplateGenerator
-                            updateFormTemplateHistory={updateFormTemplateHistory}
-                            viewAdminFormManagerDefault={viewAdminFormManagerDefault}
+                            updateFormTemplateHistory={
+                                updateFormTemplateHistory
+                            }
+                            viewAdminFormManagerDefault={
+                                viewAdminFormManagerDefault
+                            }
                         />
                     ) : (
                         <div className="flex flex-col">
