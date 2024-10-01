@@ -1,9 +1,11 @@
-import json
 from datetime import datetime, timedelta, timezone
 from http.client import HTTPException
+import uvicorn
+import os
 
 # Login and Encryption Imports
 import jwt
+import ssl
 
 # Website Imports
 from fastapi import Depends, FastAPI, HTTPException, Response, status
@@ -58,6 +60,8 @@ def get_db():
 # app implementation
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_user")
+ssl_context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+ssl_context.load_cert_chain('cert.pem', keyfile='key.pem')
 
 app.add_middleware(
     CORSMiddleware,
@@ -69,8 +73,6 @@ app.add_middleware(
 
 
 """ AUTHENTICATION FUNCTIONS"""
-
-
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
 ):
@@ -462,3 +464,7 @@ def export_form_responses(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         filename="form_responses.xlsx",
     )
+
+
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="localhost", port=8000, ssl_keyfile="key.pem", ssl_certfile="cert.pem", reload=True)

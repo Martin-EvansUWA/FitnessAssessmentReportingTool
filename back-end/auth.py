@@ -18,8 +18,7 @@ CREDENTIALS_EXCEPTION = HTTPException(
     )
 
 # fake secret key, needs to become env variable
-
-SECRET_KEY = os.getenv("SECRETKEY")
+SECRET_KEY = "92012a06851be842ea0aee09f93c98a0"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 

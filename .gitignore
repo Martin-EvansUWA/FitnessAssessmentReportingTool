@@ -166,3 +166,4 @@ venv
 *.venv
 launch.json
 *.db
+*.pem
