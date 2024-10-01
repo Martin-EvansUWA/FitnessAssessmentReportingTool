@@ -4,6 +4,7 @@ from tempfile import NamedTemporaryFile
 # DimUser CRUD operations
 from typing import Any, Dict, List
 
+from fastapi import HTTPException
 import numpy as np
 import pandas as pd
 from sqlalchemy import or_, select
@@ -274,6 +275,28 @@ def get_student_form_response(db: Session, form_template_id: int, user_id: int):
     return responses
 
 
+def get_pop_up_student_data(db: Session, form_template_id: int, subject_id: int):
+    """Fetch all form responses for a specific student and form template."""
+    responses = (
+        db.execute(
+            select(DimUserFormResponse.UserFormResponse)
+            .join(
+                FactUserForm,
+                FactUserForm.UserFormResponseID
+                == DimUserFormResponse.UserFormResponseID,
+            )
+            .where(
+                FactUserForm.FormTemplateID == form_template_id,
+                FactUserForm.SubjectUserID == subject_id,
+            )
+        )
+        .scalars()
+        .all()
+    )
+
+    return responses
+
+
 def get_student_form_response_fact_user_form_id(db: Session, fact_user_form_id: int):
     """Fetch a form response for a specific fact_user_form_id."""
     response = db.execute(
@@ -479,3 +502,33 @@ def add_super_user_if_empty(db: Session):
         return {"message": "Super user added"}
     else:
         return {"message": "Super user already exists"}
+
+
+#delete template and all entries in FactUserForm related to the form template
+def delete_form_template(form_template_id: int, db: Session):
+    try:
+        fact_entries = db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).all()
+        for entry in fact_entries:
+            db.delete(entry)
+
+        responses = db.query(DimUserFormResponse).filter(
+            DimUserFormResponse.UserFormResponseID.in_(
+                db.query(FactUserForm.UserFormResponseID).filter(FactUserForm.FormTemplateID == form_template_id)
+            )
+        ).all()
+
+        for response in responses:
+            db.delete(response)
+
+        form_template = db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).first()
+        if not form_template:
+            raise HTTPException(status_code=404, detail="Form template not found")
+
+        db.delete(form_template)
+        db.commit()
+
+        return {"message": "Form template and associated data deleted successfully"}
+
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
