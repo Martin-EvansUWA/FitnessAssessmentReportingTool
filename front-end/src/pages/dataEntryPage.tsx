@@ -28,6 +28,7 @@ const DataEntryPage = () => {
 
     const location = useLocation();
     const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
+    const formContentType: string = location.state?.type || ""; // Get the form type from the location state
 
     const navigate = useNavigate(); // Used for navigation
 

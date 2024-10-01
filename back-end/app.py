@@ -327,6 +327,22 @@ def save_form_entry(
     return {"status": 200, "message": "Form entry saved successfully"}
 
 
+# [Student] Get fact table data and form response data by fact_user_form_id
+@app.get("/retrieve_user_form_response_from_fact_table/{fact_user_form_id}")
+def retrieve_user_form_response_from_fact_table(
+    fact_user_form_id: int,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    crud_query_response = crud.get_user_response_from_fact_table(
+        db, fact_user_form_id=fact_user_form_id
+    )
+    fact_user_form = crud_query_response[0]
+    dim_user_form_response = crud_query_response[1]
+
+    return [fact_user_form, dim_user_form_response]
+
+
 """ DATA VISUALISATION FUNCTION"""
 
 
