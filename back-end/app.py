@@ -60,12 +60,10 @@ def get_db():
 # app implementation
 app = FastAPI()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login_user")
-ssl_context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-ssl_context.load_cert_chain('cert.pem', keyfile='key.pem')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://localhost:3000"],  # Add your frontend origin here
+    allow_origins=["http://localhost:3000"],  # Add your frontend origin here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
