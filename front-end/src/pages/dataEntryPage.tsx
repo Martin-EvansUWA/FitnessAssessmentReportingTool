@@ -27,7 +27,7 @@ const DataEntryPage = () => {
     >([]);
     const [subjectStudentNumber, setSubjectStudentNumber] =
         useState<string>("");
-    const [createdAtDateTime, setCreatedAtDateTime] = useState<string>("");
+    const [formStartedAt, setFormStartedAt] = useState<string>("");
 
     const location = useLocation();
     const formContentObj: FormTemplateJSON | EditFormTemplateJSON =
@@ -71,7 +71,16 @@ const DataEntryPage = () => {
 
     useEffect(() => {
         // Save the current date and time when the user starts the form
-        setCreatedAtDateTime(new Date().toISOString());
+        if (formContentType === dataEntryRedirectType.NEW_FORM) {
+            setFormStartedAt(new Date().toISOString());
+        } else {
+            // If the formContentType is not NEW_FORM, then it is an existing form
+            // and the formStartedAt is already set in the formContentObj
+            if ("FormStartedAt" in formContentObj) {
+                setFormStartedAt(formContentObj.FormStartedAt);
+            }
+        }
+
         // Update sections before rendering the component
         const sections = getSectionsFromFormTemplate(
             formContentObj.FormTemplate
@@ -88,7 +97,6 @@ const DataEntryPage = () => {
             if ("SubjectUserID" in formContentObj) {
                 setSubjectStudentNumber(formContentObj.SubjectUserID);
             }
-            setCreatedAtDateTime(formContentObj.CreatedAt);
         }
     }, [formContentObj, formContentType]);
 
@@ -164,7 +172,7 @@ const DataEntryPage = () => {
         // Formatted form data to send to the backend
         const formattedFormData = {
             SubjectUserID: subjectStudentNumber,
-            CreatedAt: createdAtDateTime,
+            CreatedAt: formStartedAt,
             CompleteAt: new Date().toISOString(),
             IsComplete: isFormComplete(),
             FormTemplateID: formContentObj.FormTemplateID,
@@ -282,6 +290,12 @@ const DataEntryPage = () => {
                         value={subjectStudentNumber}
                     />
                 </div>
+                <h2 className="text-lg font-semibold my-3 text-gray-700">
+                    <span className="text-gray-900 font-bold">
+                        Form Started At:
+                    </span>{" "}
+                    {formStartedAt}
+                </h2>
             </div>
             <button
                 className="bg-uwa-yellow font-bold h-10 w-36 rounded self-end transform transition-transform duration-200 hover:scale-105"

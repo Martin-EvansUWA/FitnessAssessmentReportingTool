@@ -162,6 +162,39 @@ def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
 
 
+# Check if a user form response exists by the UserID, CreatedAt, FormTemplateID, and SubjectUserID
+def check_if_user_form_response_exists(
+    db: Session,
+    user_id: int,
+    created_at: str,
+    form_template_id: int,
+    subject_user_id: int,
+):
+    existing_fact_user_form = (
+        db.query(models.FactUserForm)
+        .filter(
+            models.FactUserForm.UserID == user_id,
+            models.FactUserForm.CreatedAt == created_at,
+            models.FactUserForm.FormTemplateID == form_template_id,
+            models.FactUserForm.SubjectUserID == subject_user_id,
+        )
+        .first()
+    )
+    return existing_fact_user_form
+
+
+def update_dim_user_form_response(db: Session, response_id: int, new_response: str):
+    db_response = (
+        db.query(models.DimUserFormResponse)
+        .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
+        .first()
+    )
+    db_response.UserFormResponse = new_response
+    db.commit()
+    db.refresh(db_response)
+    return db_response
+
+
 # Create a new form response
 def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
@@ -176,6 +209,15 @@ def create_dim_user_form_response(
 
 
 # FactUserForm CRUD operations
+# Get fact user form by ID
+def get_fact_user_form_by_id(db: Session, fact_user_form_id: int):
+    return (
+        db.query(models.FactUserForm)
+        .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )
+
+
 # Get a specific user form
 def get_fact_user_form(
     db: Session,

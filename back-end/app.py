@@ -311,20 +311,34 @@ def save_form_entry(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
-    print(form_data)
     try:
-        created_form_response = crud.create_dim_user_form_response(db, form_data)
-        userFormResponseID = created_form_response.UserFormResponseID
-        fact_user_form_obj = createFactUserFormSchema(
-            form_data.dict(), userFormResponseID, current_user.UserID
+        existing_fact_user_form = crud.check_if_user_form_response_exists(
+            db,
+            current_user.UserID,
+            form_data.CreatedAt,
+            form_data.FormTemplateID,
+            form_data.SubjectUserID,
         )
-        create_dim_user_form_response = crud.create_fact_user_form(
-            db, fact_user_form_obj
-        )
+        if existing_fact_user_form:
+            # Update existing form response entry in DimUserFormResponse
+            crud.update_dim_user_form_response(
+                existing_fact_user_form.UserFormResponseID, form_data
+            )
+            return {"status": 200, "message": "Form entry updated successfully"}
+        else:
+            # Create new form response entry in DimUserFormResponse
+            created_form_response = crud.create_dim_user_form_response(db, form_data)
+            userFormResponseID = created_form_response.UserFormResponseID
+            fact_user_form_obj = createFactUserFormSchema(
+                form_data.dict(), userFormResponseID, current_user.UserID
+            )
+            # Create new form response entry in FactUserForm
+            create_dim_user_form_response = crud.create_fact_user_form(
+                db, fact_user_form_obj
+            )
+            return {"status": 200, "message": "Form entry updated successfully"}
     except ValueError as e:
-        raise HTTPException(status_code=400, detail="Form entry failed to save")
-
-    return {"status": 200, "message": "Form entry saved successfully"}
+        raise HTTPException(status_code=400, detail=str(e))
 
 
 # [Student] Get fact table data and form response data by fact_user_form_id
@@ -334,6 +348,7 @@ def retrieve_user_form_response_from_fact_table(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
+    fact_user_form = crud.get_fact_user_form_by_id(db, fact_user_form_id)
     form_template_id = crud.get_form_template_id_from_fact_user_form(
         db, fact_user_form_id
     )
@@ -351,6 +366,7 @@ def retrieve_user_form_response_from_fact_table(
         "Description": form_template.Description,
         "CreatedAt": form_template.CreatedAt,
         "SubjectUserID": subject_user_id,
+        "FormStartedAt": fact_user_form.CreatedAt,
         "UserFormResponse": form_response,
     }
 

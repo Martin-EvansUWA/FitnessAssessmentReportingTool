@@ -27,6 +27,7 @@ export interface FormTemplateJSON {
 
 export interface EditFormTemplateJSON extends FormTemplateJSON {
     SubjectUserID: string;
+    FormStartedAt: string;
     UserFormResponse: { [key: string]: any };
 }
 
