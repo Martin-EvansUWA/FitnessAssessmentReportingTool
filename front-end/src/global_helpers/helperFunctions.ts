@@ -1,3 +1,5 @@
+import { format } from "date-fns/format";
+
 export class HelperFunctions {
     static handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
         const key = event.key;
@@ -21,5 +23,15 @@ export class HelperFunctions {
         if (!/^\d+$/.test(pasteData)) {
             event.preventDefault();
         }
+    };
+
+    static prettierDate = (date: string) => {
+        let formatted_date = date;
+        try {
+            formatted_date = format(new Date(date), "MMMM dd, yyyy HH:mm:ss");
+        } catch (error) {
+            console.error("Error in prettierDate:", error);
+        }
+        return formatted_date;
     };
 }

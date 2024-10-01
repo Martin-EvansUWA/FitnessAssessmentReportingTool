@@ -4,9 +4,9 @@ from tempfile import NamedTemporaryFile
 # DimUser CRUD operations
 from typing import Any, Dict, List
 
-from fastapi import HTTPException
 import numpy as np
 import pandas as pd
+from fastapi import HTTPException
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -162,6 +162,39 @@ def get_dim_user_form_responses(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.DimUserFormResponse).offset(skip).limit(limit).all()
 
 
+# Check if a user form response exists by the UserID, CreatedAt, FormTemplateID, and SubjectUserID
+def check_if_user_form_response_exists(
+    db: Session,
+    user_id: int,
+    created_at: str,
+    form_template_id: int,
+    subject_user_id: int,
+):
+    existing_fact_user_form = (
+        db.query(models.FactUserForm)
+        .filter(
+            models.FactUserForm.UserID == user_id,
+            models.FactUserForm.CreatedAt == created_at,
+            models.FactUserForm.FormTemplateID == form_template_id,
+            models.FactUserForm.SubjectUserID == subject_user_id,
+        )
+        .first()
+    )
+    return existing_fact_user_form
+
+
+def update_dim_user_form_response(db: Session, response_id: int, new_response: str):
+    db_response = (
+        db.query(models.DimUserFormResponse)
+        .filter(models.DimUserFormResponse.UserFormResponseID == response_id)
+        .first()
+    )
+    db_response.UserFormResponse = new_response
+    db.commit()
+    db.refresh(db_response)
+    return db_response
+
+
 # Create a new form response
 def create_dim_user_form_response(
     db: Session, dim_user_form_response: schemas.DataEntryPageSubmissionData
@@ -176,6 +209,15 @@ def create_dim_user_form_response(
 
 
 # FactUserForm CRUD operations
+# Get fact user form by ID
+def get_fact_user_form_by_id(db: Session, fact_user_form_id: int):
+    return (
+        db.query(models.FactUserForm)
+        .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )
+
+
 # Get a specific user form
 def get_fact_user_form(
     db: Session,
@@ -485,17 +527,18 @@ def create_export_file(responses):
         df.to_excel(tmp.name, index=False)
         return tmp.name
 
+
 def add_super_user_if_empty(db: Session):
     # Check if the table is empty by querying the model (not the schema)
     if not db.query(DimUser).first():
         # Add the super user
         super_user = DimUser(
             UserID=1,
-            FirstName='SUPER',
-            LastName='USER',
-            email='SUPER.USER@mail.com',
+            FirstName="SUPER",
+            LastName="USER",
+            email="SUPER.USER@mail.com",
             isAdmin=True,
-            hashed_password='$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e'
+            hashed_password="$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e",
         )
         db.add(super_user)
         db.commit()
@@ -504,23 +547,37 @@ def add_super_user_if_empty(db: Session):
         return {"message": "Super user already exists"}
 
 
-#delete template and all entries in FactUserForm related to the form template
+# delete template and all entries in FactUserForm related to the form template
 def delete_form_template(form_template_id: int, db: Session):
     try:
-        fact_entries = db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).all()
+        fact_entries = (
+            db.query(FactUserForm)
+            .filter(FactUserForm.FormTemplateID == form_template_id)
+            .all()
+        )
         for entry in fact_entries:
             db.delete(entry)
 
-        responses = db.query(DimUserFormResponse).filter(
-            DimUserFormResponse.UserFormResponseID.in_(
-                db.query(FactUserForm.UserFormResponseID).filter(FactUserForm.FormTemplateID == form_template_id)
+        responses = (
+            db.query(DimUserFormResponse)
+            .filter(
+                DimUserFormResponse.UserFormResponseID.in_(
+                    db.query(FactUserForm.UserFormResponseID).filter(
+                        FactUserForm.FormTemplateID == form_template_id
+                    )
+                )
             )
-        ).all()
+            .all()
+        )
 
         for response in responses:
             db.delete(response)
 
-        form_template = db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).first()
+        form_template = (
+            db.query(DimFormTemplate)
+            .filter(DimFormTemplate.FormTemplateID == form_template_id)
+            .first()
+        )
         if not form_template:
             raise HTTPException(status_code=404, detail="Form template not found")
 
@@ -532,3 +589,11 @@ def delete_form_template(form_template_id: int, db: Session):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def get_subject_user_id(db: Session, fact_user_form_id: int):
+    return (
+        db.query(models.FactUserForm.SubjectUserID)
+        .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )[0]
