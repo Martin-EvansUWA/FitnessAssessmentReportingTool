@@ -4,9 +4,9 @@ from tempfile import NamedTemporaryFile
 # DimUser CRUD operations
 from typing import Any, Dict, List
 
-from fastapi import HTTPException
 import numpy as np
 import pandas as pd
+from fastapi import HTTPException
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
@@ -485,17 +485,18 @@ def create_export_file(responses):
         df.to_excel(tmp.name, index=False)
         return tmp.name
 
+
 def add_super_user_if_empty(db: Session):
     # Check if the table is empty by querying the model (not the schema)
     if not db.query(DimUser).first():
         # Add the super user
         super_user = DimUser(
             UserID=1,
-            FirstName='SUPER',
-            LastName='USER',
-            email='SUPER.USER@mail.com',
+            FirstName="SUPER",
+            LastName="USER",
+            email="SUPER.USER@mail.com",
             isAdmin=True,
-            hashed_password='$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e'
+            hashed_password="$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e",
         )
         db.add(super_user)
         db.commit()
@@ -504,23 +505,37 @@ def add_super_user_if_empty(db: Session):
         return {"message": "Super user already exists"}
 
 
-#delete template and all entries in FactUserForm related to the form template
+# delete template and all entries in FactUserForm related to the form template
 def delete_form_template(form_template_id: int, db: Session):
     try:
-        fact_entries = db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).all()
+        fact_entries = (
+            db.query(FactUserForm)
+            .filter(FactUserForm.FormTemplateID == form_template_id)
+            .all()
+        )
         for entry in fact_entries:
             db.delete(entry)
 
-        responses = db.query(DimUserFormResponse).filter(
-            DimUserFormResponse.UserFormResponseID.in_(
-                db.query(FactUserForm.UserFormResponseID).filter(FactUserForm.FormTemplateID == form_template_id)
+        responses = (
+            db.query(DimUserFormResponse)
+            .filter(
+                DimUserFormResponse.UserFormResponseID.in_(
+                    db.query(FactUserForm.UserFormResponseID).filter(
+                        FactUserForm.FormTemplateID == form_template_id
+                    )
+                )
             )
-        ).all()
+            .all()
+        )
 
         for response in responses:
             db.delete(response)
 
-        form_template = db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).first()
+        form_template = (
+            db.query(DimFormTemplate)
+            .filter(DimFormTemplate.FormTemplateID == form_template_id)
+            .first()
+        )
         if not form_template:
             raise HTTPException(status_code=404, detail="Form template not found")
 
@@ -532,3 +547,11 @@ def delete_form_template(form_template_id: int, db: Session):
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
+
+
+def get_subject_user_id(db: Session, fact_user_form_id: int):
+    return (
+        db.query(models.FactUserForm.SubjectUserID)
+        .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )[0]

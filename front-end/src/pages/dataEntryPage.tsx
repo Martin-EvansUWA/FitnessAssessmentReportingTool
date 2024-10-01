@@ -7,7 +7,7 @@ import { Bounce, toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
-import { backEndUrl } from "../global_helpers/constants";
+import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
 import {
     EditFormTemplateJSON,
@@ -77,7 +77,20 @@ const DataEntryPage = () => {
             formContentObj.FormTemplate
         );
         setSidebarSections(sections); // Set the sidebar sections
-    }, [formContentObj]);
+
+        // Pre-fill form data if editing a previously submitted form
+        if (formContentType === dataEntryRedirectType.EDIT_FORM) {
+            const previousData =
+                "UserFormResponse" in formContentObj
+                    ? formContentObj.UserFormResponse
+                    : {};
+            setFormData(previousData);
+            if ("SubjectUserID" in formContentObj) {
+                setSubjectStudentNumber(formContentObj.SubjectUserID);
+            }
+            setCreatedAtDateTime(formContentObj.CreatedAt);
+        }
+    }, [formContentObj, formContentType]);
 
     const formContentJSON = formContentObj.FormTemplate;
     const sections = Object.keys(formContentJSON);
@@ -205,7 +218,11 @@ const DataEntryPage = () => {
     const introComponent = (
         <div className="h-full flex flex-col justify-between">
             <div>
-                <h1 className="text-2xl font-bold">Data Entry Page</h1>
+                <h1 className="text-2xl font-bold">
+                    {formContentType === dataEntryRedirectType.NEW_FORM
+                        ? "Data Entry Page"
+                        : "Data Edit Page"}
+                </h1>
                 <hr className="w-28 border-t-2 border-uwa-yellow my-5" />
                 <div className="mt-5">
                     <h2 className="text-lg font-semibold my-3 text-gray-700">
