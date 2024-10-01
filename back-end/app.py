@@ -65,7 +65,7 @@ ssl_context.load_cert_chain('cert.pem', keyfile='key.pem')
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Add your frontend origin here
+    allow_origins=["https://localhost:3000"],  # Add your frontend origin here
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -104,6 +104,8 @@ async def login(
     response: Response,
     db: Session = Depends(get_db),
 ):
+    print(form_data.username)
+    print(form_data.password)
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
