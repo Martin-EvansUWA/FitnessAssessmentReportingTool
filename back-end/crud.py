@@ -461,16 +461,3 @@ def create_export_file(responses):
     with NamedTemporaryFile(delete=False, suffix=".xlsx") as tmp:
         df.to_excel(tmp.name, index=False)
         return tmp.name
-
-
-# Get user form response from fact table
-def get_user_response_from_fact_table(db: Session, fact_user_form_id: int):
-    return (
-        db.query(FactUserForm, DimUserFormResponse)
-        .join(
-            FactUserForm,
-            DimUserFormResponse.UserFormResponseID == FactUserForm.UserFormResponseID,
-        )
-        .filter(FactUserForm.FactUserFormID == fact_user_form_id)
-        .first()
-    )

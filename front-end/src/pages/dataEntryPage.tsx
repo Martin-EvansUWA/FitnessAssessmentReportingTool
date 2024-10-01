@@ -9,7 +9,10 @@ import { default as FormTemplate } from "../components/formTemplate";
 import Layout from "../components/layout";
 import { backEndUrl } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
-import { FormTemplateJSON } from "../interface/formInterface";
+import {
+    EditFormTemplateJSON,
+    FormTemplateJSON,
+} from "../interface/formInterface";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const DataEntryPage = () => {
@@ -27,7 +30,8 @@ const DataEntryPage = () => {
     const [createdAtDateTime, setCreatedAtDateTime] = useState<string>("");
 
     const location = useLocation();
-    const formContentObj: FormTemplateJSON = location.state?.data || {}; // Get the form template data from the location state
+    const formContentObj: FormTemplateJSON | EditFormTemplateJSON =
+        location.state?.data || {}; // Get the form template data from the location state
     const formContentType: string = location.state?.type || ""; // Get the form type from the location state
 
     const navigate = useNavigate(); // Used for navigation

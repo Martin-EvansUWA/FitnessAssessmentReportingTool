@@ -334,13 +334,25 @@ def retrieve_user_form_response_from_fact_table(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
-    crud_query_response = crud.get_user_response_from_fact_table(
-        db, fact_user_form_id=fact_user_form_id
+    form_template_id = crud.get_form_template_id_from_fact_user_form(
+        db, fact_user_form_id
     )
-    fact_user_form = crud_query_response[0]
-    dim_user_form_response = crud_query_response[1]
+    form_template = crud.get_dim_form_template(db, form_template_id)
+    form_response = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id
+    )
 
-    return [fact_user_form, dim_user_form_response]
+    response = {
+        "FormTemplateID": form_template.FormTemplateID,
+        "UserID": form_template.UserID,
+        "FormTemplate": form_template.FormTemplate,
+        "Title": form_template.Title,
+        "Description": form_template.Description,
+        "CreatedAt": form_template.CreatedAt,
+        "UserFormResponse": form_response,
+    }
+
+    return response
 
 
 """ DATA VISUALISATION FUNCTION"""
