@@ -322,7 +322,9 @@ def save_form_entry(
         if existing_fact_user_form:
             # Update existing form response entry in DimUserFormResponse
             crud.update_dim_user_form_response(
-                existing_fact_user_form.UserFormResponseID, form_data
+                db,
+                existing_fact_user_form.UserFormResponseID,
+                form_data.UserFormResponse,
             )
             return {"status": 200, "message": "Form entry updated successfully"}
         else:
