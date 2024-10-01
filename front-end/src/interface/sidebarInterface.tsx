@@ -40,7 +40,7 @@ export interface formHistorySidebarInfoAdmin {
 
 
 export interface FormSubmission {
-    student_id: number;
+    user_id: number;
     first_name: string;
     last_name: string;
     subject_ID: number;

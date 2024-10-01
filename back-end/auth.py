@@ -28,7 +28,7 @@ CREDENTIALS_EXCEPTION = HTTPException(
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+ACCESS_TOKEN_EXPIRE_MINUTES = 180
 
 
 def verify_password(plain_password, hashed_password):
