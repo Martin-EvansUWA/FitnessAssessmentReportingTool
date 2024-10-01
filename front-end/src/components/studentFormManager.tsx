@@ -8,7 +8,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
-import { backEndUrl } from "../global_helpers/constants";
+import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
 
 const StudentFormManager = ({
     formTitle,
@@ -48,7 +48,10 @@ const StudentFormManager = ({
                 .then((response) => {
                     console.log("Success:", response.data);
                     navigate("/data-entry", {
-                        state: { data: response.data },
+                        state: {
+                            type: dataEntryRedirectType.EDIT_FORM,
+                            data: response.data,
+                        },
                     }); // Redirect and pass form response data
                 })
                 .catch((error) => {

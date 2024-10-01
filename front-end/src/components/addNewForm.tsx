@@ -4,7 +4,7 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { backEndUrl } from "../global_helpers/constants";
+import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
 import { FormTemplateJSON } from "../interface/formInterface";
 
 const AddNewForm = () => {
@@ -27,7 +27,10 @@ const AddNewForm = () => {
                     console.log("Success:", response.data);
                     setFetchState(""); // Clear fetch state on success
                     navigate("/data-entry", {
-                        state: { data: response.data as FormTemplateJSON },
+                        state: {
+                            type: dataEntryRedirectType.NEW_FORM,
+                            data: response.data as FormTemplateJSON,
+                        },
                     }); // Redirect and pass data
                 })
                 .catch((error) => {
