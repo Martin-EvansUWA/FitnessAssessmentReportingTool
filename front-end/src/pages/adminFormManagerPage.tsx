@@ -250,7 +250,7 @@ const AdminFormManagerPage = () => {
         const access_token = Cookies.get("access_token");
         try {
             await axios.delete(
-                `${backEndUrl}/Delete_all_forms/${formDetails.form_template_id}`,
+                `${backEndUrl}/form-template-delete/${formDetails.form_template_id}`,
                 {
                     headers: {
                         Authorization: `Bearer ${access_token}`,

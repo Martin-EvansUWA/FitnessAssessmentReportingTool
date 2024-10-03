@@ -611,3 +611,8 @@ def delete_form(fact_user_form_id: int, db: Session = Depends(get_db)):
     
     return {"message": "Form response and associated data deleted successfully"}
 
+@app.delete("/form-template-delete/{form_template_id}")
+def delete_template_and_responses(form_template_id: int, db: Session = Depends(get_db)):
+    delete_form_template_and_related_entries(db, form_template_id)
+    return {"message": "Form template and related responses deleted successfully"}
+

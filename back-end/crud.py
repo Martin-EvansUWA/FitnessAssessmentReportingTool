@@ -597,3 +597,14 @@ def get_subject_user_id(db: Session, fact_user_form_id: int):
         .filter(models.FactUserForm.FactUserFormID == fact_user_form_id)
         .first()
     )[0]
+
+#[admin delete]
+def delete_form_template_and_related_entries(db: Session, form_template_id: int):
+    fact_user_forms = db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).all()
+    if fact_user_forms:
+        user_form_response_ids = [fact.UserFormResponseID for fact in fact_user_forms]
+        db.query(DimUserFormResponse).filter(DimUserFormResponse.UserFormResponseID.in_(user_form_response_ids)).delete(synchronize_session=False)
+        db.query(FactUserForm).filter(FactUserForm.FormTemplateID == form_template_id).delete(synchronize_session=False)
+
+    db.query(DimFormTemplate).filter(DimFormTemplate.FormTemplateID == form_template_id).delete(synchronize_session=False)
+    db.commit()
