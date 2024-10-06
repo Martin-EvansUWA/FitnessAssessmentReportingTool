@@ -7,13 +7,14 @@ import RadarChart from "./charts/RadarChart";
 import ScatterChart from "./charts/ScatterChart";
 import Cookies from "js-cookie";
 
-///this needs to be changed when cookies and authnticaiton has been implimented to get the right student ID
-const UserID = 1
+
 interface Props {
     factUserFormID: number | undefined; 
+    formTemplateID: number | undefined;
+    
 }
 
-const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
+const DashboardGenerator: React.FC<Props> = ({ factUserFormID, formTemplateID }) => {
     const [chartType, setChartType] = useState<string>("");
     const [studentData, setStudentData] = useState<any[]>([]);
     const [specificStudentData, setSpecificStudentData] = useState<any>({});
@@ -23,7 +24,7 @@ const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
         // Fetch all student data
         const access_token = Cookies.get("access_token");
         axios
-            .get(`${backEndUrl}/student_data/${factUserFormID}`, {
+            .get(`${backEndUrl}/student_data/${formTemplateID}`, {
                 headers: {
                   "Content-Type": "application/json",
                   Authorization: `Bearer ${access_token}`,
@@ -38,7 +39,7 @@ const DashboardGenerator: React.FC<Props> = ({ factUserFormID }) => {
 
         // Fetch specific student data
         axios
-            .get(`${backEndUrl}/normative_results/${factUserFormID}`,
+            .get(`${backEndUrl}/normative_results/${formTemplateID}`,
                 {
                     headers: {
                         Authorization: `Bearer ${access_token}`,

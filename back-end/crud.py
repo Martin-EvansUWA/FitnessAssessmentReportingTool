@@ -352,6 +352,20 @@ def get_student_form_response_fact_user_form_id(db: Session, fact_user_form_id: 
 
     return response
 
+#changed to return the students results not the value they inputed
+def get_student_form_response_responce_id(db: Session, FormTemplateID: int, SubjectUserID: int):
+    """Fetch a form response for a specific template and responce ID"""
+    response = db.execute(
+        select(DimUserFormResponse.UserFormResponse)
+        .join(
+            FactUserForm,
+            FactUserForm.UserFormResponseID == DimUserFormResponse.UserFormResponseID,
+        )
+        .where(FactUserForm.FormTemplateID == FormTemplateID, FactUserForm.SubjectUserID == SubjectUserID)
+    ).scalar_one()
+
+    return response
+
 
 def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
     # Query the form template for the given ID

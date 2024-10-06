@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
+import FormTemplate from "./formTemplate";
 
 const StudentFormManager = ({
     formTitle,
@@ -19,6 +20,7 @@ const StudentFormManager = ({
     formCreatedBy,
     formCreatedFor,
     factUserFormID,
+    formTemplateID,
 }: {
     formTitle: string;
     formDescription: string;
@@ -27,11 +29,13 @@ const StudentFormManager = ({
     formCreatedBy: string;
     formCreatedFor: string;
     factUserFormID: number | null;
+    formTemplateID: number;
+
 }) => {
     const navigate = useNavigate();
 
     const goToFormResults = () => {
-        navigate("/form-results", { state: { factUserFormID, formTitle } });
+        navigate("/form-results", { state: { factUserFormID, formTitle, formTemplateID, formCreatedFor } });
     };
 
     const goToDataEntryPage = () => {

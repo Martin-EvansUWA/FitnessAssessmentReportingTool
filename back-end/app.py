@@ -379,14 +379,14 @@ def retrieve_user_form_response_from_fact_table(
 
 
 # get all students data
-@app.get("/student_data/{FormID}")
+@app.get("/student_data/{formTemplateID}")
 def get_student_form_responses(
-    FormID: int,
+    formTemplateID: int,
     current_user: Annotated[DimUser, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
     students = crud.get_filtered_exercises_by_form_template_id(
-        db, form_template_id=FormID
+        db, form_template_id=formTemplateID
     )
     if not students:
         raise HTTPException(status_code=404, detail="Form responses not found")
@@ -408,15 +408,18 @@ def get_specific_student_data(
     return student
 
 
+
+
 # get specific students data from factUserFormID
-@app.get("/get_specific_student_data_fact_user_form_id/{fact_user_form_id}")
+@app.get("/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}")
 def get_specific_student_data_fact_user_form_id(
     current_user: Annotated[DimUser, Depends(get_current_user)],
-    fact_user_form_id=int,
+    formTemplateID=int,
+    formCreatedFor = int,
     db: Session = Depends(get_db),
 ):
-    student = crud.get_student_form_response_fact_user_form_id(
-        db, fact_user_form_id=fact_user_form_id
+    student = crud.get_student_form_response_responce_id(
+        db, FormTemplateID=formTemplateID, SubjectUserID = formCreatedFor
     )
     return student
 
@@ -568,6 +571,7 @@ def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
 
 
 # [admin] delete form template
+#not used
 @app.delete("/Delete_all_forms/{subjectID}/{form_template_id}")
 def delete_form_template(form_template_id: int, db: Session = Depends(get_db)):
     return delete_form_template(form_template_id, db)
