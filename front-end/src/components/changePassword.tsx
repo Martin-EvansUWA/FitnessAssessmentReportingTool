@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 import { useState } from "react";
 import { Bounce, toast } from "react-toastify";
 import { backEndUrl } from "../global_helpers/constants";
@@ -27,15 +28,16 @@ const ChangePassword = () => {
         }
 
         try {
+            const access_token = Cookies.get("access_token");
             const response = await axios.post(
                 `${backEndUrl}/change_password`,
                 {
-                    password: currentPassword,
+                    current_password: currentPassword,
                     new_password: newPassword,
                 },
                 {
                     headers: {
-                        "Content-Type": "application/x-www-form-urlencoded",
+                        Authorization: `Bearer ${access_token}`,
                     },
                 }
             );

@@ -13,6 +13,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
+from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
@@ -32,6 +33,7 @@ from auth import (
     ALGORITHM,
     CREDENTIALS_EXCEPTION,
     SECRET_KEY,
+    PasswordChangeRequest,
     Token,
     TokenData,
     authenticate_user,
@@ -168,20 +170,19 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
 
 @app.post("/change_password")
 def change_password(
+    request: PasswordChangeRequest,
     current_user: Annotated[DimUser, Depends(get_current_user)],
-    password: str,
-    new_password: str,
     db: Session = Depends(get_db),
 ):
-    user = authenticate_user(db, current_user.UserID, password)
+    user = authenticate_user(db, current_user.UserID, request.current_password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password",
         )
     else:
-        update_user_password(db, current_user.UserID, new_password)
-        return 200
+        update_user_password(db, current_user.UserID, request.new_password)
+        return {"message": "Password changed successfully"}
 
 
 """ HELPER FUNCTIONS """

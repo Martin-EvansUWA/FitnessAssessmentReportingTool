@@ -75,6 +75,11 @@ def get_user(db, user_id: str):
     return user
 
 
+class PasswordChangeRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
 def update_user_password(db, user_id: str, new_password: str):
     user = get_DimUser(db, user_id)
     if user == None:
