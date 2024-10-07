@@ -103,7 +103,52 @@ const AdmiinControl = () => {
 
     const handleAdminPreivilegesRevoke = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Admin privileges revoked");
+
+        try {
+            const access_token = Cookies.get("access_token");
+            if (!access_token) {
+                throw new Error("Access token not found");
+            }
+            const response = await axios.post(
+                `${backEndUrl}/revoke_admin_access/${uwaIdRevoke}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                toast.success("Admin privileges revoked successfully!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
+                setuwaIdRevoke("");
+            }
+        } catch (error) {
+            console.error("Error revoking admin privileges:", error);
+            toast.error(
+                "Failed to revoke admin privileges. Please try again.",
+                {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                }
+            );
+        }
     };
 
     return (

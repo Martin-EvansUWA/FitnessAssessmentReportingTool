@@ -290,6 +290,24 @@ def grant_admin_access(
     return {"message": "Admin access granted successfully"}
 
 
+@app.post("/revoke_admin_access/{user_id}")
+def revoke_admin_access(
+    user_id: str,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    user = crud.get_DimUser(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.isAdmin = False
+    db.commit()
+    return {"message": "Admin access revoked successfully"}
+
+
 """ STUDENT FUNCTIONS"""
 
 
