@@ -251,6 +251,27 @@ def add_form(
     return response
 
 
+@app.get("/get_all_admin_users")
+def get_all_admin_users(
+    current_user: Annotated[DimUser, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    users = crud.get_all_admin_users(db)
+    response = []
+    for user in users:
+        user_info = {
+            "UserID": user.UserID,
+            "FirstName": user.FirstName,
+            "LastName": user.LastName,
+            "Email": user.email,
+        }
+        response.append(user_info)
+    return response
+
+
 """ STUDENT FUNCTIONS"""
 
 

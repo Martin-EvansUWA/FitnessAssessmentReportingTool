@@ -1,13 +1,42 @@
+import axios from "axios";
+import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { backEndUrl } from "../global_helpers/constants";
+
+interface AdminDetails {
+    FirstName: string;
+    LastName: string;
+    UserID: number;
+    Email: string;
+}
 
 const AdmiinControl = () => {
     const [uwaIdGrant, setuwaIdGrant] = useState<string>("");
     const [uwaIdRevoke, setuwaIdRevoke] = useState<string>("");
-    const [adminUserIds, setAdminUserIds] = useState<number[]>([]);
+    const [adminUsers, setAdminUsers] = useState<AdminDetails[]>([]);
 
     useEffect(() => {
-        // Fetch admin users
-        console.log("Fetching admin users");
+        const fetchAdminUsers = async () => {
+            // Fetch admin users
+            try {
+                const access_token = Cookies.get("access_token");
+                const response = await axios.get<AdminDetails[]>(
+                    `${backEndUrl}/get_all_admin_users`,
+                    {
+                        headers: {
+                            "Content-Type": "application/json",
+                            Authorization: `Bearer ${access_token}`,
+                        },
+                    }
+                );
+                console.log("Admin users:", response.data);
+                setAdminUsers(response.data);
+            } catch (error) {
+                console.error("Error fetching admin users", error);
+            }
+        };
+
+        fetchAdminUsers();
     }, []);
 
     const handleAdminPreivilegesGrant = async (e: React.FormEvent) => {
@@ -71,9 +100,16 @@ const AdmiinControl = () => {
                             value={uwaIdRevoke}
                             onChange={(e) => setuwaIdRevoke(e.target.value)}
                         >
-                            {adminUserIds.map((id) => (
-                                <option key={id} value={id}>
-                                    {id}
+                            <option disabled value="">
+                                - select admin -
+                            </option>
+                            {adminUsers.map((adminUser) => (
+                                <option
+                                    key={adminUser.UserID}
+                                    value={adminUser.UserID}
+                                >
+                                    {adminUser.FirstName} {adminUser.LastName} (
+                                    {adminUser.Email})
                                 </option>
                             ))}
                         </select>
