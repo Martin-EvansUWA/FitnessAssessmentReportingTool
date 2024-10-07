@@ -3,21 +3,28 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
+import ChangePassword from "../components/changePassword";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
 const ProfilePage = () => {
     const [mainContent, setMainContent] = useState<JSX.Element | null>(null);
     const [userFirstName, setUserFirstName] = useState("");
+    const [userLastName, setUserLastName] = useState("");
+    const [userEmail, setUserEmail] = useState("");
     const [isAdmin, setIsAdmin] = useState(false);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        const firstName = Cookies.get("user_first_name");
-        setUserFirstName(firstName || "User");
         const adminStatus = Cookies.get("isAdmin");
         setIsAdmin(adminStatus === "true");
+        const firstName = Cookies.get("user_first_name");
+        setUserFirstName(firstName || "User");
+        const lastName = Cookies.get("user_last_name");
+        setUserLastName(lastName || "");
+        const email = Cookies.get("user_email");
+        setUserEmail(email || "");
     }, []);
 
     const defaultContent = (
@@ -49,17 +56,19 @@ const ProfilePage = () => {
             <div className="flex-1">
                 <h1 className="text-2xl font-bold mb-5">My Details</h1>
                 <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-                <div className="my-5"></div>
-            </div>
-        </div>
-    );
-
-    const changePasswordContent = (
-        <div className="flex flex-col">
-            <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-5">Change Password</h1>
-                <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-                <div className="my-5"></div>
+                <div className="flex flex-col my-5">
+                    <p>
+                        <span className="font-bold">First Name:</span>{" "}
+                        {userFirstName}
+                    </p>
+                    <p>
+                        <span className="font-bold">Last Name:</span>{" "}
+                        {userLastName}
+                    </p>
+                    <p>
+                        <span className="font-bold">Email:</span> {userEmail}
+                    </p>
+                </div>
             </div>
         </div>
     );
@@ -105,7 +114,7 @@ const ProfilePage = () => {
                 "Change Password": {
                     sectionName: "Change Password",
                     sectionOnClick: () => {
-                        setMainContent(changePasswordContent);
+                        setMainContent(<ChangePassword />);
                     },
                 },
             },
@@ -158,4 +167,5 @@ const ProfilePage = () => {
         </>
     );
 };
+
 export default ProfilePage;

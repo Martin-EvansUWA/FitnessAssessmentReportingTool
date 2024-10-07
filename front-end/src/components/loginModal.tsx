@@ -241,13 +241,13 @@ const LoginModal = ({
                     <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
                         <button
                             type="submit"
-                            className="bg-uwa-blue text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            className="bg-uwa-blue font-bold text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                         >
                             Login
                         </button>
                         <button
                             type="button"
-                            className="bg-uwa-yellow text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            className="bg-uwa-yellow font-bold text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                             onClick={toggleIsLoginCallBack}
                         >
                             Register

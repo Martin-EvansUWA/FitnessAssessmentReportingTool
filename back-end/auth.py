@@ -73,3 +73,12 @@ def get_user(db, user_id: str):
     if user == None:
         return None
     return user
+
+
+def update_user_password(db, user_id: str, new_password: str):
+    user = get_DimUser(db, user_id)
+    if user == None:
+        return None
+    user.hashed_password = get_password_hash(new_password)
+    db.commit()
+    return user

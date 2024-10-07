@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timedelta, timezone
 from http.client import HTTPException
 
@@ -16,6 +17,11 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+
 # Database Imports  ``
 import crud
 import models
@@ -30,6 +36,7 @@ from auth import (
     TokenData,
     authenticate_user,
     create_access_token,
+    update_user_password,
 )
 from crud import *
 from database import SessionLocal, engine
@@ -157,6 +164,24 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists",
         )
+
+
+@app.post("/change_password")
+def change_password(
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    password: str,
+    new_password: str,
+    db: Session = Depends(get_db),
+):
+    user = authenticate_user(db, current_user.UserID, password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password",
+        )
+    else:
+        update_user_password(db, current_user.UserID, new_password)
+        return 200
 
 
 """ HELPER FUNCTIONS """
