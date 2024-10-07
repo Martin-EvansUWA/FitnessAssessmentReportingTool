@@ -10,6 +10,7 @@ import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl, dataEntryRedirectType } from "../global_helpers/constants";
 import { HelperFunctions } from "../global_helpers/helperFunctions";
+import FormTemplate from "./formTemplate";
 
 const StudentFormManager = ({
     formTitle,
@@ -19,6 +20,7 @@ const StudentFormManager = ({
     formCreatedBy,
     formCreatedFor,
     factUserFormID,
+    formTemplateID,
 }: {
     formTitle: string;
     formDescription: string;
@@ -27,11 +29,13 @@ const StudentFormManager = ({
     formCreatedBy: string;
     formCreatedFor: string;
     factUserFormID: number | null;
+    formTemplateID: number;
+
 }) => {
     const navigate = useNavigate();
 
     const goToFormResults = () => {
-        navigate("/form-results", { state: { factUserFormID, formTitle } });
+        navigate("/form-results", { state: { factUserFormID, formTitle, formTemplateID, formCreatedFor } });
     };
 
     const goToDataEntryPage = () => {
@@ -69,6 +73,51 @@ const StudentFormManager = ({
                         transition: Bounce,
                     });
                 });
+        }
+    };
+
+    // Function to handle deletion of the form response
+    const deleteFormResponse = async () => {
+        if (!factUserFormID) return;
+
+        const access_token = Cookies.get("access_token");
+        
+        // Ask for user confirmation before deleting
+        const confirmed = window.confirm("Are you sure you want to delete this form response?");
+        if (!confirmed) return;
+
+        try {
+            await axios.delete(`${backEndUrl}/delete_form_response/${factUserFormID}`, {
+                headers: {
+                    Authorization: `Bearer ${access_token}`,
+                },
+            });
+
+            toast.success("Form response deleted successfully!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            });
+
+            // Optionally, navigate to another page or refresh the form list
+            navigate("/form-manager"); // Assuming you have a form manager page
+        } catch (error) {
+            console.error("Error deleting form response:", error);
+            toast.error("Failed to delete form response!", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+            });
         }
     };
 
@@ -134,13 +183,17 @@ const StudentFormManager = ({
                             Dashboard
                         </span>
                     </button>
-                    <button className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105">
+                    <button className="flex flex-col items-center transform transition-transform duration-200 hover:scale-105"
+                        onClick={deleteFormResponse}
+                    >
+                        
                         <FontAwesomeIcon
                             icon={faTrash}
                             className="text-2xl md:text-4xl text-red-500"
                         />
                         <span className="invisible md:visible font-bold text-red-500">
                             Delete
+
                         </span>
                     </button>
                 </div>

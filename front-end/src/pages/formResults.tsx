@@ -32,7 +32,7 @@ const defaultMainContent = (
 
 const FormResults: React.FC = () => {
   const location = useLocation();
-  const { factUserFormID, formTitle } = location.state || {};
+  const { factUserFormID, formTitle, formTemplateID, formCreatedFor } = location.state || {};
   const [mainContent, setMainContent] = useState(defaultMainContent);
   const [studentData, setStudentData] = useState([] as CategoryData[]);
 
@@ -44,7 +44,7 @@ const FormResults: React.FC = () => {
         try {
           const access_token = Cookies.get("access_token");
           const studentResponse = await axios.get<CategoryData[]>(
-            `${backEndUrl}/get_specific_student_data_fact_user_form_id/${factUserFormID}`,
+            `${backEndUrl}/get_specific_student_data_fact_user_form_id/${formTemplateID}/${formCreatedFor}`,
             {
               headers: {
                 "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const FormResults: React.FC = () => {
   }, [factUserFormID]);
 
   const handleDataVisualizationClick = useCallback(() => {
-    setMainContent(<DashboardGenerator factUserFormID={factUserFormID} />);
+    setMainContent(<DashboardGenerator factUserFormID={factUserFormID} formTemplateID={formTemplateID} />);
   }, []);
 
   const handleMyResultsClick = useCallback(() => {

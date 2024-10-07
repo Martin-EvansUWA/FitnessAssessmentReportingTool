@@ -186,6 +186,7 @@ const StudentFormManagerPage = () => {
                 formCreatedBy={formHistory?.UserID.toString() || ""}
                 formCreatedFor={formHistory?.SubjectUserID.toString() || ""}
                 factUserFormID={formHistory?.FactUserFormID || null}
+                formTemplateID={formDetails.FormTemplateID}
             />
         );
     };
