@@ -61,6 +61,7 @@ const LoginModal = ({
             isAdmin: boolean;
             user_first_name: string;
             user_last_name: string;
+            user_email: string;
         };
     }) => {
         Cookies.set("access_token", response.data["access_token"], {
@@ -73,6 +74,9 @@ const LoginModal = ({
             expires: 1,
         });
         Cookies.set("user_last_name", response.data["user_last_name"], {
+            expires: 1,
+        });
+        Cookies.set("user_email", response.data["user_email"], {
             expires: 1,
         });
     };

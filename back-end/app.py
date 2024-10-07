@@ -120,6 +120,7 @@ async def login(
     response.update({"isAdmin": user.isAdmin})
     response.update({"user_first_name": user.FirstName})
     response.update({"user_last_name": user.LastName})
+    response.update({"user_email": user.email})
     return response
 
 
@@ -408,18 +409,18 @@ def get_specific_student_data(
     return student
 
 
-
-
 # get specific students data from factUserFormID
-@app.get("/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}")
+@app.get(
+    "/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}"
+)
 def get_specific_student_data_fact_user_form_id(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     formTemplateID=int,
-    formCreatedFor = int,
+    formCreatedFor=int,
     db: Session = Depends(get_db),
 ):
     student = crud.get_student_form_response_responce_id(
-        db, FormTemplateID=formTemplateID, SubjectUserID = formCreatedFor
+        db, FormTemplateID=formTemplateID, SubjectUserID=formCreatedFor
     )
     return student
 
@@ -571,7 +572,7 @@ def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
 
 
 # [admin] delete form template
-#not used
+# not used
 @app.delete("/Delete_all_forms/{subjectID}/{form_template_id}")
 def delete_form_template(form_template_id: int, db: Session = Depends(get_db)):
     return delete_form_template(form_template_id, db)
@@ -593,30 +594,41 @@ def get_specific_student_data(
 
     return student
 
+
 @app.delete("/delete_form_response/{fact_user_form_id}")
 def delete_form(fact_user_form_id: int, db: Session = Depends(get_db)):
     # Find the FactUserForm entry
-    fact_user_form = db.query(FactUserForm).filter(FactUserForm.FactUserFormID == fact_user_form_id).first()
+    fact_user_form = (
+        db.query(FactUserForm)
+        .filter(FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )
 
     if not fact_user_form:
         raise HTTPException(status_code=404, detail="Form not found")
 
     # Find and delete associated DimUserFormResponse entry
-    dim_user_form_response = db.query(DimUserFormResponse).filter(DimUserFormResponse.UserFormResponseID == fact_user_form.UserFormResponseID).first()
+    dim_user_form_response = (
+        db.query(DimUserFormResponse)
+        .filter(
+            DimUserFormResponse.UserFormResponseID == fact_user_form.UserFormResponseID
+        )
+        .first()
+    )
 
     if dim_user_form_response:
         db.delete(dim_user_form_response)
-    
+
     # Delete the FactUserForm entry
     db.delete(fact_user_form)
 
     # Commit changes to the database
     db.commit()
-    
+
     return {"message": "Form response and associated data deleted successfully"}
+
 
 @app.delete("/form-template-delete/{form_template_id}")
 def delete_template_and_responses(form_template_id: int, db: Session = Depends(get_db)):
     delete_form_template_and_related_entries(db, form_template_id)
     return {"message": "Form template and related responses deleted successfully"}
-
