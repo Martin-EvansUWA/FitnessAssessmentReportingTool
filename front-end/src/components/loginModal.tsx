@@ -87,12 +87,8 @@ const LoginModal = ({
             const response = await axios.post(
                 `${backEndUrl}/login_user`,
                 {
-                    grant_type: "", // Optional Field
-                    username: userID, // Required Field
-                    password: password, // Required Field
-                    scope: "", // Optional Field
-                    client_id: "", // Optional Field
-                    client_secret: "", // Optional Field
+                    username: userID,
+                    password: password,
                 },
                 {
                     headers: {
