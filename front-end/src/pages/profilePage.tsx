@@ -3,6 +3,7 @@ import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
+import AdmiinControl from "../components/adminControl";
 import ChangePassword from "../components/changePassword";
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
@@ -73,16 +74,6 @@ const ProfilePage = () => {
         </div>
     );
 
-    const adminControlContent = (
-        <div className="flex flex-col">
-            <div className="flex-1">
-                <h1 className="text-2xl font-bold mb-5">Admin Control</h1>
-                <hr className="w-32 border-t-2 border-uwa-yellow mt-1" />
-                <div className="my-5"></div>
-            </div>
-        </div>
-    );
-
     const sidebarContent: SidebarData = {
         title: "My Profile",
         titleOnClick: () => {
@@ -123,7 +114,7 @@ const ProfilePage = () => {
                       "Admin Control": {
                           sectionName: "Admin Control",
                           sectionOnClick: () => {
-                              setMainContent(adminControlContent);
+                              setMainContent(<AdmiinControl />);
                           },
                       },
                   }
