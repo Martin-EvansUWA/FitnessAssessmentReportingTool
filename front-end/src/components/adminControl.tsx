@@ -1,6 +1,7 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 import { useEffect, useState } from "react";
+import { Bounce, toast } from "react-toastify";
 import { backEndUrl } from "../global_helpers/constants";
 
 interface AdminDetails {
@@ -20,6 +21,9 @@ const AdmiinControl = () => {
             // Fetch admin users
             try {
                 const access_token = Cookies.get("access_token");
+                if (!access_token) {
+                    throw new Error("Access token not found");
+                }
                 const response = await axios.get<AdminDetails[]>(
                     `${backEndUrl}/get_all_admin_users`,
                     {
@@ -33,6 +37,17 @@ const AdmiinControl = () => {
                 setAdminUsers(response.data);
             } catch (error) {
                 console.error("Error fetching admin users", error);
+                toast.error("Error fetching admin user details.", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
             }
         };
 
@@ -41,8 +56,51 @@ const AdmiinControl = () => {
 
     const handleAdminPreivilegesGrant = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log("Admin privileges granted");
+
+        try {
+            const access_token = Cookies.get("access_token");
+            if (!access_token) {
+                throw new Error("Access token not found");
+            }
+            const response = await axios.post(
+                `${backEndUrl}/grant_admin_access/${uwaIdGrant}`,
+                {},
+                {
+                    headers: {
+                        Authorization: `Bearer ${access_token}`,
+                    },
+                }
+            );
+            if (response.status === 200) {
+                toast.success("Admin privileges granted successfully!", {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    progress: undefined,
+                    theme: "colored",
+                    transition: Bounce,
+                });
+                setuwaIdGrant("");
+            }
+        } catch (error) {
+            console.error("Error granting admin privileges:", error);
+            toast.error("Failed to grant admin privileges. Please try again.", {
+                position: "top-right",
+                autoClose: 5000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Bounce,
+            });
+        }
     };
+
     const handleAdminPreivilegesRevoke = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Admin privileges revoked");

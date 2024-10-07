@@ -272,6 +272,24 @@ def get_all_admin_users(
     return response
 
 
+@app.post("/grant_admin_access/{user_id}")
+def grant_admin_access(
+    user_id: str,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    user = crud.get_DimUser(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.isAdmin = True
+    db.commit()
+    return {"message": "Admin access granted successfully"}
+
+
 """ STUDENT FUNCTIONS"""
 
 
