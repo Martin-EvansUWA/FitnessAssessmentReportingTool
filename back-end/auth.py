@@ -87,3 +87,7 @@ def update_user_password(db, user_id: str, new_password: str):
     user.hashed_password = get_password_hash(new_password)
     db.commit()
     return user
+
+class PasswordResetRequest(BaseModel):
+    student_id: int  
+    new_password: str

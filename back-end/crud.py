@@ -14,6 +14,8 @@ import models
 import schemas
 from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
+import random
+import string
 
 # Get user via their UserID
 def get_DimUser(db: Session, user_id: int):
@@ -649,3 +651,5 @@ def get_all_admin_users(db: Session):
         .filter(DimUser.isAdmin == True)
         .all()
     )
+
+
