@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, TIMESTAMP, Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import JSON, TIMESTAMP, Boolean, Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
@@ -8,18 +8,21 @@ from database import Base
 class DimUser(Base):
     __tablename__ = "dim_user"
 
-    UserID = Column(Integer, primary_key=True)
+    UserID = Column(Integer, primary_key=True)  # Corrected the case here
     FirstName = Column(String, index=True)
     LastName = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     isAdmin = Column(Boolean)
     hashed_password = Column(String)
+    
+    # New columns for password reset functionality
+    reset_token = Column(String, nullable=True)  # For storing the reset token
+    reset_token_expiration = Column(DateTime, nullable=True)  # For storing token expiration time
 
     def __repr__(self):
         return (
-            f"DimUser(UserId={self.UserId}, FirstName='{self.FirstName}', "
-            f"LastName='{self.LastName}', UserID={self.UserID}, "
-            f"email='{self.email}')"
+            f"DimUser(UserID={self.UserID}, FirstName='{self.FirstName}', "
+            f"LastName='{self.LastName}', email='{self.email}')"
         )
 
 # Form template model

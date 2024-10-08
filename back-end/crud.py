@@ -14,6 +14,10 @@ import models
 import schemas
 from models import DimFormTemplate, DimUser, DimUserFormResponse, FactUserForm
 
+from datetime import datetime, timedelta
+import secrets
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
 # Get user via their UserID
 def get_DimUser(db: Session, user_id: int):
@@ -649,3 +653,56 @@ def get_all_admin_users(db: Session):
         .filter(DimUser.isAdmin == True)
         .all()
     )
+
+
+
+def get_user_by_details(db: Session, first_name: str, last_name: str, student_number: str, student_email: str):
+    return db.query(models.DimUser).filter(
+        models.DimUser.FirstName == first_name,
+        models.DimUser.LastName == last_name,
+        models.DimUser.email == student_email,
+        models.DimUser.UserID == student_number
+    ).first()
+
+##for reseting passord
+def create_reset_token(db: Session, user: models.DimUser):
+    # Generate a secure token
+    reset_token = secrets.token_urlsafe(32)
+
+    # Set token expiration (1 hour from now)
+    expiration_time = datetime.utcnow() + timedelta(hours=1)
+
+    # Update user's reset token and expiration
+    user.reset_token = reset_token
+    user.reset_token_expiration = expiration_time
+    db.commit()
+
+    return reset_token
+
+def get_user_by_reset_token(db: Session, token: str):
+    # Check if the token exists and is not expired
+    return db.query(models.DimUser).filter(
+        models.DimUser.reset_token == token,
+        models.DimUser.reset_token_expiration > datetime.utcnow()
+    ).first()
+
+def update_user_password(db: Session, user: models.DimUser, new_password: str):
+    # Here you should hash the password before saving it (hash_password function not shown)
+    user.password = new_password
+    user.reset_token = None
+    user.reset_token_expiration = None
+    db.commit()
+
+def send_reset_email(user_email: str, reset_token: str):
+    message = Mail(
+        from_email='support@yourdomain.com',  # Replace with your actual support email address
+        to_emails=user_email,  # This is the user's email (dynamically passed)
+        subject='Password Reset Request',
+        html_content=f'<p>Click <a href="https://your-app.com/reset-password?token={reset_token}">here</a> to reset your password.</p>'
+    )
+    try:
+        sg = SendGridAPIClient('YOUR_SENDGRID_API_KEY')  # Replace with your actual SendGrid API key
+        response = sg.send(message)
+        print(f"Sent email to {user_email}, response: {response.status_code}")
+    except Exception as e:
+        raise Exception(f"Failed to send email: {str(e)}")

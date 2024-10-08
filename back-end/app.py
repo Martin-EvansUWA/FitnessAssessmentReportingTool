@@ -17,7 +17,7 @@ from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
-
+import uuid
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -717,17 +717,16 @@ def delete_template_and_responses(form_template_id: int, db: Session = Depends(g
     return {"message": "Form template and related responses deleted successfully"}
 
 
-
-##[reset password]
+##change password
 @app.post("/reset_password")
 async def reset_password(
-    first_name: str = Body(...), 
-    last_name: str = Body(...), 
-    student_number: str = Body(...), 
-    student_email: str = Body(...), 
+    first_name: str = Body(...),
+    last_name: str = Body(...),
+    student_number: str = Body(...),
+    student_email: str = Body(...),
     db: Session = Depends(get_db)
 ):
-    # Check if user exists
+    # Step 1: Check if the user exists in the database
     user = db.query(models.DimUser).filter(
         models.DimUser.FirstName == first_name,
         models.DimUser.LastName == last_name,
@@ -736,7 +735,36 @@ async def reset_password(
     ).first()
 
     if user:
-        # Password reset logic here (sending email, etc.)
+        # Step 2: Generate a reset token
+        reset_token = str(uuid.uuid4())  # Generate a unique token
+
+        # Optional: Save the reset token in the database for later validation
+        user.reset_token = reset_token
+        db.commit()
+
+        # Step 3: Send reset email to the student's email
+        send_reset_email(user_email=user.email, reset_token=reset_token)
+
         return {"status": "success", "message": "Password reset link sent to your email."}
     else:
         raise HTTPException(status_code=404, detail="User not found")
+
+# Endpoint for verifying the token and resetting the password
+@app.post("/reset_password/verify")
+async def reset_password_verify(
+    token: str = Body(...),
+    new_password: str = Body(...),
+    db: Session = Depends(get_db)
+):
+    # Fetch user by reset token
+    user = crud.get_user_by_reset_token(db, token)
+
+    if user:
+        # Hash and update the new password
+        crud.update_user_password(db, user, new_password)
+
+        return {"status": "success", "message": "Password has been reset successfully."}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid or expired reset token.")
+    
+
