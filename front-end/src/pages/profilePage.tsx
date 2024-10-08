@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Bounce, ToastContainer } from "react-toastify";
 import AdmiinControl from "../components/adminControl";
 import ChangePassword from "../components/changePassword";
+import ResetStudentPassword from "../components/resetStudentPassword"; // Import the new component
 import Layout from "../components/layout";
 import { SidebarData } from "../interface/sidebarInterface";
 
@@ -115,6 +116,16 @@ const ProfilePage = () => {
                           sectionName: "Admin Control",
                           sectionOnClick: () => {
                               setMainContent(<AdmiinControl />);
+                          },
+                      },
+                  }
+                : {},
+            isAdmin
+                ? {
+                      "Reset Student Password": {
+                          sectionName: "Reset Student Password",
+                          sectionOnClick: () => {
+                              setMainContent(<ResetStudentPassword />);
                           },
                       },
                   }

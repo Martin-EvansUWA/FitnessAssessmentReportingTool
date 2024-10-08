@@ -36,6 +36,7 @@ from auth import (
     PasswordChangeRequest,
     Token,
     TokenData,
+    PasswordResetRequest,
     authenticate_user,
     create_access_token,
     update_user_password,
@@ -183,6 +184,38 @@ def change_password(
     else:
         update_user_password(db, current_user.UserID, request.new_password)
         return {"message": "Password changed successfully"}
+
+
+#reset student password by admin
+@app.post("/reset_student_password")
+def reset_student_password(
+    request: PasswordResetRequest,  # Accept request body containing both student_id and new_password
+    current_user: Annotated[models.DimUser, Depends(get_current_user)],  # Current logged-in user
+    db: Session = Depends(get_db),  # Database session
+):
+    # Check if the current user is an admin
+    if not current_user.isAdmin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to reset student passwords",
+        )
+
+    # Check if the student exists
+    student = crud.get_DimUser(db, request.student_id)  # Use the student_id from the request body
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found",
+        )
+
+    # Update the student's password using the new password from the request body
+    update_user_password(db, request.student_id, request.new_password)
+
+    # Return success message
+    return {"message": "Password reset successfully"}
+
+
+
 
 
 """ HELPER FUNCTIONS """
