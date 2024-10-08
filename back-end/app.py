@@ -1,4 +1,5 @@
 import json
+import logging
 from datetime import datetime, timedelta, timezone
 from http.client import HTTPException
 
@@ -12,9 +13,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
+from pydantic import BaseModel
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 # Database Imports  ``
 import crud
@@ -26,10 +33,12 @@ from auth import (
     ALGORITHM,
     CREDENTIALS_EXCEPTION,
     SECRET_KEY,
+    PasswordChangeRequest,
     Token,
     TokenData,
     authenticate_user,
     create_access_token,
+    update_user_password,
 )
 from crud import *
 from database import SessionLocal, engine
@@ -120,6 +129,7 @@ async def login(
     response.update({"isAdmin": user.isAdmin})
     response.update({"user_first_name": user.FirstName})
     response.update({"user_last_name": user.LastName})
+    response.update({"user_email": user.email})
     return response
 
 
@@ -156,6 +166,23 @@ async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
             status_code=status.HTTP_409_CONFLICT,
             detail="User already exists",
         )
+
+
+@app.post("/change_password")
+def change_password(
+    request: PasswordChangeRequest,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    user = authenticate_user(db, current_user.UserID, request.current_password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password",
+        )
+    else:
+        update_user_password(db, current_user.UserID, request.new_password)
+        return {"message": "Password changed successfully"}
 
 
 """ HELPER FUNCTIONS """
@@ -222,6 +249,63 @@ def add_form(
         "FormTemplateID": created_form_template.FormTemplateID,
     }
     return response
+
+
+@app.get("/get_all_admin_users")
+def get_all_admin_users(
+    current_user: Annotated[DimUser, Depends(get_current_admin)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    users = crud.get_all_admin_users(db)
+    response = []
+    for user in users:
+        user_info = {
+            "UserID": user.UserID,
+            "FirstName": user.FirstName,
+            "LastName": user.LastName,
+            "Email": user.email,
+        }
+        response.append(user_info)
+    return response
+
+
+@app.post("/grant_admin_access/{user_id}")
+def grant_admin_access(
+    user_id: str,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    user = crud.get_DimUser(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.isAdmin = True
+    db.commit()
+    return {"message": "Admin access granted successfully"}
+
+
+@app.post("/revoke_admin_access/{user_id}")
+def revoke_admin_access(
+    user_id: str,
+    current_user: Annotated[DimUser, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    if not current_user.isAdmin:
+        raise HTTPException(status_code=401, detail="Unauthorized access")
+
+    user = crud.get_DimUser(db, user_id)
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.isAdmin = False
+    db.commit()
+    return {"message": "Admin access revoked successfully"}
 
 
 """ STUDENT FUNCTIONS"""
@@ -408,18 +492,18 @@ def get_specific_student_data(
     return student
 
 
-
-
 # get specific students data from factUserFormID
-@app.get("/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}")
+@app.get(
+    "/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}"
+)
 def get_specific_student_data_fact_user_form_id(
     current_user: Annotated[DimUser, Depends(get_current_user)],
     formTemplateID=int,
-    formCreatedFor = int,
+    formCreatedFor=int,
     db: Session = Depends(get_db),
 ):
     student = crud.get_student_form_response_responce_id(
-        db, FormTemplateID=formTemplateID, SubjectUserID = formCreatedFor
+        db, FormTemplateID=formTemplateID, SubjectUserID=formCreatedFor
     )
     return student
 
@@ -571,7 +655,7 @@ def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
 
 
 # [admin] delete form template
-#not used
+# not used
 @app.delete("/Delete_all_forms/{subjectID}/{form_template_id}")
 def delete_form_template(form_template_id: int, db: Session = Depends(get_db)):
     return delete_form_template(form_template_id, db)
@@ -593,30 +677,41 @@ def get_specific_student_data(
 
     return student
 
+
 @app.delete("/delete_form_response/{fact_user_form_id}")
 def delete_form(fact_user_form_id: int, db: Session = Depends(get_db)):
     # Find the FactUserForm entry
-    fact_user_form = db.query(FactUserForm).filter(FactUserForm.FactUserFormID == fact_user_form_id).first()
+    fact_user_form = (
+        db.query(FactUserForm)
+        .filter(FactUserForm.FactUserFormID == fact_user_form_id)
+        .first()
+    )
 
     if not fact_user_form:
         raise HTTPException(status_code=404, detail="Form not found")
 
     # Find and delete associated DimUserFormResponse entry
-    dim_user_form_response = db.query(DimUserFormResponse).filter(DimUserFormResponse.UserFormResponseID == fact_user_form.UserFormResponseID).first()
+    dim_user_form_response = (
+        db.query(DimUserFormResponse)
+        .filter(
+            DimUserFormResponse.UserFormResponseID == fact_user_form.UserFormResponseID
+        )
+        .first()
+    )
 
     if dim_user_form_response:
         db.delete(dim_user_form_response)
-    
+
     # Delete the FactUserForm entry
     db.delete(fact_user_form)
 
     # Commit changes to the database
     db.commit()
-    
+
     return {"message": "Form response and associated data deleted successfully"}
+
 
 @app.delete("/form-template-delete/{form_template_id}")
 def delete_template_and_responses(form_template_id: int, db: Session = Depends(get_db)):
     delete_form_template_and_related_entries(db, form_template_id)
     return {"message": "Form template and related responses deleted successfully"}
-

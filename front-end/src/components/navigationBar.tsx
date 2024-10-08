@@ -50,10 +50,17 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
         }
     };
 
+    const handleProfileClick = () => {
+        navigate("/profile");
+    };
+
     return (
         <div className={`${className}`}>
             <nav className="top-0 left-0 flex justify-between items-center pl-4 bg-white font-bold w-full h-16 z-10">
-                <div className="flex items-center">
+                <div
+                    className="flex items-center transform transition-transform duration-200 hover:scale-105"
+                    title="Go to home page"
+                >
                     <Link to={homePage} className="inline-flex items-center">
                         <img src={uwaLogo} alt="UWA Logo" className="h-8" />
                         <span className="ml-5 text-uwa-blue text-sm md:text-base mr-10">
@@ -65,26 +72,31 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
                     <>
                         <div className="hidden md:flex space-x-5 h-full items-center">
                             <button
-                                className="text-uwa-blue text-sm md:text-base"
+                                className="text-uwa-blue text-sm md:text-base transform transition-transform duration-200 hover:scale-105"
                                 onClick={handleLogout}
+                                title="Logout"
                             >
                                 Logout
                             </button>
-                            <a className="flex flex-row items-center space-x-2 bg-uwa-blue h-full rounded-l-full pl-5">
-                                <span className="text-white text-sm md:text-base">
+                            <button
+                                className="flex flex-row items-center space-x-2 bg-uwa-blue h-full rounded-l-full pl-5"
+                                onClick={handleProfileClick}
+                                title="Go to profile page"
+                            >
+                                <span className="text-white text-sm md:text-base transform transition-transform duration-200 hover:scale-105">
                                     Hello, {userFirstName}!
                                 </span>
                                 <FontAwesomeIcon
                                     icon={faUser}
                                     className="text-3xl text-white pr-5"
                                 />
-                            </a>
+                            </button>
                         </div>
                         <div className="md:hidden flex items-center">
                             <button
                                 title="navigation-button"
                                 onClick={toggleMenu}
-                                className="focus:outline-none text-uwa-blue m-5"
+                                className="focus:outline-none text-uwa-blue m-5 transform transition-transform duration-200 hover:scale-105"
                             >
                                 <svg
                                     className="w-6 h-6"
@@ -107,12 +119,19 @@ const NavigationBar: React.FC<NavigationBarProps> = ({
             </nav>
             {isMenuOpen && (
                 <div className="md:hidden flex flex-col bg-uwa-blue mt-16 p-4 space-y-5 absolute top-0 right-0 z-10 w-full items-end">
-                    <span className="text-white text-sm font-bold">
-                        Hello, {userFirstName}!
-                    </span>
+                    <button
+                        onClick={handleProfileClick}
+                        title="Go to profile page"
+                        className="transform transition-transform duration-200 hover:scale-105"
+                    >
+                        <span className="text-white text-sm font-bold">
+                            Hello, {userFirstName}!
+                        </span>
+                    </button>
                     <button
                         onClick={handleLogout}
-                        className="text-sm text-white"
+                        className="text-sm text-white transform transition-transform duration-200 hover:scale-105"
+                        title="Logout"
                     >
                         Logout
                     </button>

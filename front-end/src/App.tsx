@@ -4,6 +4,7 @@ import AdminFormManagerPage from "./pages/adminFormManagerPage";
 import DataEntryPage from "./pages/dataEntryPage";
 import FormResults from "./pages/formResults";
 import LandingPage from "./pages/landingPage";
+import ProfilePage from "./pages/profilePage";
 import StudentFormManagerPage from "./pages/studentFormManagerPage";
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
                     path="/admin-form-manager"
                     element={<AdminFormManagerPage />}
                 />
+                <Route path="/profile" element={<ProfilePage />} />
                 <Route path="*" element={<LandingPage />} />
             </Routes>
         </Router>

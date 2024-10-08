@@ -61,6 +61,7 @@ const LoginModal = ({
             isAdmin: boolean;
             user_first_name: string;
             user_last_name: string;
+            user_email: string;
         };
     }) => {
         Cookies.set("access_token", response.data["access_token"], {
@@ -75,6 +76,9 @@ const LoginModal = ({
         Cookies.set("user_last_name", response.data["user_last_name"], {
             expires: 1,
         });
+        Cookies.set("user_email", response.data["user_email"], {
+            expires: 1,
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -83,12 +87,8 @@ const LoginModal = ({
             const response = await axios.post(
                 `${backEndUrl}/login_user`,
                 {
-                    grant_type: "", // Optional Field
-                    username: userID, // Required Field
-                    password: password, // Required Field
-                    scope: "", // Optional Field
-                    client_id: "", // Optional Field
-                    client_secret: "", // Optional Field
+                    username: userID,
+                    password: password,
                 },
                 {
                     headers: {
@@ -241,13 +241,13 @@ const LoginModal = ({
                     <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
                         <button
                             type="submit"
-                            className="bg-uwa-blue text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            className="bg-uwa-blue font-bold text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                         >
                             Login
                         </button>
                         <button
                             type="button"
-                            className="bg-uwa-yellow text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            className="bg-uwa-yellow font-bold text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
                             onClick={toggleIsLoginCallBack}
                         >
                             Register
