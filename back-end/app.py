@@ -715,3 +715,28 @@ def delete_form(fact_user_form_id: int, db: Session = Depends(get_db)):
 def delete_template_and_responses(form_template_id: int, db: Session = Depends(get_db)):
     delete_form_template_and_related_entries(db, form_template_id)
     return {"message": "Form template and related responses deleted successfully"}
+
+
+
+##[reset password]
+@app.post("/reset_password")
+async def reset_password(
+    first_name: str = Body(...), 
+    last_name: str = Body(...), 
+    student_number: str = Body(...), 
+    student_email: str = Body(...), 
+    db: Session = Depends(get_db)
+):
+    # Check if user exists
+    user = db.query(models.DimUser).filter(
+        models.DimUser.FirstName == first_name,
+        models.DimUser.LastName == last_name,
+        models.DimUser.email == student_email,
+        models.DimUser.UserID == student_number
+    ).first()
+
+    if user:
+        # Password reset logic here (sending email, etc.)
+        return {"status": "success", "message": "Password reset link sent to your email."}
+    else:
+        raise HTTPException(status_code=404, detail="User not found")

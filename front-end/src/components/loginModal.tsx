@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bounce, toast, ToastContainer } from "react-toastify";
 import { backEndUrl } from "../global_helpers/constants";
+import ForgotPassword from "./ForgotPassword";
 
 const text = "Hello Again!";
 const containerVariants = {
@@ -44,6 +45,7 @@ const LoginModal = ({
     const [userID, setUserID] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
+    const [forgotPassword, setForgotPassword] = useState(false);
 
     const navigate = useNavigate();
 
@@ -98,7 +100,6 @@ const LoginModal = ({
             );
             cookieHandler(response);
             redirectHandler(response.data["isAdmin"]);
-            console.log("Successful Login: ", response);
             toast.success("Login successful!", {
                 position: "top-right",
                 autoClose: 5000,
@@ -194,74 +195,82 @@ const LoginModal = ({
 
     return (
         <>
-            <div className="flex flex-col">
-                <motion.h2
-                    className="text-4xl font-bold text-center mb-10"
-                    variants={containerVariants}
-                    initial="hidden"
-                    animate="visible"
-                >
-                    {text.split("").map((char, index) => (
-                        <motion.span key={index} variants={childVariants}>
-                            {char}
-                        </motion.span>
-                    ))}
-                </motion.h2>
+            {forgotPassword ? (
+                <div className="flex justify-center items-center w-full h-full p-4">
+                    <ForgotPassword setForgotPassword={setForgotPassword} />
+                </div>
+            ) : (
+                <div className="flex flex-col justify-center items-center w-full h-full p-4">
+                    <motion.h2
+                        className="text-4xl font-bold text-center mb-10"
+                        variants={containerVariants}
+                        initial="hidden"
+                        animate="visible"
+                    >
+                        {text.split("").map((char, index) => (
+                            <motion.span key={index} variants={childVariants}>
+                                {char}
+                            </motion.span>
+                        ))}
+                    </motion.h2>
 
-                <form
-                    className="flex flex-col space-y-3 w-[90%] md:w-2/3 m-auto"
-                    onSubmit={handleSubmit}
-                >
-                    <input
-                        type="text"
-                        id="userID"
-                        name="userID"
-                        placeholder="UWA ID"
-                        className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
-                        value={userID}
-                        onChange={(e) => setUserID(e.target.value)}
-                    />
+                    <form
+                        className="flex flex-col space-y-3 w-full md:w-[90%] md:w-2/3"
+                        onSubmit={handleSubmit}
+                    >
+                        <input
+                            type="text"
+                            id="userID"
+                            name="userID"
+                            placeholder="UWA ID"
+                            className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            value={userID}
+                            onChange={(e) => setUserID(e.target.value)}
+                        />
 
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        placeholder="Password"
-                        className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                    />
+                        <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Password"
+                            className="border-2 border-gray-300 h-10 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                        />
 
-                    {error && (
-                        <p className="text-red-500 text-center mt-2 animate-pulse">
-                            {error}
-                        </p>
-                    )}
+                        {error && (
+                            <p className="text-red-500 text-center mt-2 animate-pulse">
+                                {error}
+                            </p>
+                        )}
 
-                    <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
-                        <button
-                            type="submit"
-                            className="bg-uwa-blue font-bold text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
-                        >
-                            Login
-                        </button>
-                        <button
-                            type="button"
-                            className="bg-uwa-yellow font-bold text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
-                            onClick={toggleIsLoginCallBack}
-                        >
-                            Register
-                        </button>
-                    </div>
-                </form>
+                        <div className="flex flex-col space-y-2 justify-center md:flex-row md:space-x-5 md:space-y-0">
+                            <button
+                                type="submit"
+                                className="bg-uwa-blue font-bold text-white h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                            >
+                                Login
+                            </button>
+                            <button
+                                type="button"
+                                className="bg-uwa-yellow font-bold text-black h-8 md:px-5 transform transition-transform duration-200 hover:scale-105 rounded-xl"
+                                onClick={toggleIsLoginCallBack}
+                            >
+                                Register
+                            </button>
+                        </div>
+                    </form>
 
-                <a
-                    href="#"
-                    className="text-center underline text-gray-600 font-bold mt-5"
-                >
-                    Forgot Password
-                </a>
-            </div>
+                    <a
+                        href="#"
+                        className="text-center underline text-gray-600 font-bold mt-5"
+                        onClick={() => setForgotPassword(true)}
+                    >
+                        Forgot Password
+                    </a>
+                </div>
+            )}
+
             <ToastContainer
                 position="top-right"
                 autoClose={5000}
