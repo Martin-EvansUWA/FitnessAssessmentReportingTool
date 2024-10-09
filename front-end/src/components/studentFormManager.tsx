@@ -35,7 +35,7 @@ const StudentFormManager = ({
     const navigate = useNavigate();
 
     const goToFormResults = () => {
-        navigate("/form-results", { state: { factUserFormID, formTitle, formTemplateID, formCreatedFor } });
+        navigate("/form-results", { state: { factUserFormID, formTitle, formTemplateID } });
     };
 
     const goToDataEntryPage = () => {

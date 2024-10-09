@@ -521,22 +521,20 @@ def get_specific_student_data(
     student = crud.get_student_form_response(
         db, form_template_id=FormID, user_id=current_user.UserID
     )  # Example with student ID 1
-
+    print(student)
     return student
 
 
 # get specific students data from factUserFormID
-@app.get(
-    "/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}"
-)
+@app.get("/get_specific_student_data_fact_user_form_id/{factUserFormID}")
 def get_specific_student_data_fact_user_form_id(
     current_user: Annotated[DimUser, Depends(get_current_user)],
-    formTemplateID=int,
+    factUserFormID=int,
     formCreatedFor=int,
     db: Session = Depends(get_db),
 ):
-    student = crud.get_student_form_response_responce_id(
-        db, FormTemplateID=formTemplateID, SubjectUserID=formCreatedFor
+    student = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id=factUserFormID
     )
     return student
 

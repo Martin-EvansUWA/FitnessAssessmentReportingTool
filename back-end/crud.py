@@ -133,7 +133,7 @@ def save_student_form(db: Session, student_form: schemas.FactUserFormCreate):
     try:
         db_student_form = models.FactUserForm(
             FormTemplateId=student_form.FormTemplateID,
-            UserId=student_form.UserID,
+            UserID=student_form.UserID,
             SubjectUserId=student_form.SubjectUserID,
             IsComplete=student_form.IsComplete,
             CreatedAt=student_form.CreatedAt,
@@ -427,7 +427,7 @@ def get_filtered_exercises_by_form_template_id(db: Session, form_template_id):
         # Add the filtered response to the list only if it contains at least one matching entry
         if has_matching_entry:
             filtered_responses.append(filtered_data)
-    print(filtered_responses)
+   
     return filtered_responses
 
 
@@ -503,7 +503,7 @@ def calculate_normative_results(
                     normative_results[category][
                         exercise
                     ] = None  # or some other value indicating invalid norm
-
+    print(normative_results)
     return [normative_results]
 
 
