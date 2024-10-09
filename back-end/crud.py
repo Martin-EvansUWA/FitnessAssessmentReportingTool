@@ -476,7 +476,7 @@ def calculate_normative_results(
 
     # Get the maximum values for exercises
     max_values = get_max_values(db, form_template_id)
-
+    
     # Flatten the list of student responses into a single dictionary
     student_response_data = {}
     for response in student_responses:
@@ -503,7 +503,7 @@ def calculate_normative_results(
                     normative_results[category][
                         exercise
                     ] = None  # or some other value indicating invalid norm
-    print(normative_results)
+    
     return [normative_results]
 
 

@@ -150,7 +150,6 @@ async def current_user(
 
 @app.post("/register")
 async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
-    print(form_data)
     new_user = createNewUser(form_data=form_data.dict())
     try:
         ret = crud.create_DimUser(db, new_user)
@@ -521,7 +520,7 @@ def get_specific_student_data(
     student = crud.get_student_form_response(
         db, form_template_id=FormID, user_id=current_user.UserID
     )  # Example with student ID 1
-    print(student)
+    
     return student
 
 
@@ -705,7 +704,6 @@ def get_specific_student_data(
 
     if student is None:
         raise HTTPException(status_code=404, detail="Student data not found")
-
     return student
 
 
