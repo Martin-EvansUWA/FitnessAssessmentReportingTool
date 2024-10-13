@@ -550,6 +550,24 @@ def create_export_file(responses):
         return tmp.name
 
 
+def add_super_user_if_empty(db: Session):
+    # Check if the table is empty by querying the model (not the schema)
+    if not db.query(DimUser).first():
+        # Add the super user
+        super_user = DimUser(
+            UserID=1,
+            FirstName="SUPER",
+            LastName="USER",
+            email="SUPER.USER@mail.com",
+            isAdmin=True,
+            hashed_password="$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e",
+        )
+        db.add(super_user)
+        db.commit()
+        return {"message": "Super user added"}
+    else:
+        return {"message": "Super user already exists"}
+
 
 # delete template and all entries in FactUserForm related to the form template
 def delete_form_template(form_template_id: int, db: Session):
