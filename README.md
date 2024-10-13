@@ -2,6 +2,16 @@
 
 This project aims to modernize the fitness assessment process for a core unit in UWA's Sport and Exercise Science program. The platform enables students to collect, store, and report fitness assessment data, addressing the problem of outdated or non-representative normative values. By aggregating student data, the platform establishes dynamic "Sport Science Students Norms," providing accurate benchmarks for fitness comparisons. Additionally, it generates detailed reports and visualizations, helping students track their progress and identify areas for improvement.
 
+## Table of Contents
+
+-   [Fitness Assessment Reporting Tool](#fitness-assessment-reporting-tool)
+    -   [Table of Contents](#table-of-contents)
+    -   [Features](#features)
+    -   [Technologies](#technologies)
+    -   [Product Owner](#product-owner)
+    -   [Developers](#developers)
+    -   [IP Exploitation Model](#ip-exploitation-model)
+
 ## Features
 
 -   **Data Entry:** Students can log in and enter fitness assessment results.
@@ -10,6 +20,13 @@ This project aims to modernize the fitness assessment process for a core unit in
 -   **Visualisations:** Insightful analytics and visualisations to track progress and identify improvement areas.
 -   **Form Generation:** Staff can generate and manage fitness assessment forms.
 -   **Staff Access:** Administrative tools for staff to manage data, oversee reports, and maintain the integrity of the platform.
+
+## Technologies
+
+-   **Frontend:** React, TypeScript, Axios, Chart.js, Framer Motion, React Router, Tailwind CSS
+-   **Backend:** FastAPI, SQLAlchemy, Pydantic, Uvicorn, Passlib, Pandas
+
+Detailed installation and start guides are available within each directory (`front-end` and `back-end`).
 
 ## Product Owner
 
