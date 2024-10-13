@@ -1,46 +1,44 @@
-# Getting Started with Create React App
+# Fitness Assessment Reporting Tool - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend portion of the Fitness Assessment Reporting Tool, built using **React** and **TypeScript**. The platform allows students and staff to enter, store, and visualize fitness assessment data, generating reports and dynamic fitness norms.
 
-## Available Scripts
+## Table of Contents
 
-In the project directory, you can run:
+- [Fitness Assessment Reporting Tool - Frontend](#fitness-assessment-reporting-tool---frontend)
+  - [Table of Contents](#table-of-contents)
+  - [Project Overview](#project-overview)
+  - [Requirements](#requirements)
+  - [Installation Guide](#installation-guide)
+    - [1. Install Node.js and TypeScript](#1-install-nodejs-and-typescript)
+      - [Installing Node.js:](#installing-nodejs)
+      - [Installing TypeScript:](#installing-typescript)
 
-### `npm start`
+## Project Overview
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+This tool serves the Sport and Exercise Science students at UWA by providing a user-friendly interface for logging fitness assessments, visualizing results, and generating detailed reports. Students can track their progress, compare against their peers, and identify areas for improvement.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## Requirements
 
-### `npm test`
+Before starting, ensure you have the following installed on your machine:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- **Node.js** (version 16 or later)
+- **npm** (Node Package Manager, typically installed with Node.js)
+- **TypeScript**
 
-### `npm run build`
+## Installation Guide
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 1. Install Node.js and TypeScript
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Installing Node.js:
+To run the React project, you'll need to have Node.js installed. You can download it from the official website:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+- [Download Node.js](https://nodejs.org/)
 
-### `npm run eject`
+Ensure you have a version that supports TypeScript (version 16.x or later is recommended).
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+#### Installing TypeScript:
+Once Node.js is installed, you can install TypeScript globally using npm:
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+```bash
+npm install -g typescript
+```
