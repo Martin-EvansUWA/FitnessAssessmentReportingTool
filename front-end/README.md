@@ -32,7 +32,7 @@ Before starting, ensure you have the following installed on your machine:
 #### Installing Node.js:
 To run the React project, you'll need to have Node.js installed. You can download it from the official website:
 
-- [Download Node.js](https://nodejs.org/)
+- [Download Node.js](https://nodejs.org/en)
 
 Ensure you have a version that supports TypeScript (version 16.x or later is recommended).
 
@@ -41,4 +41,10 @@ Once Node.js is installed, you can install TypeScript globally using npm:
 
 ```bash
 npm install -g typescript
+```
+
+You can verify the installation by checking the version of TypeScript:
+  
+```bash
+tsc -v
 ```
