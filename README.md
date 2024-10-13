@@ -8,6 +8,7 @@ This project aims to modernize the fitness assessment process for a core unit in
 -   **Data Storage:** Secure storage and aggregation of data to generate class norms.
 -   **Reporting:** Detailed reports comparing individual fitness variables against class data.
 -   **Visualisations:** Insightful analytics and visualisations to track progress and identify improvement areas.
+-   **Form Generation:** Staff can generate and manage fitness assessment forms.
 -   **Staff Access:** Administrative tools for staff to manage data, oversee reports, and maintain the integrity of the platform.
 
 ## Product Owner

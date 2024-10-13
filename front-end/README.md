@@ -1,6 +1,6 @@
 # Fitness Assessment Reporting Tool - Frontend
 
-This is the frontend portion of the Fitness Assessment Reporting Tool, built using **React** and **TypeScript**. The platform allows students and staff to enter, store, and visualize fitness assessment data, generating reports and dynamic fitness norms.
+This is the frontend portion of the Fitness Assessment Reporting Tool, built using **React** and **TypeScript**. The platform allows students to enter, store, and visualize fitness assessment data, generating reports and dynamic fitness norms. Staff can generate and manage fitness assessment forms, oversee reports, and maintain the platform's integrity. It aims to modernize the fitness assessment process for UWA's Sport and Exercise Science program.
 
 ## Table of Contents
 
@@ -14,7 +14,7 @@ This is the frontend portion of the Fitness Assessment Reporting Tool, built usi
             -   [Installing TypeScript:](#installing-typescript)
         -   [2. Clone the Repository](#2-clone-the-repository)
         -   [3. Install Dependencies](#3-install-dependencies)
-        -   [4.Start the Development Server](#4start-the-development-server)
+        -   [4. Start the Development Server](#4-start-the-development-server)
 
 ## Project Overview
 
@@ -36,7 +36,7 @@ Before starting, ensure you have the following installed on your machine:
 
 To run the React project, you'll need to have Node.js installed. You can download it from the official website:
 
--   [Download Node.js](https://nodejs.org/)
+-   [Download Node.js](https://nodejs.org/en)
 
 Ensure you have a version that supports TypeScript (version 16.x or later is recommended).
 
@@ -79,7 +79,7 @@ npm install
 
 This command will download and install all necessary dependencies listed in the package.json file, ensuring that the project can run smoothly.
 
-### 4.Start the Development Server
+### 4. Start the Development Server
 
 Once the dependencies are installed, you can start the development server:
 
