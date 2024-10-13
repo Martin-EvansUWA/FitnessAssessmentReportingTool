@@ -21,11 +21,11 @@ This project aims to modernize the fitness assessment process for a core unit in
 
 ## Developers
 
--   Lloyd Junghyeon Na - [LloydN01](https://github.com/LloydN01) (<23433196@student.uwa.edu.au>)
--   Martin Evans <23621647@student.uwa.edu.au>
--   Lisa Regina Cantu <23374376@student.uwa.edu.au>
--   Jericho Carreon Cura <23102622@student.uwa.edu.au>
--   Meg Elizabeth Goody <23390643@student.uwa.edu.au>
+-   Lloyd Junghyeon Na [[LloydN01](https://github.com/LloydN01)] - <23433196@student.uwa.edu.au>
+-   Martin Evans [[Martin-EvansUWA](https://github.com/Martin-EvansUWA)] - <23621647@student.uwa.edu.au>
+-   Lisa Regina Cantu [[lcan2](https://github.com/lcan2)] - <23374376@student.uwa.edu.au>
+-   Jericho Carreon Cura [[hurrkage](https://github.com/hurrkage)] - <23102622@student.uwa.edu.au>
+-   Meg Elizabeth Goody [[megGoody](https://github.com/megGoody)] - <23390643@student.uwa.edu.au>
 
 ## IP Exploitation Model
 
