@@ -1,6 +1,6 @@
 # Fitness Assessment Reporting Tool
 
-This project aims to modernize the fitness assessment process for a core unit in UWA's Sport and Exercise Science program. The platform enables students to collect, store, and report fitness assessment data, addressing the problem of outdated or non-representative normative values. By aggregating student data, the platform establishes dynamic "Sport Science Students Norms," providing accurate benchmarks for fitness comparisons. Additionally, it generates detailed reports and visualizations, helping students track their progress and identify areas for improvement.
+This web-application aims to modernize the fitness assessment process for a core unit in UWA's Sport and Exercise Science program. The platform enables students to collect, store, and report fitness assessment data, addressing the problem of outdated or non-representative normative values. By aggregating student data, the platform establishes dynamic "Sport Science Students Norms," providing accurate benchmarks for fitness comparisons. Additionally, it generates detailed reports and visualizations, helping students track their progress and identify areas for improvement.
 
 ## Table of Contents
 
