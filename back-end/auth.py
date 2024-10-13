@@ -36,7 +36,7 @@ def verify_password(plain_password, hashed_password):
 
 
 def get_password_hash(password):
-    return pwd_context.hash(password, salt=SECRET_KEY)
+    return pwd_context.hash(password)
 
 
 class Token(BaseModel):
