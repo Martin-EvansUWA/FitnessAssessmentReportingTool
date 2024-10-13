@@ -34,11 +34,12 @@ from auth import (
     CREDENTIALS_EXCEPTION,
     SECRET_KEY,
     PasswordChangeRequest,
+    PasswordResetRequest,
     Token,
     TokenData,
-    PasswordResetRequest,
     authenticate_user,
     create_access_token,
+    get_password_hash,
     update_user_password,
 )
 from crud import *
@@ -78,9 +79,11 @@ app.add_middleware(
 )
 
 
-
 """adding admin when startup is called"""
+
+
 async def add_super_user_if_empty(db: Session):
+    hased_password = get_password_hash("1")
     if not db.query(models.DimUser).first():  # Use models.DimUser
         super_user = models.DimUser(  # Use models.DimUser
             UserID=1,
@@ -88,7 +91,7 @@ async def add_super_user_if_empty(db: Session):
             LastName="USER",
             email="SUPER.USER@mail.com",
             isAdmin=True,
-            hashed_password="$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e",
+            hashed_password=hased_password,
         )
         db.add(super_user)
         db.commit()  # Commit without await
@@ -96,19 +99,22 @@ async def add_super_user_if_empty(db: Session):
     else:
         return {"message": "Super user already exists"}
 
+
 @app.on_event("startup")
 async def startup_event():
     db = SessionLocal()
     try:
-        await add_super_user_if_empty(db)  # This still needs to be awaited if add_super_user_if_empty is async
+        await add_super_user_if_empty(
+            db
+        )  # This still needs to be awaited if add_super_user_if_empty is async
     finally:
         db.close()
+
 
 @app.on_event("shutdown")
 async def shutdown_event():
     # Perform any cleanup needed on shutdown
     pass
-
 
 
 """ AUTHENTICATION FUNCTIONS"""
@@ -218,11 +224,13 @@ def change_password(
         return {"message": "Password changed successfully"}
 
 
-#reset student password by admin
+# reset student password by admin
 @app.post("/reset_student_password")
 def reset_student_password(
     request: PasswordResetRequest,  # Accept request body containing both student_id and new_password
-    current_user: Annotated[models.DimUser, Depends(get_current_user)],  # Current logged-in user
+    current_user: Annotated[
+        models.DimUser, Depends(get_current_user)
+    ],  # Current logged-in user
     db: Session = Depends(get_db),  # Database session
 ):
     # Check if the current user is an admin
@@ -233,7 +241,9 @@ def reset_student_password(
         )
 
     # Check if the student exists
-    student = crud.get_DimUser(db, request.student_id)  # Use the student_id from the request body
+    student = crud.get_DimUser(
+        db, request.student_id
+    )  # Use the student_id from the request body
     if not student:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -245,9 +255,6 @@ def reset_student_password(
 
     # Return success message
     return {"message": "Password reset successfully"}
-
-
-
 
 
 """ HELPER FUNCTIONS """
@@ -553,7 +560,7 @@ def get_specific_student_data(
     student = crud.get_student_form_response(
         db, form_template_id=FormID, user_id=current_user.UserID
     )  # Example with student ID 1
-    
+
     return student
 
 
@@ -710,8 +717,6 @@ def export_form_responses(
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         filename="form_responses.xlsx",
     )
-
-
 
 
 # [admin] delete form template
