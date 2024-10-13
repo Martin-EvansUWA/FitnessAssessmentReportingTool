@@ -81,7 +81,7 @@ If you encounter any issues with admin permissions, you may need to run the comm
 Once the dependencies are installed, you can start the FastAPI server:
 
 ```
-uvicorn main:app --reload
+uvicorn app:app --reload
 ```
 
 This will start the FastAPI server, and you should be able to access the API documentation in your browser at:
@@ -105,7 +105,7 @@ Please log in as the super user and change the password to something more secure
 
 In the project directory, you can run the following scripts:
 
--   `uvicorn main:app --reload`: Starts the FastAPI server in development mode.
+-   `uvicorn app:app --reload`: Starts the FastAPI server in development mode.
 -   `pytest`: Runs the test suite.
 
 ## Other Useful FastAPI Tips
