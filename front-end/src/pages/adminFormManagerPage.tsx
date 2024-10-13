@@ -568,70 +568,47 @@ const AdminFormManagerPage = () => {
                             {/* Popup for specific student data */}
                             {showStudentPopup && (
                                 <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                                    <div className="bg-white p-5 rounded-lg shadow-lg">
-                                        <h2 className="font-bold text-lg">
-                                            Student Details
-                                        </h2>
+                                    <div className="bg-white p-5 rounded-lg shadow-lg max-w-lg w-full">
+                                        <h2 className="font-bold text-lg">Responce Details</h2>
                                         <hr className="w-20 border-t-2 border-uwa-yellow mt-1" />
+
                                         {studentDataError ? (
                                             <p>{studentDataError}</p>
                                         ) : (
                                             specificStudentData &&
-                                            Array.isArray(
-                                                specificStudentData
-                                            ) &&
-                                            specificStudentData.map(
-                                                (
-                                                    item: Record<string, any>,
-                                                    index: number
-                                                ) => {
-                                                    const studentDetails =
-                                                        item["Student Details"];
-                                                    return (
-                                                        <div key={index}>
-                                                            <ul>
-                                                                {Object.entries(
-                                                                    studentDetails
-                                                                ).map(
-                                                                    ([
-                                                                        key,
-                                                                        value,
-                                                                    ]) => (
-                                                                        <li
-                                                                            key={
-                                                                                key
-                                                                            }
-                                                                        >
-                                                                            <strong>
-                                                                                {
-                                                                                    key
-                                                                                }
-
-                                                                                :
-                                                                            </strong>{" "}
-                                                                            {String(
-                                                                                value
-                                                                            )}
+                                            Array.isArray(specificStudentData) &&
+                                            specificStudentData.map((item: Record<string, any>, index: number) => {
+                                                return (
+                                                    <div key={index} className="mt-4">
+                                                        {/* Loop through all keys in each item */}
+                                                        {Object.entries(item).map(([categoryKey, categoryValue]) => (
+                                                            <div key={categoryKey} className="mb-4">
+                                                                <h3 className="font-bold text-md mb-2">{categoryKey}</h3>
+                                                                <ul>
+                                                                    {/* Loop through the details of each category */}
+                                                                    {Object.entries(categoryValue).map(([key, value]) => (
+                                                                        <li key={key}>
+                                                                            <strong>{key}:</strong> {String(value)}
                                                                         </li>
-                                                                    )
-                                                                )}
-                                                            </ul>
-                                                        </div>
-                                                    );
-                                                }
-                                            )
+                                                                    ))}
+                                                                </ul>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                );
+                                            })
                                         )}
+
                                         <button
                                             className="mt-4 bg-blue-600 text-white px-4 py-2 rounded"
-                                            onClick={() =>
-                                                setShowStudentPopup(false)
-                                            }
+                                            onClick={() => setShowStudentPopup(false)}
                                         >
                                             Close
                                         </button>
                                     </div>
                                 </div>
                             )}
+
                         </div>
                     )
                 }

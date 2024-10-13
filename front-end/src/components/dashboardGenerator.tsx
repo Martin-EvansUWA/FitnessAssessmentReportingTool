@@ -79,6 +79,7 @@ const DashboardGenerator: React.FC<Props> = ({ factUserFormID, formTemplateID })
             <div>
                 <h1 className="text-2xl font-bold mb-5">Data Visualization</h1>
                 <hr className="w-28 border-t-2 border-uwa-yellow mt-2" />
+                
             </div>
             <div className="my-6">
                 <label className="mb-2">

@@ -78,6 +78,39 @@ app.add_middleware(
 )
 
 
+
+"""adding admin when startup is called"""
+async def add_super_user_if_empty(db: Session):
+    if not db.query(models.DimUser).first():  # Use models.DimUser
+        super_user = models.DimUser(  # Use models.DimUser
+            UserID=1,
+            FirstName="SUPER",
+            LastName="USER",
+            email="SUPER.USER@mail.com",
+            isAdmin=True,
+            hashed_password="$2b$12$Kdm5oMsFb7bbNeFBhBJ13.SXqhvXN3w5.D4f9pJFvLMB6psqAjK4e",
+        )
+        db.add(super_user)
+        db.commit()  # Commit without await
+        return {"message": "Super user added"}
+    else:
+        return {"message": "Super user already exists"}
+
+@app.on_event("startup")
+async def startup_event():
+    db = SessionLocal()
+    try:
+        await add_super_user_if_empty(db)  # This still needs to be awaited if add_super_user_if_empty is async
+    finally:
+        db.close()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    # Perform any cleanup needed on shutdown
+    pass
+
+
+
 """ AUTHENTICATION FUNCTIONS"""
 
 
@@ -150,7 +183,6 @@ async def current_user(
 
 @app.post("/register")
 async def register(form_data: DimUserCreate, db: Session = Depends(get_db)):
-    print(form_data)
     new_user = createNewUser(form_data=form_data.dict())
     try:
         ret = crud.create_DimUser(db, new_user)
@@ -521,22 +553,20 @@ def get_specific_student_data(
     student = crud.get_student_form_response(
         db, form_template_id=FormID, user_id=current_user.UserID
     )  # Example with student ID 1
-
+    
     return student
 
 
 # get specific students data from factUserFormID
-@app.get(
-    "/get_specific_student_data_fact_user_form_id/{formTemplateID}/{formCreatedFor}"
-)
+@app.get("/get_specific_student_data_fact_user_form_id/{factUserFormID}")
 def get_specific_student_data_fact_user_form_id(
     current_user: Annotated[DimUser, Depends(get_current_user)],
-    formTemplateID=int,
+    factUserFormID=int,
     formCreatedFor=int,
     db: Session = Depends(get_db),
 ):
-    student = crud.get_student_form_response_responce_id(
-        db, FormTemplateID=formTemplateID, SubjectUserID=formCreatedFor
+    student = crud.get_student_form_response_fact_user_form_id(
+        db, fact_user_form_id=factUserFormID
     )
     return student
 
@@ -682,9 +712,6 @@ def export_form_responses(
     )
 
 
-@app.get("/add_super_admin")
-def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
-    return add_super_user_if_empty(db)
 
 
 # [admin] delete form template
@@ -707,7 +734,6 @@ def get_specific_student_data(
 
     if student is None:
         raise HTTPException(status_code=404, detail="Student data not found")
-
     return student
 
 

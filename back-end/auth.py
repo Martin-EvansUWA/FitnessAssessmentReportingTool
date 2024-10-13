@@ -32,11 +32,11 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 180
 
 
 def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+    return pwd_context.verify(plain_password + SECRET_KEY, hashed_password)
 
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    return pwd_context.hash(password + SECRET_KEY)
 
 
 class Token(BaseModel):

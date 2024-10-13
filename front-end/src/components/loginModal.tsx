@@ -255,12 +255,7 @@ const LoginModal = ({
                     </div>
                 </form>
 
-                <a
-                    href="#"
-                    className="text-center underline text-gray-600 font-bold mt-5"
-                >
-                    Forgot Password
-                </a>
+                
             </div>
             <ToastContainer
                 position="top-right"
