@@ -21,7 +21,7 @@ This project aims to modernize the fitness assessment process for a core unit in
 
 ## Developers
 
--   Lloyd Junghyeon Na <23433196@student.uwa.edu.au>
+-   Lloyd Junghyeon Na <23433196@student.uwa.edu.au> - [LloydN01](https://github.com/LloydN01)
 -   Martin Evans <23621647@student.uwa.edu.au>
 -   Lisa Regina Cantu <23374376@student.uwa.edu.au>
 -   Jericho Carreon Cura <23102622@student.uwa.edu.au>
