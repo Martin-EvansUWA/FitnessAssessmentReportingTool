@@ -4,17 +4,17 @@ This is the frontend portion of the Fitness Assessment Reporting Tool, built usi
 
 ## Table of Contents
 
-- [Fitness Assessment Reporting Tool - Frontend](#fitness-assessment-reporting-tool---frontend)
-  - [Table of Contents](#table-of-contents)
-  - [Project Overview](#project-overview)
-  - [Requirements](#requirements)
-  - [Installation Guide](#installation-guide)
-    - [1. Install Node.js and TypeScript](#1-install-nodejs-and-typescript)
-      - [Installing Node.js:](#installing-nodejs)
-      - [Installing TypeScript:](#installing-typescript)
-    - [2. Clone the Repository](#2-clone-the-repository)
-    - [3. Install Dependencies](#3-install-dependencies)
-    - [4. Start the Development Server](#4-start-the-development-server)
+-   [Fitness Assessment Reporting Tool - Frontend](#fitness-assessment-reporting-tool---frontend)
+    -   [Table of Contents](#table-of-contents)
+    -   [Project Overview](#project-overview)
+    -   [Requirements](#requirements)
+    -   [Installation Guide](#installation-guide)
+        -   [1. Install Node.js and TypeScript](#1-install-nodejs-and-typescript)
+            -   [Installing Node.js:](#installing-nodejs)
+            -   [Installing TypeScript:](#installing-typescript)
+        -   [2. Clone the Repository](#2-clone-the-repository)
+        -   [3. Install Dependencies](#3-install-dependencies)
+        -   [4. Start the Development Server](#4-start-the-development-server)
 
 ## Project Overview
 
@@ -58,6 +58,7 @@ tsc -v
 ### 2. Clone the Repository
 
 **Skip this step if you have already cloned the repository (from the back-end README).**
+
 Clone this repository to your local machine using the following command:
 
 ```bash

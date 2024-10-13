@@ -14,6 +14,7 @@ This is the backend portion of the Fitness Assessment Reporting Tool, built usin
         -   [3. Clone the Repository](#3-clone-the-repository)
         -   [4. Install Dependencies](#4-install-dependencies)
         -   [5. Start the Development Server](#5-start-the-development-server)
+    -   [Initial Super User Account](#initial-super-user-account)
     -   [Available Scripts](#available-scripts)
     -   [Other Useful FastAPI Tips](#other-useful-fastapi-tips)
 
@@ -50,6 +51,7 @@ Replace 'your_secret_key' with the HEX Code generated from step 1. Make sure to 
 ### 3. Clone the Repository
 
 **Skip this step if you have already cloned the repository (from the front-end README).**
+
 Clone this repository to your local machine using the following command:
 
 ```bash
@@ -89,6 +91,15 @@ http://localhost:8000/docs
 ```
 
 The server will automatically reload when you make changes to the code, allowing for quick and easy development.
+
+## Initial Super User Account
+
+When the server first starts, a SQLite3 database will be generated automatically with a super user account pre-registered with the following credentials:
+
+-   **UWA ID:** 1
+-   **Password:** 1
+
+Please log in as the super user and change the password to something more secure via the app's profile page.
 
 ## Available Scripts
 
