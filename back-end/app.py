@@ -679,9 +679,6 @@ def export_form_responses(
     )
 
 
-@app.get("/add_super_admin")
-def insert_super_user_if_empty_route(db: Session = Depends(get_db)):
-    return add_super_user_if_empty(db)
 
 
 # [admin] delete form template
